@@ -43,9 +43,9 @@ function Support() {
       {/* Social Links Grid */}
       <div className="grid grid-cols-3 gap-6">
         {socialLinks.map((link) => (
-          <div key={link.name} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div key={link.name} className="card p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold">{link.icon}</span>
               </div>
               <h3 className="text-xl font-semibold text-white">{link.name}</h3>
@@ -56,14 +56,14 @@ function Support() {
             </p>
             
             <div className="mb-4">
-              <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3">
+              <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
                 <span className="text-white/80 font-mono text-sm">{link.handle}</span>
               </div>
             </div>
             
             <button 
               onClick={() => window.open(link.url, '_blank')}
-              className="w-full bg-white/10 hover:bg-white/15 text-white py-3 rounded-lg transition-all font-medium"
+              className="w-full bg-white/10 hover:bg-white/15 text-white py-3 rounded-xl transition-all font-medium"
             >
               {link.buttonText}
             </button>
@@ -72,7 +72,7 @@ function Support() {
       </div>
 
       {/* Copy Session Logs */}
-      <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+      <div className="card p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
             <h3 className="text-xl font-semibold text-white mb-2">Attach session logs</h3>
@@ -82,7 +82,7 @@ function Support() {
           </div>
           <button
             onClick={handleCopyLogs}
-            className="bg-white hover:bg-gray-100 text-gray-900 px-8 py-3 rounded-lg font-semibold transition-all whitespace-nowrap"
+            className="bg-white hover:bg-gray-100 text-gray-900 px-8 py-3 rounded-xl font-semibold transition-all whitespace-nowrap"
           >
             Copy session logs
           </button>
@@ -90,7 +90,7 @@ function Support() {
       </div>
 
       {/* Response Time Info */}
-      <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
+      <div className="card p-6 text-center">
         <div className="text-white/60 space-y-1">
           <p className="text-lg">We typically respond within 24 hours</p>
           <p className="text-sm">Support available in multiple timezones</p>

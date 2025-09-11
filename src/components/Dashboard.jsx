@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Call from './Call'
 import Support from './Support'
 import BalanceModule from './BalanceModule'
+import CallerID from './CallerID'
 
 function Dashboard() {
   const [activeModule, setActiveModule] = useState('Call')
@@ -12,6 +13,8 @@ function Dashboard() {
     switch (activeModule) {
       case 'Call':
         return <Call />
+      case 'Caller ID':
+        return <CallerID />
       case 'Balance':
         return <BalanceModule />
       case 'Support':
@@ -34,40 +37,46 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-black">
-      {/* Navbar */}
-      <nav className="p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between">
-            <img src="/logo.png" alt="Logo" className="h-12 w-auto" />
-            <button 
-              onClick={() => window.location.href = '/'}
-              className="bg-white/10 hover:bg-white/15 text-white px-4 py-2 rounded-lg text-sm transition-all"
-            >
-              Log out
-            </button>
-          </div>
-        </div>
-      </nav>
+      {/* Background Overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#0e1b4f] via-[#0b0f23] to-black opacity-90"></div>
+      <div className="pointer-events-none absolute -top-48 -left-24 h-[40rem] w-[40rem] rounded-full bg-gradient-to-tr from-[#0A43FF]/30 to-transparent blur-3xl"></div>
 
       {/* Main Layout */}
-      <div className="px-6 pb-6">
+      <div className="relative p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex gap-6">
-            {/* Menu Card */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 w-[200px] h-fit">
-              <div className="flex flex-col gap-3">
-                {menuItems.map((item) => (
-                  <button
-                    key={item}
-                    onClick={() => setActiveModule(item)}
-                    className={`px-4 py-2 rounded-lg text-sm text-start font-medium transition-all duration-200 ${activeModule === item
-                      ? 'bg-white text-gray-900 shadow-lg'
-                      : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
-                      }`}
-                  >
-                    {item}
-                  </button>
-                ))}
+            {/* Sidebar Column */}
+            <div className="w-[200px] flex flex-col gap-6">
+              {/* Logo Card */}
+              <div className="card p-6 flex items-center justify-center">
+                <img src="/logo.png" alt="Logo" className="h-16 w-auto" />
+              </div>
+
+              {/* Menu Card */}
+              <div className="card p-2">
+                <div className="flex flex-col gap-3">
+                  {menuItems.map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => setActiveModule(item)}
+                      className={`w-full text-left px-4 py-3 rounded-xl ring-1 ring-white/10 font-medium transition-all duration-200 ${activeModule === item
+                        ? 'bg-white/10 border border-white/20 text-white'
+                        : 'hover:bg-white/5 text-white/70'
+                        }`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Server Status Card */}
+              <div className="card p-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-white/70 text-sm">Solity API:</span>
+                  <span className="text-green-300 text-sm font-medium">Online</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
               </div>
             </div>
 

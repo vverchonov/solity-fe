@@ -30,8 +30,12 @@ function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-black">
+      {/* Background Overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#0e1b4f] via-[#0b0f23] to-black opacity-90"></div>
+      <div className="pointer-events-none absolute -top-48 -left-24 h-[40rem] w-[40rem] rounded-full bg-gradient-to-tr from-[#0A43FF]/30 to-transparent blur-3xl"></div>
+      
       {/* Navbar */}
-      <nav className="p-6">
+      <nav className="relative p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center">
             <img src="/logo.png" alt="Logo" className="h-12 w-auto" />
@@ -40,11 +44,11 @@ function Login() {
       </nav>
       
       {/* Main Content */}
-      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-120px)]">
+      <div className="relative flex items-center justify-center p-4 min-h-[calc(100vh-120px)]">
         <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-8 lg:gap-12">
           
           {/* Welcome Card */}
-          <div className="w-full lg:w-1/2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 lg:p-12">
+          <div className="w-full lg:w-1/2 card p-8 lg:p-12">
             <div className="space-y-8">
               <div>
                 <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
@@ -101,7 +105,7 @@ function Login() {
           </div>
 
           {/* Auth Card */}
-          <div className="w-full lg:w-1/2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 lg:p-12">
+          <div className="w-full lg:w-1/2 card p-8 lg:p-12">
             <div className="space-y-8">
               <div className="text-center">
                 <h3 className="text-2xl lg:text-3xl font-bold text-white mb-8">
@@ -113,7 +117,7 @@ function Login() {
               <div className="flex bg-white/5 rounded-xl p-1">
                 <button
                   onClick={() => setIsLogin(true)}
-                  className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
                     isLogin 
                       ? 'bg-white text-gray-900 shadow-lg' 
                       : 'text-white/60 hover:text-white'
@@ -123,7 +127,7 @@ function Login() {
                 </button>
                 <button
                   onClick={() => setIsLogin(false)}
-                  className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
                     !isLogin 
                       ? 'bg-white text-gray-900 shadow-lg' 
                       : 'text-white/60 hover:text-white'
@@ -145,7 +149,7 @@ function Login() {
                     name="username"
                     value={formData.username}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
                     placeholder="Enter your username"
                     required
                   />
@@ -161,7 +165,7 @@ function Login() {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
                     placeholder="Enter your password"
                     required
                   />
@@ -178,7 +182,7 @@ function Login() {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
                       placeholder="Confirm your password"
                       required
                     />
@@ -187,7 +191,7 @@ function Login() {
 
                 <button
                   type="submit"
-                  className="w-full py-3 px-6 bg-white hover:bg-gray-100 text-gray-900 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="w-full py-3 px-6 bg-white hover:bg-gray-100 text-gray-900 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {isLogin ? 'Sign In' : 'Create Account'}
                 </button>
