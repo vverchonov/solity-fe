@@ -204,6 +204,23 @@ function Call() {
               )}
             </div>
 
+            {/* Caller ID */}
+            <div className="mb-6">
+              <label className="text-white/70 text-sm block mb-3">Caller ID</label>
+              <div className="flex gap-3 items-center">
+                <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+                  {callerID}
+                </div>
+                <button
+                  onClick={randomizeCallerID}
+                  disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
+                  className={`bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-xl text-sm transition-all whitespace-nowrap w-32 h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  Randomize
+                </button>
+              </div>
+            </div>
+
             {/* Phone Input */}
             <div className="mb-6">
               <label className="text-white/70 text-sm block mb-3">To (phone)</label>
@@ -227,23 +244,6 @@ function Call() {
                     }`}
                 >
                   {isInCall || callState.callStatus === 'calling' ? 'End Call' : 'Call'}
-                </button>
-              </div>
-            </div>
-
-            {/* Caller ID */}
-            <div className="mb-6">
-              <label className="text-white/70 text-sm block mb-3">Caller ID</label>
-              <div className="flex gap-3 items-center">
-                <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
-                  {callerID}
-                </div>
-                <button
-                  onClick={randomizeCallerID}
-                  disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
-                  className={`bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-xl text-sm transition-all whitespace-nowrap w-32 h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  Randomize
                 </button>
               </div>
               <div className="text-gray-400 text-xs mt-2">
