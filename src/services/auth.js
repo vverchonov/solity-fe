@@ -1,0 +1,189 @@
+import apiClient from '../lib/axios'
+
+// Token management utilities (only access token in localStorage)
+export const tokenUtils = {
+  setAccessToken: (accessToken) => {
+    localStorage.setItem('accessToken', accessToken)
+  },
+
+  getAccessToken: () => localStorage.getItem('accessToken'),
+
+  clearAccessToken: () => {
+    localStorage.removeItem('accessToken')
+  },
+
+  hasAccessToken: () => {
+    const accessToken = tokenUtils.getAccessToken()
+    return !!accessToken
+  },
+
+  // Decode JWT token to check expiration
+  isTokenExpired: (token) => {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      const currentTime = Date.now() / 1000
+      return payload.exp < currentTime
+    } catch (error) {
+      return true
+    }
+  }
+}
+
+// Authentication API functions
+export const authAPI = {
+  // Login with username and password
+  login: async (username, password) => {
+    try {
+      const response = await apiClient.post('/auth/login', {
+        username,
+        password
+      })
+
+      const { accessToken, user } = response.data
+
+      if (accessToken) {
+        tokenUtils.setAccessToken(accessToken)
+      }
+
+      return {
+        success: true,
+        data: {
+          user,
+          accessToken
+        }
+      }
+    } catch (error) {
+      console.error('Login failed:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Login failed'
+      }
+    }
+  },
+
+  // Create new account
+  register: async (username, password, email = null) => {
+    try {
+      const response = await apiClient.post('/auth/register', {
+        username,
+        password,
+        email
+      })
+
+      const { accessToken, user } = response.data
+
+      if (accessToken) {
+        tokenUtils.setAccessToken(accessToken)
+      }
+
+      return {
+        success: true,
+        data: {
+          user,
+          accessToken
+        }
+      }
+    } catch (error) {
+      console.error('Registration failed:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Registration failed'
+      }
+    }
+  },
+
+  // Refresh access token using httpOnly refresh token cookie
+  refreshToken: async () => {
+    try {
+      // The refresh token is sent as an httpOnly cookie automatically
+      const response = await apiClient.post('/auth/refresh')
+
+      const { accessToken: newAccessToken } = response.data
+
+      tokenUtils.setAccessToken(newAccessToken)
+
+      return {
+        success: true,
+        data: {
+          accessToken: newAccessToken
+        }
+      }
+    } catch (error) {
+      console.error('Token refresh failed:', error)
+      tokenUtils.clearAccessToken()
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Token refresh failed'
+      }
+    }
+  },
+
+  // Logout user
+  logout: async () => {
+    try {
+      // Notify server about logout to invalidate httpOnly refresh token cookie
+      await apiClient.post('/auth/logout')
+
+      tokenUtils.clearAccessToken()
+
+      return {
+        success: true
+      }
+    } catch (error) {
+      console.error('Logout failed:', error)
+      // Clear access token even if server request fails
+      tokenUtils.clearAccessToken()
+      return {
+        success: true // Consider logout successful even if server call fails
+      }
+    }
+  },
+
+  // Get current user profile
+  getCurrentUser: async () => {
+    try {
+      if (!tokenUtils.hasAccessToken()) {
+        throw new Error('No access token')
+      }
+
+      const response = await apiClient.get('/auth/me')
+
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (error) {
+      console.error('Get current user failed:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Failed to get user info'
+      }
+    }
+  },
+
+  // Check if user is authenticated
+  isAuthenticated: () => {
+    const accessToken = tokenUtils.getAccessToken()
+    if (!accessToken) return false
+
+    // Check if access token is expired
+    return !tokenUtils.isTokenExpired(accessToken)
+  },
+
+  // Force refresh token if access token is expired
+  ensureValidToken: async () => {
+    const accessToken = tokenUtils.getAccessToken()
+    
+    if (!accessToken) {
+      return { success: false, error: 'No access token' }
+    }
+
+    if (tokenUtils.isTokenExpired(accessToken)) {
+      return await authAPI.refreshToken()
+    }
+
+    return { success: true }
+  }
+}
+
+export default authAPI

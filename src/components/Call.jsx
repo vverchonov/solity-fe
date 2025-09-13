@@ -1,14 +1,49 @@
 import { useState, useEffect } from 'react'
 import Balance from './Balance'
+import { CallModal } from './CallModal'
+import { useCall } from '../contexts/CallProvider'
 
 function Call() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [callerID, setCallerID] = useState('+12025550123')
-  const [isMuted, setIsMuted] = useState(false)
   const [soundDisabled, setSoundDisabled] = useState(false)
-  const [isInCall, setIsInCall] = useState(false)
   const [callStartTime, setCallStartTime] = useState(null)
   const [callDuration, setCallDuration] = useState(0)
+  const [callStatus, setCallStatus] = useState('ready') // 'ready', 'ringing', 'in-call', 'ended'
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  
+  // Use CallProvider
+  const { 
+    callState, 
+    makeCall, 
+    hangupCall, 
+    toggleMute, 
+    sendDTMF,
+    connectToServer,
+    callConfig,
+    setCallConfig 
+  } = useCall()
+  
+  // Derived state from CallProvider
+  const isInCall = callState.callStatus === 'in-call'
+  const isMuted = callState.isMuted
+
+  // Sync with CallProvider state changes
+  useEffect(() => {
+    if (callState.callStatus === 'in-call' && !callStartTime) {
+      setCallStartTime(Date.now())
+      setIsModalVisible(true)
+      setCallStatus('in-call')
+    } else if (callState.callStatus === 'idle') {
+      setCallStartTime(null)
+      setCallDuration(0)
+      setIsModalVisible(false)
+      if (callStatus === 'in-call') {
+        setCallStatus('ended')
+        setTimeout(() => setCallStatus('ready'), 5000)
+      }
+    }
+  }, [callState.callStatus, callStartTime, callStatus])
 
   useEffect(() => {
     let interval = null
@@ -26,6 +61,25 @@ function Call() {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
+
+  const getStatusPill = () => {
+    // Use CallProvider status when available, fallback to local status
+    const status = isInCall ? 'in-call' : (callState.callStatus === 'calling' ? 'ringing' : callStatus)
+    
+    switch (status) {
+      case 'ringing':
+      case 'calling':
+        return { text: 'Ringing...', className: 'bg-yellow-500/20 border border-yellow-400/30 text-yellow-100 px-3 py-1 rounded-full text-sm' }
+      case 'in-call':
+        return { text: 'In Call', className: 'bg-green-500/20 border border-green-400/30 text-green-100 px-3 py-1 rounded-full text-sm' }
+      case 'ended':
+        return { text: 'Call Ended', className: 'bg-red-500/20 border border-red-400/30 text-red-100 px-3 py-1 rounded-full text-sm' }
+      case 'connecting':
+        return { text: 'Connecting...', className: 'bg-blue-500/20 border border-blue-400/30 text-blue-100 px-3 py-1 rounded-full text-sm' }
+      default:
+        return { text: callState.isRegistered ? 'Ready' : 'Connecting...', className: 'chip' }
+    }
   }
 
   const handleNumberClick = (num) => {
@@ -50,30 +104,69 @@ function Call() {
     setCallerID(randomNum)
   }
 
-  const handleMute = () => {
-    setIsMuted(!isMuted)
-  }
 
   const handleSoundToggle = () => {
     setSoundDisabled(!soundDisabled)
   }
 
-  const handleStartCall = () => {
+  const handleStartCall = async () => {
     if (phoneNumber.trim()) {
-      setIsInCall(true)
+      setCallStatus('ringing')
       setCallStartTime(Date.now())
-      console.log('Call started')
+      console.log('Starting call...')
+
+      try {
+        await makeCall(phoneNumber, callerID)
+        setIsModalVisible(true)
+        console.log('Call initiated')
+      } catch (error) {
+        setCallStatus('ready')
+        console.error('Call failed:', error)
+      }
     }
   }
 
-  const handleEndCall = () => {
+  const handleEndCall = async () => {
     console.log('Call ended')
-    // Reset states
-    setIsMuted(false)
-    setSoundDisabled(false)
-    setIsInCall(false)
-    setCallStartTime(null)
-    setCallDuration(0)
+
+    try {
+      await hangupCall()
+      
+      // Show "Call Ended" status
+      setCallStatus('ended')
+      setCallStartTime(null)
+      setCallDuration(0)
+      setSoundDisabled(false)
+      setIsModalVisible(false)
+
+      // Return to "Ready" after 5 seconds
+      setTimeout(() => {
+        setCallStatus('ready')
+      }, 5000)
+    } catch (error) {
+      console.error('Error ending call:', error)
+    }
+  }
+
+  const handleDTMF = (digit) => {
+    console.log('DTMF digit pressed:', digit)
+    sendDTMF(digit)
+  }
+
+  const handleMute = async () => {
+    try {
+      await toggleMute()
+    } catch (error) {
+      console.error('Error toggling mute:', error)
+    }
+  }
+
+  const handleMinimizeModal = () => {
+    setIsModalVisible(false)
+  }
+
+  const handleShowModal = () => {
+    setIsModalVisible(true)
   }
 
   const numberPadButtons = [
@@ -88,11 +181,23 @@ function Call() {
       {/* Call Card - Top Left */}
       <div className="col-span-8 card p-4 flex justify-center">
         <div className='flex flex-row w-full gap-4'>
-          <div className='w-9/12'>
+          <div className='w-full'>
             {/* Status */}
             <div className="flex items-center gap-3 mb-6">
-              <span className="chip">Ready</span>
-              {isInCall && (
+              <span className={getStatusPill().className}>{getStatusPill().text}</span>
+              {isInCall && !isModalVisible && (
+                <button
+                  onClick={handleShowModal}
+                  className="bg-green-500/20 border border-green-400/30 text-green-100 px-3 py-1 rounded-full text-sm hover:bg-green-500/30 hover:scale-105 transition-all cursor-pointer flex items-center gap-2"
+                >
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  {formatCallDuration(callDuration)} • Click to expand
+                </button>
+              )}
+              {isInCall && isModalVisible && (
                 <span className="text-white/70 text-sm">
                   Call duration: {formatCallDuration(callDuration)}
                 </span>
@@ -108,18 +213,20 @@ function Call() {
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="e.g. +44 20 7946 0958"
-                  disabled={isInCall}
-                  className={`flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 ${isInCall ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isInCall || callState.callStatus === 'calling'}
+                  className={`flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 ${isInCall || callState.callStatus === 'calling' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
-                <button 
-                  onClick={isInCall ? handleEndCall : handleStartCall}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap w-28 h-[50px] ${
-                    isInCall 
-                      ? 'bg-red-500 hover:bg-red-600 text-white' 
-                      : 'bg-white hover:bg-gray-100 text-gray-900'
-                  }`}
+                <button
+                  onClick={isInCall || callState.callStatus === 'calling' ? handleEndCall : handleStartCall}
+                  disabled={callStatus === 'ended'}
+                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap w-32 h-[50px] ${isInCall || callState.callStatus === 'calling'
+                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      : callStatus === 'ended'
+                        ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                        : 'bg-white hover:bg-gray-100 text-gray-900'
+                    }`}
                 >
-                  {isInCall ? 'End Call' : 'Call'}
+                  {isInCall || callState.callStatus === 'calling' ? 'End Call' : 'Call'}
                 </button>
               </div>
             </div>
@@ -133,8 +240,8 @@ function Call() {
                 </div>
                 <button
                   onClick={randomizeCallerID}
-                  disabled={isInCall}
-                  className={`bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-xl text-sm transition-all whitespace-nowrap w-28 h-[50px] ${isInCall ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
+                  className={`bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-xl text-sm transition-all whitespace-nowrap w-32 h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Randomize
                 </button>
@@ -144,8 +251,8 @@ function Call() {
               </div>
             </div>
 
-            {/* Call Control Buttons - Only show when in call */}
-            {isInCall && (
+            {/* Call Control Buttons - Only show when in call and modal is not visible */}
+            {isInCall && !isModalVisible && (
               <div className="flex gap-3">
                 <button
                   onClick={handleMute}
@@ -172,7 +279,7 @@ function Call() {
           </div>
 
           {/* Number Pad */}
-          <div className="w-3/12 flex justify-center h-fit my-auto">
+          <div className="w-3/12 flex justify-center h-fit my-auto hidden">
             <div className="grid grid-cols-3 gap-4">
               {numberPadButtons.flat().map((btn) => (
                 <button
@@ -220,6 +327,20 @@ function Call() {
           </div>
         </div>
       </div>
+
+      {/* Call Modal */}
+      <CallModal
+        isVisible={isInCall && isModalVisible}
+        phoneNumber={phoneNumber}
+        callDuration={callDuration}
+        isMuted={isMuted}
+        soundDisabled={soundDisabled}
+        onEndCall={handleEndCall}
+        onMute={handleMute}
+        onSoundToggle={handleSoundToggle}
+        onDTMF={handleDTMF}
+        onMinimize={handleMinimizeModal}
+      />
     </div>
   )
 }
