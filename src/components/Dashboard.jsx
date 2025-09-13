@@ -48,8 +48,8 @@ function Dashboard() {
             {/* Sidebar Column */}
             <div className="w-[200px] flex flex-col gap-6">
               {/* Logo Card */}
-              <div className="card p-6 flex items-center justify-center">
-                <img src="/logo.png" alt="Logo" className="h-16 w-auto" />
+              <div className="card p-2 flex items-center justify-center">
+                <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
               </div>
 
               {/* Menu Card */}
