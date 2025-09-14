@@ -20,7 +20,7 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Form submitted:', formData)
-    
+
     if (isLogin) {
       navigate('/dashboard')
     } else {
@@ -33,7 +33,7 @@ function Login() {
       {/* Background Overlay */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#0e1b4f] via-[#0b0f23] to-black opacity-90"></div>
       <div className="pointer-events-none absolute -top-48 -left-24 h-[40rem] w-[40rem] rounded-full bg-gradient-to-tr from-[#0A43FF]/30 to-transparent blur-3xl"></div>
-      
+
       {/* Navbar */}
       <nav className="relative p-6">
         <div className="max-w-7xl mx-auto">
@@ -42,23 +42,23 @@ function Login() {
           </div>
         </div>
       </nav>
-      
+
       {/* Main Content */}
       <div className="relative flex items-center justify-center p-4 min-h-[calc(100vh-120px)]">
         <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-8 lg:gap-12">
-          
+
           {/* Welcome Card */}
           <div className="w-full lg:w-1/2 card p-8 lg:p-12">
             <div className="space-y-8">
               <div>
                 <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-                  Welcome
+                  Solity Mobile
                 </h1>
                 <h2 className="text-2xl lg:text-3xl text-blue-300 mb-6">
-                  Access Solity
+                  Solana Ecosystem
                 </h2>
                 <p className="text-white/70 text-lg leading-relaxed">
-                  Authenticate to continue to the decentralized caller. Choose wallet or email — your session stays local.
+                  Onchain telecommunication company providing worldwide service. Solana ecosystem based. Private calls any number to any number.
                 </p>
               </div>
 
@@ -67,37 +67,32 @@ function Login() {
                   <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                   <div>
                     <span className="text-blue-300 font-semibold">on-chain</span>
-                    <p className="text-white/60 text-sm">Transparent credits in SOL</p>
+                    <p className="text-white/60 text-sm">Transparent fees in SOL</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                   <div>
                     <span className="text-green-300 font-semibold">private</span>
-                    <p className="text-white/60 text-sm">No call history stored</p>
+                    <p className="text-white/60 text-sm">No KYC, no call history</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                   <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
                   <div>
-                    <span className="text-purple-300 font-semibold">minimal</span>
-                    <p className="text-white/60 text-sm">Just a dialer, nothing else</p>
+                    <span className="text-purple-300 font-semibold">decentralised</span>
+                    <p className="text-white/60 text-sm">Any numbers to use</p>
                   </div>
                 </div>
               </div>
 
               <div className="pt-8 border-t border-white/10">
                 <div className="space-y-2">
-                  <p className="text-white/50 text-sm">Session wallet</p>
-                  <p className="text-white font-mono text-lg">SOL1TyA68.DuK9</p>
-                  <div className="flex items-center gap-2 mt-4">
-                    <span className="text-white/50 text-sm">Status</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-green-300 text-sm font-medium">Online</span>
-                    </div>
+                  <p className="text-white font-mono text-lg">CA: soon</p>
+                  <div className="mt-4">
+
                   </div>
                 </div>
               </div>
@@ -117,21 +112,19 @@ function Login() {
               <div className="flex bg-white/5 rounded-xl p-1">
                 <button
                   onClick={() => setIsLogin(true)}
-                  className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
-                    isLogin 
-                      ? 'bg-white text-gray-900 shadow-lg' 
-                      : 'text-white/60 hover:text-white'
-                  }`}
+                  className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${isLogin
+                    ? 'bg-white text-gray-900 shadow-lg'
+                    : 'text-white/60 hover:text-white'
+                    }`}
                 >
                   Login
                 </button>
                 <button
                   onClick={() => setIsLogin(false)}
-                  className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
-                    !isLogin 
-                      ? 'bg-white text-gray-900 shadow-lg' 
-                      : 'text-white/60 hover:text-white'
-                  }`}
+                  className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${!isLogin
+                    ? 'bg-white text-gray-900 shadow-lg'
+                    : 'text-white/60 hover:text-white'
+                    }`}
                 >
                   Sign Up
                 </button>

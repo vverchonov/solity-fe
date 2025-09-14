@@ -25,10 +25,10 @@ function Balance() {
 
       {/* Balance Display */}
       <div className="mb-4">
-        <div className="text-3xl font-bold text-white mb-2">
+        <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
           0.0000 SOL
         </div>
-        <p className="text-yellow-400 text-xs">
+        <p className="text-yellow-400 text-xs mt-1">
           Low balance — please top up before a call.
         </p>
       </div>
@@ -52,16 +52,8 @@ function Balance() {
       {/* Deposit Address */}
       <div className="mb-4">
         <h3 className="text-white/70 text-sm mb-2">Deposit Address</h3>
-        <div className="flex gap-2">
-          <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
-            <span className="text-white font-mono text-sm">{depositAddress}</span>
-          </div>
-          <button
-            onClick={handleCopyAddress}
-            className="bg-white/10 hover:bg-white/15 text-white px-3 py-2 rounded-xl text-sm transition-all"
-          >
-            Copy
-          </button>
+        <div className="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+          <span className="text-white font-mono text-sm">{depositAddress}</span>
         </div>
         <div className="mt-2 text-xs text-white/50">
           <p>Send only SOL to this address.</p>

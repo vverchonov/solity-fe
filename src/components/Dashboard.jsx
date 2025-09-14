@@ -2,26 +2,62 @@ import { useState } from 'react'
 import Call from './Call'
 import Support from './Support'
 import BalanceModule from './BalanceModule'
-import CallerID from './CallerID'
 import Scaling from './Scaling'
 
 function Dashboard() {
   const [activeModule, setActiveModule] = useState('Call')
 
-  const menuItems = ['Call', 'Caller ID', 'Balance', 'About', 'Scaling', 'Support']
+  const menuItems = ['Call', 'Balance', 'E-SIM', 'Support', 'About']
 
   const renderModule = () => {
     switch (activeModule) {
       case 'Call':
         return <Call />
-      case 'Caller ID':
-        return <CallerID />
       case 'Balance':
         return <BalanceModule />
+      case 'About':
+        return (
+          <div className="h-full space-y-6">
+            {/* About Cards */}
+            <div className="card p-6">
+              <h2 className="text-2xl font-bold text-white mb-6">About Solity</h2>
+              <div>
+                <p className="text-white/80 text-base leading-relaxed">
+                  Solity is an on-chain mobility service provider built on Solana. Users fund account in SOL, which settle transparently to the Solity Treasury. Our flagship product, SolityNET, lets you place global, low-latency voice calls with flexible caller identity options. Next, we're rolling out a suite of innovative mobility products that reject the usual corporate limitations, making connectivity more open, programmable, and user-controlled.
+                </p>
+              </div>
+            </div>
+            
+            <div className="card p-6">
+              <h3 className="text-xl font-bold text-white mb-4">SolityNET</h3>
+              <p className="text-white/80 text-base leading-relaxed">
+                SolityNET is a comprehensive solution to decentralize global telephony. At launch, calling will be available in the US and Canada. We can onboard 80+ countries, but to avoid overloading the network we'll expand coverage gradually—adding regions day by day.
+              </p>
+            </div>
+
+            {/* Scaling Content */}
+            <div className="card p-6">
+              <h2 className="text-2xl font-bold text-white mb-3">
+                Scaling
+              </h2>
+              <p className="text-white/70 text-base mb-6">
+                What's planned for the server and our general scaling map.
+              </p>
+              <div className="flex gap-3">
+                <div className="bg-white/10 border border-white/20 text-white/80 px-4 py-2 rounded-full text-sm">
+                  Last updated 9/13/2025
+                </div>
+                <div className="bg-white/10 border border-white/20 text-white/80 px-4 py-2 rounded-full text-sm">
+                  Environment: SolityNET
+                </div>
+              </div>
+            </div>
+
+            <Scaling />
+          </div>
+        )
       case 'Support':
         return <Support />
-      case 'Scaling':
-        return <Scaling />
       default:
         return (
           <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -62,13 +98,21 @@ function Dashboard() {
                   {menuItems.map((item) => (
                     <button
                       key={item}
-                      onClick={() => setActiveModule(item)}
-                      className={`w-full text-left px-4 py-3 rounded-xl ring-1 ring-white/10 font-medium transition-all duration-200 ${activeModule === item
+                      onClick={item === 'E-SIM' ? undefined : () => setActiveModule(item)}
+                      disabled={item === 'E-SIM'}
+                      className={`w-full text-left px-4 py-3 rounded-xl ring-1 ring-white/10 font-medium transition-all duration-200 flex items-center justify-between ${item === 'E-SIM'
+                        ? 'opacity-50 cursor-not-allowed text-white/50'
+                        : activeModule === item
                         ? 'bg-white/10 border border-white/20 text-white'
                         : 'hover:bg-white/5 text-white/70'
                         }`}
                     >
-                      {item}
+                      <span>{item}</span>
+                      {item === 'E-SIM' && (
+                        <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      )}
                     </button>
                   ))}
                 </div>

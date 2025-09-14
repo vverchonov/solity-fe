@@ -127,29 +127,7 @@ function Scaling() {
   }
 
   return (
-    <div className="h-full space-y-6">
-      {/* First Card */}
-      <div className="card p-6">
-        {/* Header */}
-        <h2 className="text-2xl font-bold text-white mb-3">
-          Scaling
-        </h2>
-
-        {/* Description text */}
-        <p className="text-white/70 text-base mb-6">
-          What's planned for the server and our general scaling map.
-        </p>
-
-        {/* Pills */}
-        <div className="flex gap-3">
-          <div className="bg-white/10 border border-white/20 text-white/80 px-4 py-2 rounded-full text-sm">
-            Last updated 9/13/2025
-          </div>
-          <div className="bg-white/10 border border-white/20 text-white/80 px-4 py-2 rounded-full text-sm">
-            Environment: SolityNET
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6">
 
       {/* Server Updates Card */}
       <div className="card p-6">
