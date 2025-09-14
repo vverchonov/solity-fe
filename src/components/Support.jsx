@@ -24,9 +24,9 @@ function Support() {
       icon: '#',
       name: 'Discord',
       description: 'Connect with other users and get technical help',
-      handle: 'discord.gg/solity',
+      handle: 'discord.gg/EHz8Yjy2',
       buttonText: '# Join Discord',
-      url: 'https://discord.gg/solity'
+      url: 'https://discord.gg/EHz8Yjy2'
     },
     {
       icon: 'X',

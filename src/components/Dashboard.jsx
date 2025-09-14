@@ -7,7 +7,7 @@ import Scaling from './Scaling'
 function Dashboard() {
   const [activeModule, setActiveModule] = useState('Call')
 
-  const menuItems = ['Call', 'Balance', 'E-SIM', 'Support', 'About']
+  const menuItems = ['Call', 'Balance', 'About', 'E-SIM', 'Support']
 
   const renderModule = () => {
     switch (activeModule) {
@@ -96,24 +96,30 @@ function Dashboard() {
               <div className="card p-2">
                 <div className="flex flex-col gap-3">
                   {menuItems.map((item) => (
-                    <button
-                      key={item}
-                      onClick={item === 'E-SIM' ? undefined : () => setActiveModule(item)}
-                      disabled={item === 'E-SIM'}
-                      className={`w-full text-left px-4 py-3 rounded-xl ring-1 ring-white/10 font-medium transition-all duration-200 flex items-center justify-between ${item === 'E-SIM'
-                        ? 'opacity-50 cursor-not-allowed text-white/50'
-                        : activeModule === item
-                        ? 'bg-white/10 border border-white/20 text-white'
-                        : 'hover:bg-white/5 text-white/70'
-                        }`}
-                    >
-                      <span>{item}</span>
+                    <div key={item} className={`relative ${item === 'E-SIM' ? 'group' : ''}`}>
+                      <button
+                        onClick={item === 'E-SIM' ? undefined : () => setActiveModule(item)}
+                        disabled={item === 'E-SIM'}
+                        className={`w-full text-left px-4 py-3 rounded-xl ring-1 ring-white/10 font-medium transition-all duration-200 flex items-center justify-between ${item === 'E-SIM'
+                          ? 'opacity-50 cursor-not-allowed text-white/50'
+                          : activeModule === item
+                          ? 'bg-white/10 border border-white/20 text-white'
+                          : 'hover:bg-white/5 text-white/70'
+                          }`}
+                      >
+                        <span>{item}</span>
+                        {item === 'E-SIM' && (
+                          <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        )}
+                      </button>
                       {item === 'E-SIM' && (
-                        <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
+                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                          Coming soon
+                        </div>
                       )}
-                    </button>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -123,7 +129,12 @@ function Dashboard() {
                 <div className="flex items-center gap-3">
                   <span className="text-white/70 text-sm">Solity API:</span>
                   <span className="text-green-300 text-sm font-medium">Online</span>
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="flex items-end gap-0.5">
+                    <div className="w-0.5 h-1.5 bg-green-400 rounded-sm"></div>
+                    <div className="w-0.5 h-2 bg-green-400 rounded-sm"></div>
+                    <div className="w-0.5 h-2.5 bg-green-400 rounded-sm"></div>
+                    <div className="w-0.5 h-3 bg-green-400 rounded-sm"></div>
+                  </div>
                 </div>
               </div>
             </div>

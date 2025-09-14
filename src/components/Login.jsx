@@ -90,9 +90,16 @@ function Login() {
 
               <div className="pt-8 border-t border-white/10">
                 <div className="space-y-2">
-                  <p className="text-white font-mono text-lg">CA: soon</p>
-                  <div className="mt-4">
-
+                  <p className="text-white/50 text-sm">Company Registration Number:</p>
+                  <p className="text-white font-mono text-lg">CA</p>
+                  <div className="flex items-center gap-2 mt-4">
+                    <div className="flex items-end gap-0.5">
+                      <div className="w-1 h-2 bg-green-400 rounded-sm"></div>
+                      <div className="w-1 h-3 bg-green-400 rounded-sm"></div>
+                      <div className="w-1 h-4 bg-green-400 rounded-sm"></div>
+                      <div className="w-1 h-5 bg-green-400 rounded-sm"></div>
+                    </div>
+                    <span className="text-green-300 text-xs font-medium">Server Online</span>
                   </div>
                 </div>
               </div>
