@@ -22,11 +22,10 @@ function BalanceModule() {
     if (!searchQuery.trim()) return true
     
     const query = searchQuery.toLowerCase()
-    const matchesId = rate.id?.toString().includes(query)
     const matchesName = rate.name?.toLowerCase().includes(query)
     const matchesCodes = rate.codes?.toLowerCase().includes(query)
     
-    return matchesId || matchesName || matchesCodes
+    return matchesName || matchesCodes
   })
 
   // Sort by active status first, then by name
@@ -36,8 +35,17 @@ function BalanceModule() {
     return (a.name || '').localeCompare(b.name || '')
   })
 
-  // Take first 20 records
-  const displayRates = sortedRates.slice(0, 20)
+  // Take first 20 records and handle duplicate IDs
+  const displayRates = sortedRates.slice(0, 20).map((rate, index) => {
+    const seenIds = sortedRates.slice(0, index).map(r => r.id)
+    const duplicateCount = seenIds.filter(id => id === rate.id).length
+    
+    return {
+      ...rate,
+      displayId: duplicateCount > 0 ? `${rate.id}_${duplicateCount + 1}` : rate.id,
+      uniqueKey: `${rate.id}_${index}` // For React key prop
+    }
+  })
 
   return (
     <div className="space-y-6 h-full">
@@ -119,7 +127,7 @@ function BalanceModule() {
           <div className="w-64">
             <input
               type="text"
-              placeholder="Search by ID, name, or codes..."
+              placeholder="Search by name or codes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
@@ -135,12 +143,11 @@ function BalanceModule() {
         ) : (
           <>
             {/* Table Header */}
-            <div className="grid grid-cols-5 gap-4 pb-4 border-b border-white/10 mb-4">
-              <div className="text-white/60 text-sm font-medium">ID</div>
+            <div className="grid grid-cols-4 gap-4 pb-4 border-b border-white/10 mb-4">
               <div className="text-white/60 text-sm font-medium">Direction</div>
               <div className="text-white/60 text-sm font-medium">Status</div>
               <div className="text-white/60 text-sm font-medium">Codes</div>
-              <div className="text-white/60 text-sm font-medium text-right">Rate</div>
+              <div className="text-white/60 text-sm font-medium text-right">Cost</div>
             </div>
             
             {/* Table Rows */}
@@ -151,8 +158,7 @@ function BalanceModule() {
                 </div>
               ) : (
                 displayRates.map((rate) => (
-                  <div key={rate.id} className="grid grid-cols-5 gap-4 py-2 hover:bg-white/5 rounded-lg transition-colors">
-                    <div className="text-white text-sm font-mono">{rate.id}</div>
+                  <div key={rate.uniqueKey} className="grid grid-cols-4 gap-4 py-2 hover:bg-white/5 rounded-lg transition-colors">
                     <div className="text-white/70 text-sm capitalize">
                       {rate.direction || '-'}
                     </div>
@@ -169,7 +175,7 @@ function BalanceModule() {
                       {rate.codes || '-'}
                     </div>
                     <div className="text-white text-sm font-mono text-right">
-                      ${rate.rate || '0.00'}
+                      {(rate.cost || 0).toFixed(8)} SOL
                     </div>
                   </div>
                 ))

@@ -1,15 +1,33 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Call from './Call'
 import Support from './Support'
 import BalanceModule from './BalanceModule'
 import Scaling from './Scaling'
 import { useHealth } from '../contexts/HealthProvider'
+import { useUser } from '../contexts/UserContext'
+import { authAPI } from '../services/auth'
 
 function Dashboard() {
   const [activeModule, setActiveModule] = useState('Call')
+  const navigate = useNavigate()
   const { health, isServerHealthy, getUnhealthyServices } = useHealth()
+  const { clearUser } = useUser()
 
   const menuItems = ['Call', 'Balance', 'About', 'E-SIM', 'Support']
+
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout()
+      clearUser()
+      navigate('/')
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Clear user state and redirect even if logout fails
+      clearUser()
+      navigate('/')
+    }
+  }
 
   const renderModule = () => {
     switch (activeModule) {
@@ -128,7 +146,7 @@ function Dashboard() {
 
               {/* Server Status Card */}
               <div className="card p-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mb-3">
                   <span className="text-white/70 text-sm">Solity NET:</span>
                   <span className={`text-sm font-medium ${isServerHealthy() ? 'text-green-300' : 'text-red-300'}`}>
                     {isServerHealthy() ? 'Online' : 'No Connection'}
@@ -141,10 +159,21 @@ function Dashboard() {
                   </div>
                 </div>
                 {!isServerHealthy() && (
-                  <div className="mt-2 text-xs text-red-400">
+                  <div className="mb-3 text-xs text-red-400">
                     Issues: {getUnhealthyServices().join(', ')}
                   </div>
                 )}
+                
+                {/* Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-3 py-2 text-left font-medium text-white/70 hover:bg-white/5 hover:text-white transition-all duration-200 flex items-center gap-3 rounded-lg"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Log Out</span>
+                </button>
               </div>
             </div>
 
