@@ -4,7 +4,32 @@ import { useRates } from '../contexts/RatesProvider'
 function BalanceModule() {
   const [topUpAmount, setTopUpAmount] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
-  const { rates, isLoading: ratesLoading, getActiveRates } = useRates()
+
+  // Fixed rates data
+  const rates = [
+    { code: 'TZ', country: 'Tanzania', dialCode: '+255', cost: 0.01305 },
+    { code: 'GB', country: 'United Kingdom', dialCode: '+44', cost: 0.0125 },
+    { code: 'CF', country: 'Central African Republic', dialCode: '+236', cost: 0.0119 },
+    { code: 'XX', country: 'Sao Tome and Principe', dialCode: '', cost: 0.00995 },
+    { code: 'PG', country: 'Papua New Guinea', dialCode: '+675', cost: 0.00975 },
+    { code: 'NF', country: 'Norfolk Island', dialCode: '+672', cost: 0.00935 },
+    { code: 'GW', country: 'Guinea-Bissau', dialCode: '+245', cost: 0.00905 },
+    { code: 'DZ', country: 'Algeria', dialCode: '+213', cost: 0.00705 },
+    { code: 'VU', country: 'Vanuatu', dialCode: '+678', cost: 0.0069 },
+    { code: 'CU', country: 'Cuba', dialCode: '+53', cost: 0.0067 },
+    { code: 'MV', country: 'Maldives', dialCode: '+960', cost: 0.00655 },
+    { code: 'TV', country: 'Tuvalu', dialCode: '+688', cost: 0.0065 },
+    { code: 'CK', country: 'Cook Islands', dialCode: '+682', cost: 0.00645 },
+    { code: 'SB', country: 'Solomon Islands', dialCode: '+677', cost: 0.00625 },
+    { code: 'WS', country: 'Samoa', dialCode: '+685', cost: 0.00625 },
+    { code: 'TN', country: 'Tunisia', dialCode: '+216', cost: 0.00605 },
+    { code: 'CN', country: 'China', dialCode: '+86', cost: 0.00575 },
+    { code: 'SC', country: 'Seychelles', dialCode: '+248', cost: 0.0055 },
+    { code: 'TL', country: 'Timor-Leste', dialCode: '+670', cost: 0.0054 },
+    { code: 'DE', country: 'Germany', dialCode: '+49', cost: 0.0052 }
+  ]
+
+  const ratesLoading = false
 
   const quickAmounts = [0.1, 0.5, 1, 2]
 
@@ -22,30 +47,21 @@ function BalanceModule() {
     if (!searchQuery.trim()) return true
     
     const query = searchQuery.toLowerCase()
-    const matchesName = rate.name?.toLowerCase().includes(query)
-    const matchesCodes = rate.codes?.toLowerCase().includes(query)
+    const matchesCountry = rate.country?.toLowerCase().includes(query)
+    const matchesCode = rate.code?.toLowerCase().includes(query)
+    const matchesDialCode = rate.dialCode?.toLowerCase().includes(query)
     
-    return matchesName || matchesCodes
+    return matchesCountry || matchesCode || matchesDialCode
   })
 
-  // Sort by active status first, then by name
-  const sortedRates = filteredRates.sort((a, b) => {
-    if (a.active && !b.active) return -1
-    if (!a.active && b.active) return 1
-    return (a.name || '').localeCompare(b.name || '')
-  })
+  // Sort by cost (highest to lowest)
+  const sortedRates = filteredRates.sort((a, b) => b.cost - a.cost)
 
-  // Take first 20 records and handle duplicate IDs
-  const displayRates = sortedRates.slice(0, 20).map((rate, index) => {
-    const seenIds = sortedRates.slice(0, index).map(r => r.id)
-    const duplicateCount = seenIds.filter(id => id === rate.id).length
-    
-    return {
-      ...rate,
-      displayId: duplicateCount > 0 ? `${rate.id}_${duplicateCount + 1}` : rate.id,
-      uniqueKey: `${rate.id}_${index}` // For React key prop
-    }
-  })
+  // Take first 20 records
+  const displayRates = sortedRates.slice(0, 20).map((rate, index) => ({
+    ...rate,
+    uniqueKey: `${rate.code}_${index}` // For React key prop
+  }))
 
   return (
     <div className="space-y-6 h-full">
@@ -127,7 +143,7 @@ function BalanceModule() {
           <div className="w-64">
             <input
               type="text"
-              placeholder="Search by name or codes..."
+              placeholder="Search by country, code, or dial code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
@@ -144,9 +160,9 @@ function BalanceModule() {
           <>
             {/* Table Header */}
             <div className="grid grid-cols-4 gap-4 pb-4 border-b border-white/10 mb-4">
-              <div className="text-white/60 text-sm font-medium">Direction</div>
-              <div className="text-white/60 text-sm font-medium">Status</div>
-              <div className="text-white/60 text-sm font-medium">Codes</div>
+              <div className="text-white/60 text-sm font-medium">Country</div>
+              <div className="text-white/60 text-sm font-medium">Code</div>
+              <div className="text-white/60 text-sm font-medium">Dial Code</div>
               <div className="text-white/60 text-sm font-medium text-right">Cost</div>
             </div>
             
@@ -159,23 +175,17 @@ function BalanceModule() {
               ) : (
                 displayRates.map((rate) => (
                   <div key={rate.uniqueKey} className="grid grid-cols-4 gap-4 py-2 hover:bg-white/5 rounded-lg transition-colors">
-                    <div className="text-white/70 text-sm capitalize">
-                      {rate.direction || '-'}
+                    <div className="text-white text-sm">
+                      {rate.country}
                     </div>
-                    <div className="text-sm">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        rate.active 
-                          ? 'bg-green-600/20 text-green-300 border border-green-600/30' 
-                          : 'bg-red-600/20 text-red-300 border border-red-600/30'
-                      }`}>
-                        {rate.active ? 'Active' : 'Inactive'}
-                      </span>
+                    <div className="text-white/70 text-sm font-mono">
+                      {rate.code}
                     </div>
-                    <div className="text-white/70 text-sm font-mono truncate" title={rate.codes}>
-                      {rate.codes || '-'}
+                    <div className="text-white/70 text-sm font-mono">
+                      {rate.dialCode || '-'}
                     </div>
                     <div className="text-white text-sm font-mono text-right">
-                      {(rate.cost || 0).toFixed(8)} SOL
+                      {rate.cost.toFixed(8)} SOL
                     </div>
                   </div>
                 ))
