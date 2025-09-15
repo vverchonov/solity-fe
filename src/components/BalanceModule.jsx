@@ -3,6 +3,7 @@ import { useRates } from '../contexts/RatesProvider'
 
 function BalanceModule() {
   const [topUpAmount, setTopUpAmount] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const { rates, isLoading: ratesLoading, getActiveRates } = useRates()
 
   const quickAmounts = [0.1, 0.5, 1, 2]
@@ -15,6 +16,28 @@ function BalanceModule() {
   const handleAddFunds = () => {
     console.log('Adding funds:', topUpAmount)
   }
+
+  // Filter and search rates
+  const filteredRates = rates.filter(rate => {
+    if (!searchQuery.trim()) return true
+    
+    const query = searchQuery.toLowerCase()
+    const matchesId = rate.id?.toString().includes(query)
+    const matchesName = rate.name?.toLowerCase().includes(query)
+    const matchesCodes = rate.codes?.toLowerCase().includes(query)
+    
+    return matchesId || matchesName || matchesCodes
+  })
+
+  // Sort by active status first, then by name
+  const sortedRates = filteredRates.sort((a, b) => {
+    if (a.active && !b.active) return -1
+    if (!a.active && b.active) return 1
+    return (a.name || '').localeCompare(b.name || '')
+  })
+
+  // Take first 20 records
+  const displayRates = sortedRates.slice(0, 20)
 
   return (
     <div className="space-y-6 h-full">
@@ -82,39 +105,86 @@ function BalanceModule() {
         </div>
       </div>
 
-      {/* Pricing Card */}
+      {/* Rates Table Card */}
       <div className="card p-6 flex-1">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-            <div className="w-3 h-3 bg-white/40 rounded-full"></div>
-          </div>
-          <h3 className="text-xl font-semibold text-white">North America</h3>
-        </div>
-        
-        {/* Table Header */}
-        <div className="grid grid-cols-3 gap-4 pb-4 border-b border-white/10 mb-4">
-          <div className="text-white/60 text-sm font-medium">Country</div>
-          <div className="text-white/60 text-sm font-medium">Code</div>
-          <div className="text-white/60 text-sm font-medium text-right">Rate per minute</div>
-        </div>
-        
-        {/* Table Rows */}
-        <div className="space-y-4">
-          {[
-            { country: "United States", code: "US", dialCode: "+1", rate: "0.00015 SOL" },
-            { country: "Canada", code: "CA", dialCode: "+1", rate: "0.00018 SOL" },
-            { country: "Mexico", code: "MX", dialCode: "+52", rate: "0.00025 SOL" }
-          ].map((item) => (
-            <div key={item.code} className="grid grid-cols-3 gap-4 py-2">
-              <div className="flex items-center gap-3">
-                <span className="text-white/60 text-sm font-medium w-8">{item.code}</span>
-                <span className="text-white text-sm">{item.country}</span>
-              </div>
-              <div className="text-white/80 text-sm font-mono">{item.dialCode}</div>
-              <div className="text-white text-sm font-mono text-right">{item.rate}</div>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-3 h-3 bg-white/40 rounded-full"></div>
             </div>
-          ))}
+            <h3 className="text-xl font-semibold text-white">Current Rates</h3>
+          </div>
+          
+          {/* Search Field */}
+          <div className="w-64">
+            <input
+              type="text"
+              placeholder="Search by ID, name, or codes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
+            />
+          </div>
         </div>
+
+        {ratesLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            <span className="ml-3 text-white/70">Loading rates...</span>
+          </div>
+        ) : (
+          <>
+            {/* Table Header */}
+            <div className="grid grid-cols-5 gap-4 pb-4 border-b border-white/10 mb-4">
+              <div className="text-white/60 text-sm font-medium">ID</div>
+              <div className="text-white/60 text-sm font-medium">Direction</div>
+              <div className="text-white/60 text-sm font-medium">Status</div>
+              <div className="text-white/60 text-sm font-medium">Codes</div>
+              <div className="text-white/60 text-sm font-medium text-right">Rate</div>
+            </div>
+            
+            {/* Table Rows */}
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {displayRates.length === 0 ? (
+                <div className="text-center py-8 text-white/60">
+                  {searchQuery ? 'No rates found matching your search.' : 'No rates available.'}
+                </div>
+              ) : (
+                displayRates.map((rate) => (
+                  <div key={rate.id} className="grid grid-cols-5 gap-4 py-2 hover:bg-white/5 rounded-lg transition-colors">
+                    <div className="text-white text-sm font-mono">{rate.id}</div>
+                    <div className="text-white/70 text-sm capitalize">
+                      {rate.direction || '-'}
+                    </div>
+                    <div className="text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        rate.active 
+                          ? 'bg-green-600/20 text-green-300 border border-green-600/30' 
+                          : 'bg-red-600/20 text-red-300 border border-red-600/30'
+                      }`}>
+                        {rate.active ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                    <div className="text-white/70 text-sm font-mono truncate" title={rate.codes}>
+                      {rate.codes || '-'}
+                    </div>
+                    <div className="text-white text-sm font-mono text-right">
+                      ${rate.rate || '0.00'}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            
+            {/* Results Info */}
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <div className="text-white/50 text-sm">
+                Showing {displayRates.length} of {filteredRates.length} rates
+                {searchQuery && ` (filtered from ${rates.length} total)`}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

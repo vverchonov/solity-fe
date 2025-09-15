@@ -111,25 +111,26 @@ export const authAPI = {
       // The refresh token is sent as an httpOnly cookie automatically
       const response = await apiClient.post('/auth/refresh')
 
-      const { accessToken: newAccessToken, id, status, userRole, accessTokenExpiry } = response.data
+      const { accessToken: newAccessToken, status, userRole, balances, accessTokenExpiry } = response.data
 
       tokenUtils.setAccessToken(newAccessToken)
 
-      // Check if user data is included in refresh response
-      let user = null
-      if (id && status && userRole) {
-        user = {
-          id,
-          status,
-          userRole,
-          accessTokenExpiry
-        }
+      // Create user object from refresh response
+      const user = {
+        status,
+        userRole,
+        balances,
+        accessTokenExpiry
       }
 
       return {
         success: true,
         data: {
           accessToken: newAccessToken,
+          status,
+          userRole,
+          balances,
+          accessTokenExpiry,
           user
         }
       }
