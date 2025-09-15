@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 function Balance() {
-  const [depositAddress] = useState('SoL1TyZ27...EuK4')
+  const [customAmount, setCustomAmount] = useState('')
 
   const quickAmounts = [0.1, 0.5, 1, 2]
 
@@ -10,8 +10,12 @@ function Balance() {
     // Here you would typically add the balance to the user's account
   }
 
-  const handleCopyAddress = () => {
-    navigator.clipboard.writeText('SoL1TyZ27abcdefghijklmnopqrstuvwxyzEuK4')
+  const handleAddCustomAmount = () => {
+    const amount = parseFloat(customAmount)
+    if (amount > 0) {
+      handleAddBalance(amount)
+      setCustomAmount('')
+    }
   }
 
   return (
@@ -49,15 +53,26 @@ function Balance() {
         </div>
       </div>
 
-      {/* Deposit Address */}
+      {/* Custom Amount */}
       <div className="mb-4">
-        <h3 className="text-white/70 text-sm mb-2">Deposit Address</h3>
-        <div className="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
-          <span className="text-white font-mono text-sm">{depositAddress}</span>
-        </div>
-        <div className="mt-2 text-xs text-white/50">
-          <p>Send only SOL to this address.</p>
-          <p>Funds are credited after network confirmations.</p>
+        <h3 className="text-white/70 text-sm mb-2">Custom Amount</h3>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            value={customAmount}
+            onChange={(e) => setCustomAmount(e.target.value)}
+            placeholder="Enter SOL amount"
+            step="0.01"
+            min="0"
+            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
+          />
+          <button
+            onClick={handleAddCustomAmount}
+            disabled={!customAmount || parseFloat(customAmount) <= 0}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-all"
+          >
+            Add
+          </button>
         </div>
       </div>
     </div>

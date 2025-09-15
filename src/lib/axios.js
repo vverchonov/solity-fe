@@ -8,7 +8,7 @@ export const setGlobalToast = (showError) => {
 }
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
   timeout: 10000,
   withCredentials: true, // Include httpOnly cookies in all requests
   headers: {
@@ -39,7 +39,7 @@ const processQueue = (error, token = null) => {
       resolve(token)
     }
   })
-  
+
   failedQueue = []
 }
 
@@ -93,23 +93,23 @@ apiClient.interceptors.response.use(
         const { accessToken: newAccessToken } = response.data
 
         setAccessToken(newAccessToken)
-        
+
         // Update the authorization header for the failed request
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
-        
+
         processQueue(null, newAccessToken)
-        
+
         return apiClient(originalRequest)
       } catch (refreshError) {
         processQueue(refreshError, null)
         clearAccessToken()
-        
+
         // Show toast for refresh token error
         if (globalShowError) {
           globalShowError('Session expired. Please login again.')
         }
-        
-        window.location.href = '/login'
+
+        window.location.href = '/'
         return Promise.reject(refreshError)
       } finally {
         isRefreshing = false
@@ -118,10 +118,10 @@ apiClient.interceptors.response.use(
 
     // Show error toast for other errors (but not 401 during token refresh)
     if (error.response && globalShowError) {
-      const message = error.response.data?.message || 
-                     error.response.data?.error || 
-                     `Error: ${error.response.status} ${error.response.statusText}`
-      
+      const message = error.response.data?.message ||
+        error.response.data?.error ||
+        `Error: ${error.response.status} ${error.response.statusText}`
+
       // Don't show toast for auth-related errors that redirect to login
       if (error.response.status !== 401) {
         globalShowError(message)

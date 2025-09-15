@@ -3,9 +3,11 @@ import Call from './Call'
 import Support from './Support'
 import BalanceModule from './BalanceModule'
 import Scaling from './Scaling'
+import { useHealth } from '../contexts/HealthProvider'
 
 function Dashboard() {
   const [activeModule, setActiveModule] = useState('Call')
+  const { health, isServerHealthy, getUnhealthyServices } = useHealth()
 
   const menuItems = ['Call', 'Balance', 'About', 'E-SIM', 'Support']
 
@@ -27,7 +29,7 @@ function Dashboard() {
                 </p>
               </div>
             </div>
-            
+
             <div className="card p-6">
               <h3 className="text-xl font-bold text-white mb-4">SolityNET</h3>
               <p className="text-white/80 text-base leading-relaxed">
@@ -103,8 +105,8 @@ function Dashboard() {
                         className={`w-full text-left px-4 py-3 rounded-xl ring-1 ring-white/10 font-medium transition-all duration-200 flex items-center justify-between ${item === 'E-SIM'
                           ? 'opacity-50 cursor-not-allowed text-white/50'
                           : activeModule === item
-                          ? 'bg-white/10 border border-white/20 text-white'
-                          : 'hover:bg-white/5 text-white/70'
+                            ? 'bg-white/10 border border-white/20 text-white'
+                            : 'hover:bg-white/5 text-white/70'
                           }`}
                       >
                         <span>{item}</span>
@@ -127,15 +129,22 @@ function Dashboard() {
               {/* Server Status Card */}
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-white/70 text-sm">Solity API:</span>
-                  <span className="text-green-300 text-sm font-medium">Online</span>
+                  <span className="text-white/70 text-sm">Solity NET:</span>
+                  <span className={`text-sm font-medium ${isServerHealthy() ? 'text-green-300' : 'text-red-300'}`}>
+                    {isServerHealthy() ? 'Online' : 'No Connection'}
+                  </span>
                   <div className="flex items-end gap-0.5">
-                    <div className="w-0.5 h-1.5 bg-green-400 rounded-sm"></div>
-                    <div className="w-0.5 h-2 bg-green-400 rounded-sm"></div>
-                    <div className="w-0.5 h-2.5 bg-green-400 rounded-sm"></div>
-                    <div className="w-0.5 h-3 bg-green-400 rounded-sm"></div>
+                    <div className={`w-0.5 h-1.5 rounded-sm ${health.api ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                    <div className={`w-0.5 h-2 rounded-sm ${health.db ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                    <div className={`w-0.5 h-2.5 rounded-sm ${health.tele ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                    <div className={`w-0.5 h-3 rounded-sm ${isServerHealthy() ? 'bg-green-400' : 'bg-red-400'}`}></div>
                   </div>
                 </div>
+                {!isServerHealthy() && (
+                  <div className="mt-2 text-xs text-red-400">
+                    Issues: {getUnhealthyServices().join(', ')}
+                  </div>
+                )}
               </div>
             </div>
 

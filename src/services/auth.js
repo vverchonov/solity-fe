@@ -39,10 +39,17 @@ export const authAPI = {
         password
       })
 
-      const { accessToken, user } = response.data
+      const { accessToken, id, status, userRole, accessTokenExpiry } = response.data
 
       if (accessToken) {
         tokenUtils.setAccessToken(accessToken)
+      }
+
+      const user = {
+        id,
+        status,
+        userRole,
+        accessTokenExpiry
       }
 
       return {
@@ -62,18 +69,24 @@ export const authAPI = {
   },
 
   // Create new account
-  register: async (username, password, email = null) => {
+  register: async (username, password) => {
     try {
-      const response = await apiClient.post('/auth/register', {
+      const response = await apiClient.post('/auth/signup', {
         username,
-        password,
-        email
+        password
       })
 
-      const { accessToken, user } = response.data
+      const { accessToken, id, status, userRole, accessTokenExpiry } = response.data
 
       if (accessToken) {
         tokenUtils.setAccessToken(accessToken)
+      }
+
+      const user = {
+        id,
+        status,
+        userRole,
+        accessTokenExpiry
       }
 
       return {
@@ -98,14 +111,26 @@ export const authAPI = {
       // The refresh token is sent as an httpOnly cookie automatically
       const response = await apiClient.post('/auth/refresh')
 
-      const { accessToken: newAccessToken } = response.data
+      const { accessToken: newAccessToken, id, status, userRole, accessTokenExpiry } = response.data
 
       tokenUtils.setAccessToken(newAccessToken)
+
+      // Check if user data is included in refresh response
+      let user = null
+      if (id && status && userRole) {
+        user = {
+          id,
+          status,
+          userRole,
+          accessTokenExpiry
+        }
+      }
 
       return {
         success: true,
         data: {
-          accessToken: newAccessToken
+          accessToken: newAccessToken,
+          user
         }
       }
     } catch (error) {
@@ -139,27 +164,6 @@ export const authAPI = {
     }
   },
 
-  // Get current user profile
-  getCurrentUser: async () => {
-    try {
-      if (!tokenUtils.hasAccessToken()) {
-        throw new Error('No access token')
-      }
-
-      const response = await apiClient.get('/auth/me')
-
-      return {
-        success: true,
-        data: response.data
-      }
-    } catch (error) {
-      console.error('Get current user failed:', error)
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Failed to get user info'
-      }
-    }
-  },
 
   // Check if user is authenticated
   isAuthenticated: () => {

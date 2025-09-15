@@ -78,15 +78,15 @@ export const useAuth = () => {
       await authAPI.logout()
       setUser(null)
       setIsAuthenticated(false)
-      // Redirect to login page
-      window.location.href = '/login'
+      // Redirect to home page
+      window.location.href = '/'
     } catch (error) {
       console.error('Logout error:', error)
       // Clear local state even if server call fails
       setUser(null)
       setIsAuthenticated(false)
       tokenUtils.clearAccessToken()
-      window.location.href = '/login'
+      window.location.href = '/'
     } finally {
       setLoading(false)
     }

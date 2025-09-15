@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { useRates } from '../contexts/RatesProvider'
 
 function BalanceModule() {
   const [topUpAmount, setTopUpAmount] = useState('')
-  const [depositAddress] = useState('SoL1TyZ27...EuK4')
+  const { rates, isLoading: ratesLoading, getActiveRates } = useRates()
 
   const quickAmounts = [0.1, 0.5, 1, 2]
 
@@ -10,9 +11,6 @@ function BalanceModule() {
     setTopUpAmount(amount.toString())
   }
 
-  const handleCopyAddress = () => {
-    navigator.clipboard.writeText('SoL1TyZ27abcdefghijklmnopqrstuvwxyzEuK4')
-  }
 
   const handleAddFunds = () => {
     console.log('Adding funds:', topUpAmount)
@@ -30,8 +28,8 @@ function BalanceModule() {
         </div>
 
         <div className="grid grid-cols-3 gap-6">
-          {/* Left Column - Balance & Deposit */}
-          <div className="col-span-2 space-y-4">
+          {/* Left Column - Balance */}
+          <div className="col-span-2">
             {/* Balance Display */}
             <div className="mb-4">
               <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
@@ -40,14 +38,6 @@ function BalanceModule() {
               <p className="text-yellow-400 text-sm mt-1">
                 Low balance — please top up before a call.
               </p>
-            </div>
-
-            {/* Deposit Address */}
-            <div>
-              <h3 className="text-white/70 text-lg mb-3">Deposit Address</h3>
-              <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
-                <span className="text-white font-mono">{depositAddress}</span>
-              </div>
             </div>
           </div>
 

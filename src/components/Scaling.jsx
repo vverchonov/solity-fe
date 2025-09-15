@@ -1,63 +1,63 @@
 function Scaling() {
   const serverUpdates = [
     {
-      title: "Edge caching for prompts",
-      category: "Performance",
-      status: "Done",
-      description: "Cuts cold-start for popular prompts.",
-      details: ["TTL 5m", "Stale-while-revalidate"],
-      impact: 2,
-      eta: "2026-03-01",
-      overdue: ""
-    },
-    {
-      title: "Rate limiter v2",
-      category: "Reliability",
-      status: "In progress",
-      description: "Per-key burst control to avoid noisy neighbors.",
-      details: ["Token bucket by CID", "Priority for verified callers"],
-      impact: 4,
-      eta: "2026-03-25",
-      overdue: ""
-    },
-    {
-      title: "Multi-region SIP ingress",
+      title: "SolityNET Call",
       category: "Telephony",
+      status: "Done",
+      description: "We're rolling out the SolityNET calling feature to the public. It took just three months to go from idea to live product—our first step toward becoming the leading crypto-native mobility provider.",
+      details: ["Public launch complete", "3 months development", "Crypto-native mobility"],
+      impact: 5,
+      eta: "2026-02-01",
+      overdue: ""
+    },
+    {
+      title: "SolityNET Coverage Increase",
+      category: "Performance",
       status: "In progress",
-      description: "Route calls to nearest POP to reduce latency; active-active failover.",
-      details: ["New POP in FRA & SGP", "Geo DNS & health checks", "Failover runbooks"],
-      impact: 5,
-      eta: "2026-04-05",
-      overdue: ""
-    },
-    {
-      title: "Observability baseline",
-      category: "Observability",
-      status: "Planned",
-      description: "Golden signals, tracing for call lifecycle.",
-      details: ["Dashboards for P95/99", "Trace spans across services"],
-      impact: 3,
-      eta: "2026-04-12",
-      overdue: ""
-    },
-    {
-      title: "Autoscaling workers (HPA)",
-      category: "Compute",
-      status: "Planned",
-      description: "Scale audio workers by CPU + queue depth.",
-      details: ["Prometheus adapter metrics", "HPA v2 policy tuning"],
+      description: "Daily coverage expansions are planned. 40+ countries are queued for rollout. We'll post day-by-day updates on X.",
+      details: ["40+ countries queued", "Daily expansions", "X updates"],
       impact: 4,
-      eta: "2026-04-20",
+      eta: "2026-03-15",
       overdue: ""
     },
     {
-      title: "Session encryption at rest",
-      category: "Security",
-      status: "Planned",
-      description: "Rotate KMS keys; no call content stored.",
-      details: ["KMS rotation schedule", "Key access audit"],
+      title: "SolityNET API",
+      category: "Technology",
+      status: "In progress",
+      description: "Opening up the SolityNET API brings full integration flexibility. Hook up your own systems—or connect an AI assistant that can place calls on your behalf, from ordering pizza to scheduling business meetings.",
+      details: ["Full integration flexibility", "AI assistant support", "Business automation"],
       impact: 5,
-      eta: "2026-05-01",
+      eta: "2026-04-01",
+      overdue: ""
+    },
+    {
+      title: "SolityNET SMS",
+      category: "Telephony",
+      status: "Planned",
+      description: "Decentralized outbound SMS is fully feasible and in active development. As with calling, we're focusing on sending only; we won't support inbound SMS reception to avoid potential exposure of personal information.",
+      details: ["Outbound SMS only", "Privacy focused", "Decentralized"],
+      impact: 4,
+      eta: "2026-05-15",
+      overdue: ""
+    },
+    {
+      title: "Solity AI Assistant",
+      category: "AI",
+      status: "Planned",
+      description: "A test launch of the AI assistant is planned before eSIM, since it's a core mobility feature. It can replace voicemail, screen incoming calls as your gatekeeper, and handle simple tasks like \"book a table\" or \"order pizza.\"",
+      details: ["Voicemail replacement", "Call screening", "Task automation"],
+      impact: 5,
+      eta: "2026-06-01",
+      overdue: ""
+    },
+    {
+      title: "Solity eSIM US",
+      category: "Telephony",
+      status: "Planned",
+      description: "The United States will be our first eSIM market, offering direct telephony with unique/custom extension numbers. Global coverage is a key goal on our roadmap.",
+      details: ["US first market", "Custom extensions", "Global coverage goal"],
+      impact: 5,
+      eta: "2026-07-01",
       overdue: ""
     }
   ]
@@ -183,14 +183,8 @@ function Scaling() {
                 ))}
               </ul>
 
-              {/* Footer with Impact and ETA */}
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="text-white/60">Impact</span>
-                  <div className="flex">
-                    {renderStars(update.impact)}
-                  </div>
-                </div>
+              {/* Footer with ETA */}
+              <div className="flex items-center justify-end text-sm">
                 <div className="flex items-center gap-2">
                   <span className="text-white/60">ETA:</span>
                   <div className="flex items-center gap-1">

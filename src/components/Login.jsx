@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { authAPI } from '../services/auth'
+import { useToastContext } from '../contexts/ToastContext'
+import { useUser } from '../contexts/UserContext'
+import { useHealth } from '../contexts/HealthProvider'
 
 function Login() {
   const [isLogin, setIsLogin] = useState(true)
@@ -8,7 +12,33 @@ function Login() {
     password: '',
     confirmPassword: ''
   })
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { addToast } = useToastContext()
+  const { updateUser, user, isLoading, shouldRedirectToDashboard, clearRedirectFlag } = useUser()
+  const { health, isServerHealthy, getUnhealthyServices } = useHealth()
+
+  // Redirect if already authenticated or after successful refresh
+  useEffect(() => {
+    if (!isLoading && (user || shouldRedirectToDashboard)) {
+      navigate('/dashboard')
+      if (shouldRedirectToDashboard) {
+        clearRedirectFlag()
+      }
+    }
+  }, [user, isLoading, shouldRedirectToDashboard, navigate, clearRedirectFlag])
+
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white/70">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleInputChange = (e) => {
     setFormData({
@@ -17,14 +47,98 @@ function Login() {
     })
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Form submitted:', formData)
+  const validatePassword = (password, isSignup = false) => {
+    if (password.length < 12) {
+      return 'Password must be at least 12 characters long'
+    }
+    
+    if (isSignup) {
+      if (!/[A-Z]/.test(password)) {
+        return 'Password must contain at least one uppercase letter'
+      }
+      if (!/[a-z]/.test(password)) {
+        return 'Password must contain at least one lowercase letter'
+      }
+      if (!/[0-9]/.test(password)) {
+        return 'Password must contain at least one digit'
+      }
+      if (!/[^A-Za-z0-9]/.test(password)) {
+        return 'Password must contain at least one special character'
+      }
+    }
+    
+    return null
+  }
 
-    if (isLogin) {
-      navigate('/dashboard')
-    } else {
-      navigate('/dashboard')
+  const validateUsername = (username) => {
+    if (username.length < 3) {
+      return 'Username must be at least 3 characters long'
+    }
+    if (username.length > 30) {
+      return 'Username must be no more than 30 characters long'
+    }
+    return null
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    console.log('Form submitted:', { isLogin, formData })
+
+    if (!formData.username || !formData.password) {
+      addToast('Please fill in all required fields', 'error')
+      return
+    }
+
+    // Validate username
+    const usernameError = validateUsername(formData.username)
+    if (usernameError) {
+      addToast(usernameError, 'error')
+      return
+    }
+
+    // Validate password
+    const passwordError = validatePassword(formData.password, !isLogin)
+    if (passwordError) {
+      addToast(passwordError, 'error')
+      return
+    }
+
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      addToast('Passwords do not match', 'error')
+      return
+    }
+
+    setLoading(true)
+    console.log('Starting authentication request...')
+
+    try {
+      let result
+      if (isLogin) {
+        console.log('Making login request...')
+        result = await authAPI.login(formData.username, formData.password)
+      } else {
+        console.log('Making register request...')
+        result = await authAPI.register(formData.username, formData.password)
+      }
+
+      console.log('Authentication result:', result)
+
+      if (result.success) {
+        // Store user data in context
+        console.log('Current user:', result.data.user)
+        updateUser(result.data.user)
+        addToast(isLogin ? 'Login successful!' : 'Account created successfully!', 'success')
+        navigate('/dashboard')
+      } else {
+        addToast(result.error || 'Authentication failed', 'error')
+      }
+    } catch (error) {
+      console.error('Authentication error:', error)
+      addToast(error.message || 'Authentication failed', 'error')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -94,12 +208,21 @@ function Login() {
                   <p className="text-white font-mono text-lg">CA</p>
                   <div className="flex items-center gap-2 mt-4">
                     <div className="flex items-end gap-0.5">
-                      <div className="w-1 h-2 bg-green-400 rounded-sm"></div>
-                      <div className="w-1 h-3 bg-green-400 rounded-sm"></div>
-                      <div className="w-1 h-4 bg-green-400 rounded-sm"></div>
-                      <div className="w-1 h-5 bg-green-400 rounded-sm"></div>
+                      <div className={`w-1 h-2 rounded-sm ${health.api ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                      <div className={`w-1 h-3 rounded-sm ${health.db ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                      <div className={`w-1 h-4 rounded-sm ${health.tele ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                      <div className={`w-1 h-5 rounded-sm ${isServerHealthy() ? 'bg-green-400' : 'bg-red-400'}`}></div>
                     </div>
-                    <span className="text-green-300 text-xs font-medium">Server Online</span>
+                    <div className="flex flex-col">
+                      <span className={`text-xs font-medium ${isServerHealthy() ? 'text-green-300' : 'text-red-300'}`}>
+                        {isServerHealthy() ? 'Server Online' : 'Connection Issues'}
+                      </span>
+                      {!isServerHealthy() && (
+                        <span className="text-red-400 text-xs">
+                          {getUnhealthyServices().join(', ')}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -191,9 +314,13 @@ function Login() {
 
                 <button
                   type="submit"
-                  className="w-full py-3 px-6 bg-white hover:bg-gray-100 text-gray-900 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                  disabled={loading}
+                  className={`w-full py-3 px-6 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl ${loading
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                    : 'bg-white hover:bg-gray-100 text-gray-900'
+                    }`}
                 >
-                  {isLogin ? 'Sign In' : 'Create Account'}
+                  {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
                 </button>
               </form>
             </div>
