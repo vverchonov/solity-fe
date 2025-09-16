@@ -287,6 +287,14 @@ function Dashboard() {
                     </div>
                   )}
                 </div>
+<<<<<<< HEAD
+=======
+                {!isServerHealthy() && (
+                  <div className="px-3 mb-3 text-xs text-red-400">
+                    Issues: {getUnhealthyServices().join(', ')}
+                  </div>
+                )}
+>>>>>>> b321ce5 (update)
 
 
                 {/* Username Section */}

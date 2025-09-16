@@ -4,9 +4,7 @@ import axios from 'axios';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-const SERVER_URL = 'wss://rdx.narayana.im:8089/ws';
-const DOMAIN_URL = 'rdx.narayana.im';
-const DISPLAY_NAME = 'LettoDev';
+const DISPLAY_NAME = 'solity';
 const BACKEND_URL = 'https://api.sipcallers.com';
 
 const CallContext = createContext(undefined);
@@ -59,8 +57,10 @@ export const CallProvider = ({ children }) => {
         try {
             addLog('Connecting to server...');
 
+            // NOTE: This legacy connectToServer function should use credentials from /tele/credentials
+            // The new call flow uses makeCall() with dynamic credentials instead
             const options = {
-                aor: `sip:${callConfig.username}@${DOMAIN_URL}`,
+                aor: `sip:${callConfig.username}@solityapp.net`, // Should use credentials.domain
                 media: {
                     constraints: { audio: true, video: false },
                     remote: { audio: getAudioElement('remoteAudio') }
@@ -72,7 +72,7 @@ export const CallProvider = ({ children }) => {
                 }
             };
 
-            const simpleUser = new Web.SimpleUser(SERVER_URL, options);
+            const simpleUser = new Web.SimpleUser('wss://solityapp.net:8089/ws', options); // Should use credentials.wss
             simpleUserRef.current = simpleUser;
 
             // Set up event handlers
@@ -253,7 +253,7 @@ export const CallProvider = ({ children }) => {
             addLog(`Calling ${targetNumber} with caller ID ${callerID}...`);
             setCallState(prev => ({ ...prev, callStatus: 'calling', remoteNumber: targetNumber }));
 
-            const target = `sip:${targetNumber}@${credentials?.domain || DOMAIN_URL}`;
+            const target = `sip:${targetNumber}@${credentials?.domain || 'solityapp.net'}`;
             await simpleUserRef.current.call(target);
 
         } catch (error) {

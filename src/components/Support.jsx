@@ -1,14 +1,28 @@
 import { useState } from 'react'
+import { useLogs } from '../contexts/LogsProvider'
 
 function Support() {
-  const handleCopyLogs = () => {
-    const logs = `[12:34:56] Session initialized
-[12:34:57] Wallet connected: SOL1TyA68.DuK9
-[12:34:58] Ready for calls
-[12:35:12] Balance updated: 0.0000 SOL`
+  const { logs } = useLogs()
 
-    navigator.clipboard.writeText(logs)
-    console.log('Session logs copied to clipboard')
+  const handleCopyLogs = () => {
+    if (logs.length === 0) {
+      const noLogsMessage = 'No logs available - session just started'
+      navigator.clipboard.writeText(noLogsMessage)
+      console.log('No logs message copied to clipboard')
+      return
+    }
+
+    // Format logs for copying
+    const formattedLogs = logs.map(log => {
+      let logText = `${log.timestamp} ${log.message}`
+      if (log.details) {
+        logText += `\n  Details: ${typeof log.details === 'object' ? JSON.stringify(log.details, null, 2) : log.details}`
+      }
+      return logText
+    }).join('\n')
+
+    navigator.clipboard.writeText(formattedLogs)
+    console.log('Session logs copied to clipboard', `${logs.length} logs copied`)
   }
 
   const socialLinks = [

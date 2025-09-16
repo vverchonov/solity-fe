@@ -350,11 +350,11 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
                 <button
                   onClick={isInCall || callState.callStatus === 'calling' ? handleEndCall : handleStartCall}
                   disabled={callStatus === 'ended' || (!isInCall && callState.callStatus !== 'calling' && !phoneNumber.trim())}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] ${isInCall || callState.callStatus === 'calling'
-                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] border ${isInCall || callState.callStatus === 'calling'
+                    ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-600/30 hover:border-red-600/50'
                     : callStatus === 'ended' || !phoneNumber.trim()
-                      ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
-                      : 'bg-slate-500 hover:bg-gray-100 text-gray-900'
+                      ? 'bg-gray-600/20 text-gray-500 border-gray-600/30 cursor-not-allowed'
+                      : 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-600/30 hover:border-green-600/50'
                     }`}
                 >
                   {isInCall || callState.callStatus === 'calling' ? 'End Call' : 'Call'}
