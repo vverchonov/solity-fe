@@ -5,31 +5,11 @@ function BalanceModule() {
   const [topUpAmount, setTopUpAmount] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Fixed rates data
-  const rates = [
-    { code: 'TZ', country: 'Tanzania', dialCode: '+255', cost: 0.01305 },
-    { code: 'GB', country: 'United Kingdom', dialCode: '+44', cost: 0.0125 },
-    { code: 'CF', country: 'Central African Republic', dialCode: '+236', cost: 0.0119 },
-    { code: 'XX', country: 'Sao Tome and Principe', dialCode: '', cost: 0.00995 },
-    { code: 'PG', country: 'Papua New Guinea', dialCode: '+675', cost: 0.00975 },
-    { code: 'NF', country: 'Norfolk Island', dialCode: '+672', cost: 0.00935 },
-    { code: 'GW', country: 'Guinea-Bissau', dialCode: '+245', cost: 0.00905 },
-    { code: 'DZ', country: 'Algeria', dialCode: '+213', cost: 0.00705 },
-    { code: 'VU', country: 'Vanuatu', dialCode: '+678', cost: 0.0069 },
-    { code: 'CU', country: 'Cuba', dialCode: '+53', cost: 0.0067 },
-    { code: 'MV', country: 'Maldives', dialCode: '+960', cost: 0.00655 },
-    { code: 'TV', country: 'Tuvalu', dialCode: '+688', cost: 0.0065 },
-    { code: 'CK', country: 'Cook Islands', dialCode: '+682', cost: 0.00645 },
-    { code: 'SB', country: 'Solomon Islands', dialCode: '+677', cost: 0.00625 },
-    { code: 'WS', country: 'Samoa', dialCode: '+685', cost: 0.00625 },
-    { code: 'TN', country: 'Tunisia', dialCode: '+216', cost: 0.00605 },
-    { code: 'CN', country: 'China', dialCode: '+86', cost: 0.00575 },
-    { code: 'SC', country: 'Seychelles', dialCode: '+248', cost: 0.0055 },
-    { code: 'TL', country: 'Timor-Leste', dialCode: '+670', cost: 0.0054 },
-    { code: 'DE', country: 'Germany', dialCode: '+49', cost: 0.0052 }
-  ]
+  // Use rates from the /current endpoint via RatesProvider
+  const { rates: apiRates, isLoading: ratesLoading, error: ratesError } = useRates()
 
-  const ratesLoading = false
+  // Use actual rates from API or fallback to empty array
+  const rates = apiRates || []
 
   const quickAmounts = [0.1, 0.5, 1, 2]
 
@@ -42,25 +22,28 @@ function BalanceModule() {
     console.log('Adding funds:', topUpAmount)
   }
 
-  // Filter and search rates
+  // Filter and search rates - adapted for API data structure
   const filteredRates = rates.filter(rate => {
+    // Only show active rates
+    if (!rate.active) return false
+
     if (!searchQuery.trim()) return true
-    
+
     const query = searchQuery.toLowerCase()
     const matchesCountry = rate.country?.toLowerCase().includes(query)
-    const matchesCode = rate.code?.toLowerCase().includes(query)
-    const matchesDialCode = rate.dialCode?.toLowerCase().includes(query)
-    
+    const matchesCode = rate.codes?.toLowerCase().includes(query)
+    const matchesDialCode = rate.dial_code?.toLowerCase().includes(query) || rate.dialCode?.toLowerCase().includes(query)
+
     return matchesCountry || matchesCode || matchesDialCode
   })
 
-  // Sort by cost (highest to lowest)
-  const sortedRates = filteredRates.sort((a, b) => b.cost - a.cost)
+  // Sort by rate (highest to lowest) - using 'rate' field from API
+  const sortedRates = filteredRates.sort((a, b) => (b.rate || b.cost || 0) - (a.rate || a.cost || 0))
 
   // Take first 20 records
   const displayRates = sortedRates.slice(0, 20).map((rate, index) => ({
     ...rate,
-    uniqueKey: `${rate.code}_${index}` // For React key prop
+    uniqueKey: `${rate.codes || rate.code}_${index}` // For React key prop
   }))
 
   return (
@@ -100,24 +83,23 @@ function BalanceModule() {
                 placeholder="Enter custom amount"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 text-sm"
               />
-              
+
               {/* Quick Top-up Buttons */}
               <div className="grid grid-cols-2 gap-2">
                 {quickAmounts.map((amount) => (
                   <button
                     key={amount}
                     onClick={() => handleQuickTopUp(amount)}
-                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                      topUpAmount === amount.toString()
+                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${topUpAmount === amount.toString()
                         ? 'bg-white text-gray-900'
                         : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
-                    }`}
+                      }`}
                   >
                     {amount}
                   </button>
                 ))}
               </div>
-              
+
               <button
                 onClick={handleAddFunds}
                 className="w-full bg-white hover:bg-gray-100 text-gray-900 py-2 rounded-xl font-medium transition-all text-sm"
@@ -138,7 +120,7 @@ function BalanceModule() {
             </div>
             <h3 className="text-xl font-semibold text-white">Current Rates</h3>
           </div>
-          
+
           {/* Search Field */}
           <div className="w-64">
             <input
@@ -156,6 +138,13 @@ function BalanceModule() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
             <span className="ml-3 text-white/70">Loading rates...</span>
           </div>
+        ) : ratesError ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="text-red-400 text-sm mb-2">Failed to load rates</div>
+              <div className="text-white/60 text-xs">{ratesError}</div>
+            </div>
+          </div>
         ) : (
           <>
             {/* Table Header */}
@@ -165,7 +154,7 @@ function BalanceModule() {
               <div className="text-white/60 text-sm font-medium">Dial Code</div>
               <div className="text-white/60 text-sm font-medium text-right">Cost</div>
             </div>
-            
+
             {/* Table Rows */}
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {displayRates.length === 0 ? (
@@ -176,22 +165,22 @@ function BalanceModule() {
                 displayRates.map((rate) => (
                   <div key={rate.uniqueKey} className="grid grid-cols-4 gap-4 py-2 hover:bg-white/5 rounded-lg transition-colors">
                     <div className="text-white text-sm">
-                      {rate.country}
+                      {rate.country || rate.destination || rate.name || 'Unknown'}
                     </div>
                     <div className="text-white/70 text-sm font-mono">
-                      {rate.code}
+                      {rate.codes || rate.code || '-'}
                     </div>
                     <div className="text-white/70 text-sm font-mono">
-                      {rate.dialCode || '-'}
+                      {rate.dial_code || rate.dialCode || '-'}
                     </div>
                     <div className="text-white text-sm font-mono text-right">
-                      {rate.cost.toFixed(8)} SOL
+                      {(rate.rate || rate.cost || 0).toFixed(8)} SOL
                     </div>
                   </div>
                 ))
               )}
             </div>
-            
+
             {/* Results Info */}
             <div className="mt-4 pt-4 border-t border-white/10">
               <div className="text-white/50 text-sm">
