@@ -154,7 +154,7 @@ function Dashboard() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
-                    <span className="text-white/80 text-sm font-medium">
+                    <span className="text-white/80 text-[0.5rem] text-center font-medium">
                       {user?.userRole === 'admin' ? 'Admin User' :
                         user?.userRole === 'premium' ? 'Premium User' :
                           'Standard User'}
@@ -274,9 +274,9 @@ function Dashboard() {
               </div>
 
               {/* Server Status Card */}
-              <div className="card p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-white/70 text-sm">Solity NET:</span>
+              <div className="card px-4 py-2 flex flex-col gap-2">
+                <div className="w-full flex items-baseline justify-start gap-1 px-3 py-3">
+                  <span className="text-white/70 text-sm">SolityNET:</span>
                   <span className={`text-sm font-medium ${isServerHealthy() ? 'text-green-300' : 'text-red-300'}`}>
                     {isServerHealthy() ? 'Online' : 'No Connection'}
                   </span>
@@ -288,21 +288,21 @@ function Dashboard() {
                   </div>
                 </div>
                 {!isServerHealthy() && (
-                  <div className="mb-3 text-xs text-red-400">
+                <div className="mb-3 text-xs text-red-400">
                     Issues: {getUnhealthyServices().join(', ')}
-                  </div>
+                </div>
                 )}
 
 
                 {/* Username Section */}
-                <div className="w-full px-4 py-3 mb-3 bg-white/5 border border-white/10 rounded-lg">
-                  <div className="flex items-center gap-3">
+                <div className="w-full px-3 py-3 bg-white/5 border border-white/10 rounded-lg">
+                  <div className="flex items-center justify-start gap-3">
                     <div className="w-6 h-6 bg-white/10 rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
-                    <div className="text-white/80 font-medium">
+                    <div className="text-white/80 text-sm font-medium">
                       {user?.userRole === 'admin' ? 'Admin User' :
                         user?.userRole === 'premium' ? 'Premium User' :
                           'Standard User'}
@@ -313,11 +313,13 @@ function Dashboard() {
                 {/* Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className="w-full px-3 py-2 text-left font-medium text-white/70 hover:bg-white/5 hover:text-white transition-all duration-200 flex items-center gap-3 rounded-lg"
+                  className="w-full text-sm px-3 py-3 font-medium text-white/70 hover:bg-white/5 hover:text-white transition-all duration-200 flex items-center justify-start gap-3 rounded-lg"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
+                  <div className="w-6 h-6 flex items-center justify-center">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </div>
                   <span>Log Out</span>
                 </button>
               </div>

@@ -419,8 +419,8 @@ function BalanceModule({ onNavigateToSupport }) {
     return (a.cost || 0) - (b.cost || 0)
   })
 
-  // Take first 50 records to show more data
-  const displayRates = sortedRates.slice(0, 50).map((rate, index) => {
+  // Take first 10 records to show more data
+  const displayRates = sortedRates.slice(0, 10).map((rate, index) => {
     // Count how many times this ID appears before this index
     const sameIdCount = sortedRates.slice(0, index).filter(r => r.id === rate.id).length
     const displayId = sameIdCount > 0 ? `${rate.id}-${sameIdCount + 1}` : rate.id
@@ -440,9 +440,9 @@ function BalanceModule({ onNavigateToSupport }) {
 
   return (
     <>
-      <div className="space-y-6 h-full">
+      <div className="space-y-6 h-full max-h-full overflow-hidden flex flex-col">
         {/* Balance Card */}
-        <div className="card p-6">
+        <div className="card p-6 flex-shrink-0">
           <div className="flex justify-between items-start mb-6">
             <h2 className="text-2xl text-white/70">Balance</h2>
             <div className="bg-white/10 px-4 py-2 rounded-full">
@@ -638,7 +638,7 @@ function BalanceModule({ onNavigateToSupport }) {
         </div>
 
         {/* Invoices Table Card */}
-        <div id="recent-invoices-section" className="card p-6">
+        <div id="recent-invoices-section" className="card p-6 h-96 flex-shrink-0">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -649,12 +649,12 @@ function BalanceModule({ onNavigateToSupport }) {
           </div>
 
           {invoicesLoading ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
               <span className="ml-3 text-white/70">Loading invoices...</span>
             </div>
           ) : invoicesError ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="text-red-400 text-sm mb-2">Failed to load invoices</div>
                 <div className="text-white/60 text-xs">{invoicesError}</div>
@@ -672,7 +672,7 @@ function BalanceModule({ onNavigateToSupport }) {
               </div>
 
               {/* Table Rows */}
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="space-y-2 h-48 overflow-y-auto">
                 {displayInvoices.length === 0 ? (
                   <div className="text-center py-8 text-white/60">
                     No invoices found.
@@ -713,7 +713,7 @@ function BalanceModule({ onNavigateToSupport }) {
         </div>
 
         {/* Rates Table Card */}
-        <div className="card p-6 flex-1">
+        <div className="card p-6 min-h-0 flex-1 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -747,50 +747,67 @@ function BalanceModule({ onNavigateToSupport }) {
               </div>
             </div>
           ) : (
-            <>
+            <div className="flex flex-col min-h-0 flex-1">
               {/* Table Header */}
-              <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs" style={{ gridTemplateColumns: '40px 2fr 1fr 1fr 1fr' }}>
-                <div className="text-white/60 font-medium">Active</div>
+              <div className="hidden md:grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs items-center flex-shrink-0" style={{ gridTemplateColumns: '60px 1fr 1fr 120px' }}>
+                <div className="text-white/60 font-medium text-center">Active</div>
                 <div className="text-white/60 font-medium">Direction</div>
                 <div className="text-white/60 font-medium">Codes</div>
-                <div className="text-white/60 font-medium">Route</div>
                 <div className="text-white/60 font-medium text-right">Cost</div>
               </div>
 
               {/* Table Rows */}
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
                 {displayRates.length === 0 ? (
                   <div className="text-center py-8 text-white/60">
                     {searchQuery ? 'No rates found matching your search.' : 'No rates available.'}
                   </div>
                 ) : (
                   displayRates.map((rate) => (
-                    <div key={rate.uniqueKey} className="grid gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs" style={{ gridTemplateColumns: '40px 2fr 1fr 1fr 1fr' }}>
-                      <div className="flex items-center justify-center">
-                        <div className={`w-2 h-2 rounded-full ${rate.active ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      </div>
-                      <div className="text-white">
-                        <div className="truncate" title={rate.direction}>
-                          {rate.direction ? (rate.direction.length > 35 ? rate.direction.substring(0, 35) + '...' : rate.direction) : '-'}
+                    <div key={rate.uniqueKey} className="hover:bg-white/5 rounded-lg transition-colors">
+                      {/* Desktop Layout */}
+                      <div className="hidden md:grid gap-3 py-2 text-xs items-center" style={{ gridTemplateColumns: '60px 1fr 1fr 120px' }}>
+                        <div className="flex items-center justify-center">
+                          <div className={`w-2 h-2 rounded-full ${rate.active ? 'bg-green-400' : 'bg-red-400'}`}></div>
                         </div>
-                      </div>
-                      <div className="text-white/70 font-mono relative group">
-                        <div className="truncate cursor-help">
-                          {rate.formattedCodes.length > 20 ? rate.formattedCodes.substring(0, 20) + '...' : rate.formattedCodes}
+                        <div className="text-white flex items-center">
+                          <div className="truncate" title={rate.direction}>
+                            {rate.direction || '-'}
+                          </div>
                         </div>
-                        {rate.formattedCodes.length > 20 && (
-                          <div className="absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                        <div className="text-white/70 font-mono flex items-start">
+                          <div className="break-words text-xs">
                             {rate.formattedCodes}
                           </div>
-                        )}
-                      </div>
-                      <div className="text-white/70">
-                        <div className="truncate" title={rate.routename}>
-                          {rate.routename ? (rate.routename.length > 18 ? rate.routename.substring(0, 18) + '...' : rate.routename) : '-'}
+                        </div>
+                        <div className="text-white font-mono text-right flex items-center justify-end">
+                          <span>{rate.displaycost || '0'} {rate.displaycurrency || ''}</span>
                         </div>
                       </div>
-                      <div className="text-white font-mono text-right">
-                        {rate.displaycost || '0'} {rate.displaycurrency || ''}
+                      
+                      {/* Mobile Layout */}
+                      <div className="md:hidden p-3 space-y-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${rate.active ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                            <span className="text-white/60 text-xs">
+                              {rate.active ? 'Active' : 'Inactive'}
+                            </span>
+                          </div>
+                          <div className="text-white font-mono">
+                            {rate.displaycost || '0'} {rate.displaycurrency || ''}
+                          </div>
+                        </div>
+                        <div className="text-white">
+                          <span className="text-white/60">Direction: </span>
+                          {rate.direction || '-'}
+                        </div>
+                        <div className="text-white/70">
+                          <span className="text-white/60">Codes: </span>
+                          <span className="font-mono break-words">
+                            {rate.formattedCodes}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -798,13 +815,13 @@ function BalanceModule({ onNavigateToSupport }) {
               </div>
 
               {/* Results Info */}
-              <div className="mt-4 pt-4 border-t border-white/10">
+              <div className="mt-4 pt-4 border-t border-white/10 flex-shrink-0">
                 <div className="text-white/50 text-sm">
                   Showing {displayRates.length} of {filteredRates.length} rates
                   {searchQuery && ` (filtered from ${rates.length} total)`}
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
