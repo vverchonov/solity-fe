@@ -364,7 +364,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
           </div>
 
           {/* Number Pad - Hidden on mobile, available on larger screens */}
-          <div className="w-3/12 justify-center h-fit my-auto hidden lg:flex">
+          <div className="w-3/12 justify-center h-fit my-auto hidden">
             <div className="grid grid-cols-3 gap-4">
               {numberPadButtons.flat().map((btn) => (
                 <button
@@ -421,9 +421,9 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
                   key={log.id}
                   className={
                     log.type === 'success' ? 'text-green-400' :
-                    log.type === 'error' ? 'text-red-400' :
-                    log.type === 'warning' ? 'text-yellow-400' :
-                    'text-white/60'
+                      log.type === 'error' ? 'text-red-400' :
+                        log.type === 'warning' ? 'text-yellow-400' :
+                          'text-white/60'
                   }
                 >
                   <span className="text-blue-300">{log.timestamp}</span> {log.message}
