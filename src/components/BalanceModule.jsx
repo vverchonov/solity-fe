@@ -107,10 +107,10 @@ function BalanceModule() {
                   disabled={isConnecting}
                   className={`w-full py-2 px-4 rounded-xl text-sm font-medium transition-all ${
                     isConnecting
-                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                      ? 'bg-white/10 text-white/40 cursor-not-allowed'
                       : isWalletConnected
-                        ? 'bg-red-600 hover:bg-red-700 text-white'
-                        : 'bg-purple-600 hover:bg-purple-700 text-white'
+                        ? 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/20'
+                        : 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/20'
                   }`}
                 >
                   {isConnecting
