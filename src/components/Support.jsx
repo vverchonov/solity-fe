@@ -40,8 +40,8 @@ function Support() {
 
   return (
     <div className="space-y-6 h-full overflow-y-auto">
-      {/* Social Links Grid - Responsive: 1 column on mobile, 2 on tablet, 3 on desktop */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Social Links - Responsive Layout */}
+      <div className="flex flex-col lg:flex-row gap-6">
         {socialLinks.map((link) => (
           <div key={link.name} className="card p-6">
             <div className="flex items-center gap-3 mb-4">

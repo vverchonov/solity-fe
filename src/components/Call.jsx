@@ -17,6 +17,10 @@ function Call() {
   const [currentRate, setCurrentRate] = useState(null)
   const [isResolvingRate, setIsResolvingRate] = useState(false)
   const [rateError, setRateError] = useState(null)
+  const [logs, setLogs] = useState([
+    { timestamp: '[12:34:56]', message: 'Session initialized', type: 'info' },
+    { timestamp: '[12:35:12]', message: 'Balance updated: 0.0000 SOL', type: 'success' }
+  ])
 
   // Use CallProvider
   const {
@@ -226,6 +230,10 @@ function Call() {
     setIsModalVisible(true)
   }
 
+  const handleClearLogs = () => {
+    setLogs([])
+  }
+
   const numberPadButtons = [
     ['1', '2', '3'],
     ['4', '5', '6'],
@@ -395,24 +403,29 @@ function Call() {
       <div className="lg:col-span-12 card p-4 h-fit">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg text-white/70">Logs</h3>
-          <button className="text-white/60 hover:text-white text-sm transition-all">
+          <button
+            onClick={handleClearLogs}
+            className="text-white/60 hover:text-white text-sm transition-all"
+          >
             Clear
           </button>
         </div>
         <div className="bg-black/20 rounded-xl p-3 h-48 overflow-y-auto">
           <div className="space-y-1 text-sm font-mono">
-            <div className="text-white/60">
-              <span className="text-blue-300">[12:34:56]</span> Session initialized
-            </div>
-            <div className="text-white/60">
-              <span className="text-blue-300">[12:34:57]</span> Wallet connected: SOL1TyA68.DuK9
-            </div>
-            <div className="text-white/60">
-              <span className="text-blue-300">[12:34:58]</span> Ready for calls
-            </div>
-            <div className="text-green-400">
-              <span className="text-blue-300">[12:35:12]</span> Balance updated: 0.0000 SOL
-            </div>
+            {logs.length === 0 ? (
+              <div className="text-white/40 text-center py-8">
+                No logs to display
+              </div>
+            ) : (
+              logs.map((log, index) => (
+                <div
+                  key={index}
+                  className={log.type === 'success' ? 'text-green-400' : 'text-white/60'}
+                >
+                  <span className="text-blue-300">{log.timestamp}</span> {log.message}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

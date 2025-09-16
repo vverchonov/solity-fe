@@ -44,7 +44,7 @@ function Balance() {
           {quickAmounts.map((amount) => (
             <button
               key={amount}
-              onClick={() => handleAddBalance(amount)}
+              onClick={() => setCustomAmount(amount.toString())}
               className="px-3 py-2 rounded-xl text-sm font-medium transition-all bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20"
             >
               {amount}
