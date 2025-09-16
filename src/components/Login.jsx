@@ -143,70 +143,70 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-black">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-950 via-blue-950 to-black overflow-x-hidden">
       {/* Background Overlay */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#0e1b4f] via-[#0b0f23] to-black opacity-90"></div>
-      <div className="pointer-events-none absolute -top-48 -left-24 h-[40rem] w-[40rem] rounded-full bg-gradient-to-tr from-[#0A43FF]/30 to-transparent blur-3xl"></div>
+      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-[#0e1b4f] via-[#0b0f23] to-black opacity-90"></div>
+      <div className="pointer-events-none fixed -top-48 -left-24 h-[40rem] w-[40rem] rounded-full bg-gradient-to-tr from-[#0A43FF]/30 to-transparent blur-3xl"></div>
 
       {/* Navbar */}
-      <nav className="relative p-6">
-        <div className="max-w-7xl mx-auto">
+      <nav className="relative w-full px-4 py-4 lg:p-6">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="flex items-center">
-            <img src="/logo.png" alt="Logo" className="h-12 w-auto" />
+            <img src="/logo.png" alt="Logo" className="h-8 sm:h-10 lg:h-12 w-auto" />
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="relative flex items-center justify-center p-4 min-h-[calc(100vh-120px)]">
-        <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-8 lg:gap-12">
+      <div className="relative w-full flex items-center justify-center px-4 py-2 min-h-[calc(100vh-120px)]">
+        <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-12 mx-auto">
 
           {/* Welcome Card */}
-          <div className="w-full lg:w-1/2 card p-8 lg:p-12">
-            <div className="space-y-8">
-              <div>
-                <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+          <div className="w-full lg:w-1/2 card p-4 sm:p-6 lg:p-12 min-w-0 flex-shrink-0 mx-auto">
+            <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
+              <div className="w-full text-center lg:text-left">
+                <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white mb-3 lg:mb-4 break-words">
                   Solity Mobile
                 </h1>
-                <h2 className="text-2xl lg:text-3xl text-blue-300 mb-6">
+                <h2 className="text-lg sm:text-xl lg:text-3xl text-blue-300 mb-4 lg:mb-6 break-words">
                   Solana Ecosystem
                 </h2>
-                <p className="text-white/70 text-lg leading-relaxed">
+                <p className="text-white/70 text-sm sm:text-base lg:text-lg leading-relaxed">
                   Onchain telecommunication company providing worldwide service. Solana ecosystem based. Private calls any number to any number.
                 </p>
               </div>
 
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  <div>
-                    <span className="text-blue-300 font-semibold">on-chain</span>
-                    <p className="text-white/60 text-sm">Transparent fees in SOL</p>
+              <div className="space-y-4 lg:space-y-6 w-full">
+                <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-blue-300 font-semibold text-sm lg:text-base">on-chain</span>
+                    <p className="text-white/60 text-xs lg:text-sm">Transparent fees in SOL</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <div>
-                    <span className="text-green-300 font-semibold">private</span>
-                    <p className="text-white/60 text-sm">No KYC, no call history</p>
+                <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
+                  <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-green-300 font-semibold text-sm lg:text-base">private</span>
+                    <p className="text-white/60 text-xs lg:text-sm">No KYC, no call history</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  <div>
-                    <span className="text-purple-300 font-semibold">decentralised</span>
-                    <p className="text-white/60 text-sm">Any numbers to use</p>
+                <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full flex-shrink-0"></div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-purple-300 font-semibold text-sm lg:text-base">decentralised</span>
+                    <p className="text-white/60 text-xs lg:text-sm">Any numbers to use</p>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-8 border-t border-white/10">
-                <div className="space-y-2">
-                  <p className="text-white/50 text-sm">Company Registration Number:</p>
-                  <p className="text-white font-mono text-lg">CA</p>
-                  <div className="flex items-center gap-2 mt-4">
+              <div className="pt-6 lg:pt-8 border-t border-white/10">
+                <div className="space-y-2 flex flex-col items-center lg:items-start">
+                  <p className="text-white/50 text-xs lg:text-sm">Company Registration Number:</p>
+                  <p className="text-white font-mono text-sm lg:text-lg">CA</p>
+                  <div className="flex items-center gap-2 mt-3 lg:mt-4">
                     <div className="flex items-end gap-0.5">
                       <div className={`w-1 h-2 rounded-sm ${health.api ? 'bg-green-400' : 'bg-red-400'}`}></div>
                       <div className={`w-1 h-3 rounded-sm ${health.db ? 'bg-green-400' : 'bg-red-400'}`}></div>
@@ -230,10 +230,10 @@ function Login() {
           </div>
 
           {/* Auth Card */}
-          <div className="w-full lg:w-1/2 card p-8 lg:p-12">
-            <div className="space-y-8">
-              <div className="text-center">
-                <h3 className="text-2xl lg:text-3xl font-bold text-white mb-8">
+          <div className="w-full lg:w-1/2 card p-4 sm:p-6 lg:p-12 min-w-0 flex-shrink-0 mx-auto">
+            <div className="space-y-6 lg:space-y-8 w-full">
+              <div className="text-center w-full">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-6 lg:mb-8">
                   {isLogin ? 'Sign In' : 'Create Account'}
                 </h3>
               </div>
@@ -323,7 +323,18 @@ function Login() {
                   {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
                 </button>
               </form>
+
             </div>
+              {isLogin && (
+                <div className="text-center">
+                  <button
+                    onClick={() => addToast('Please contact Support', 'info')}
+                    className="text-sm mt-2 text-white/70 hover:text-white"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
           </div>
         </div>
       </div>
