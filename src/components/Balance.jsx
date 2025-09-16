@@ -454,19 +454,11 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
         {/* Processing Invoice Notification */}
         {latestProcessingInvoice && (
           <div className="mb-3 p-2 bg-blue-600/20 border border-blue-600/30 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                <span className="text-blue-400 text-xs font-medium">
-                  Payment Processing {formatInvoiceAmount(latestProcessingInvoice.lamports)}
-                </span>
-              </div>
-              <button
-                onClick={() => handleCancelInvoice(latestProcessingInvoice.id)}
-                className="text-xs text-red-400 hover:text-red-300 transition-colors underline"
-              >
-                Cancel
-              </button>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+              <span className="text-blue-400 text-xs font-medium">
+                Payment Processing {formatInvoiceAmount(latestProcessingInvoice.lamports)}
+              </span>
             </div>
           </div>
         )}

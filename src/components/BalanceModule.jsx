@@ -497,17 +497,9 @@ function BalanceModule({ onNavigateToSupport }) {
                 {/* Processing Invoice Notification */}
                 {latestProcessingInvoice && (
                   <div className="mt-3 mb-3 p-3 bg-blue-600/20 border border-blue-600/30 rounded-xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-                        <span className="text-blue-400 text-sm font-medium">Payment Processing</span>
-                      </div>
-                      <button
-                        onClick={() => handleCancelInvoice(latestProcessingInvoice.id)}
-                        className="text-xs text-red-400 hover:text-red-300 transition-colors underline"
-                      >
-                        Cancel
-                      </button>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                      <span className="text-blue-400 text-sm font-medium">Payment Processing</span>
                     </div>
                     <p className="text-white/70 text-xs">
                       Your {formatInvoiceAmount(latestProcessingInvoice.lamports)} payment is being processed.
