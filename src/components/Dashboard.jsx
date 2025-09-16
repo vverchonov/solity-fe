@@ -161,13 +161,18 @@ function Dashboard() {
                   </div>
 
                   {/* Compact Server Status */}
-                  <div className="flex items-center gap-2" title={`Solity NET: ${isServerHealthy() ? 'Online' : 'No Connection'}`}>
+                  <div className="flex items-center gap-2 relative group" title={`Solity NET: ${isServerHealthy() ? 'Online' : 'Offline'}`}>
                     <div className="flex items-end gap-0.5">
                       <div className={`w-0.5 h-1.5 rounded-sm ${health.api ? 'bg-green-400' : 'bg-red-400'}`}></div>
                       <div className={`w-0.5 h-2 rounded-sm ${health.db ? 'bg-green-400' : 'bg-red-400'}`}></div>
                       <div className={`w-0.5 h-2.5 rounded-sm ${health.tele ? 'bg-green-400' : 'bg-red-400'}`}></div>
                       <div className={`w-0.5 h-3 rounded-sm ${isServerHealthy() ? 'bg-green-400' : 'bg-red-400'}`}></div>
                     </div>
+                    {!isServerHealthy() && (
+                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                        Offline: {getUnhealthyServices().join(', ')}
+                      </div>
+                    )}
                   </div>
 
                   {/* Compact Logout Button */}
@@ -217,15 +222,6 @@ function Dashboard() {
                       </div>
                     ))}
                   </div>
-
-                  {/* Server Status Details (when menu is open) */}
-                  {!isServerHealthy() && (
-                    <div className="mt-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
-                      <div className="text-xs text-red-400">
-                        Issues: {getUnhealthyServices().join(', ')}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -274,10 +270,10 @@ function Dashboard() {
 
               {/* Server Status Card */}
               <div className="card px-4 py-2 flex flex-col gap-2">
-                <div className="w-full flex items-baseline justify-start gap-1 px-3 py-3">
+                <div className="w-full flex items-baseline justify-start gap-1 px-3 py-3 relative group">
                   <span className="text-white/70 text-sm">SolityNET:</span>
                   <span className={`text-sm font-medium ${isServerHealthy() ? 'text-green-300' : 'text-red-300'}`}>
-                    {isServerHealthy() ? 'Online' : 'No Connection'}
+                    {isServerHealthy() ? 'Online' : 'Offline'}
                   </span>
                   <div className="flex items-end gap-0.5">
                     <div className={`w-0.5 h-1.5 rounded-sm ${health.api ? 'bg-green-400' : 'bg-red-400'}`}></div>
@@ -285,12 +281,12 @@ function Dashboard() {
                     <div className={`w-0.5 h-2.5 rounded-sm ${health.tele ? 'bg-green-400' : 'bg-red-400'}`}></div>
                     <div className={`w-0.5 h-3 rounded-sm ${isServerHealthy() ? 'bg-green-400' : 'bg-red-400'}`}></div>
                   </div>
+                  {!isServerHealthy() && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                      Offline: {getUnhealthyServices().join(', ')}
+                    </div>
+                  )}
                 </div>
-                {!isServerHealthy() && (
-                <div className="mb-3 text-xs text-red-400">
-                    Issues: {getUnhealthyServices().join(', ')}
-                </div>
-                )}
 
 
                 {/* Username Section */}

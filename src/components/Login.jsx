@@ -213,14 +213,14 @@ function Login() {
                       <div className={`w-1 h-4 rounded-sm ${health.tele ? 'bg-green-400' : 'bg-red-400'}`}></div>
                       <div className={`w-1 h-5 rounded-sm ${isServerHealthy() ? 'bg-green-400' : 'bg-red-400'}`}></div>
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col relative group">
                       <span className={`text-xs font-medium ${isServerHealthy() ? 'text-green-300' : 'text-red-300'}`}>
-                        {isServerHealthy() ? 'Server Online' : 'Connection Issues'}
+                        {isServerHealthy() ? 'Services Online' : 'Some Services Offline'}
                       </span>
                       {!isServerHealthy() && (
-                        <span className="text-red-400 text-xs">
-                          {getUnhealthyServices().join(', ')}
-                        </span>
+                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                          Offline: {getUnhealthyServices().join(', ')}
+                        </div>
                       )}
                     </div>
                   </div>
