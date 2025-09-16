@@ -11,6 +11,7 @@ import { WalletProvider } from './contexts/WalletProvider'
 import { BalanceProvider } from './contexts/BalanceProvider'
 import { InvoicesProvider } from './contexts/InvoicesProvider'
 import { LogsProvider } from './contexts/LogsProvider'
+import { TeleProvider } from './contexts/TeleProvider'
 
 function App() {
   return (
@@ -19,10 +20,11 @@ function App() {
         <LogsProvider>
           <WalletProvider>
             <UserProvider>
-              <InvoicesProvider>
-                <BalanceProvider>
-                  <CallProvider>
-                    <Router>
+              <TeleProvider>
+                <InvoicesProvider>
+                  <BalanceProvider>
+                    <CallProvider>
+                      <Router>
                       <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/dashboard" element={
@@ -32,11 +34,12 @@ function App() {
                             </RatesProvider>
                           </ProtectedRoute>
                         } />
-                      </Routes>
-                    </Router>
-                  </CallProvider>
-                </BalanceProvider>
-              </InvoicesProvider>
+                        </Routes>
+                      </Router>
+                    </CallProvider>
+                  </BalanceProvider>
+                </InvoicesProvider>
+              </TeleProvider>
             </UserProvider>
           </WalletProvider>
         </LogsProvider>

@@ -1,15 +1,20 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../contexts/WalletProvider'
 import { useBalance } from '../contexts/BalanceProvider'
 import { useInvoices } from '../contexts/InvoicesProvider'
 import { useLogs } from '../contexts/LogsProvider'
+import { useUser } from '../contexts/UserContext'
 import { paymentsAPI } from '../services/payments'
 import { solanaService } from '../services/solana'
+import { authAPI } from '../services/auth'
 
 function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const [customAmount, setCustomAmount] = useState('')
   const [showProcessingModal, setShowProcessingModal] = useState(false)
   const [isRefreshingBalance, setIsRefreshingBalance] = useState(false)
+  const navigate = useNavigate()
+  const { user, clearUser } = useUser()
   const { isWalletConnected, walletAddress, isConnecting, connectWallet, disconnectWallet, walletProvider } = useWallet()
   const {
     balance,
@@ -148,6 +153,19 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
 
   const handleDisconnectWallet = async () => {
     await disconnectWallet()
+  }
+
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout()
+      clearUser()
+      navigate('/')
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Clear user state and redirect even if logout fails
+      clearUser()
+      navigate('/')
+    }
   }
 
   const handleCancelInvoice = async (invoiceId) => {
@@ -488,7 +506,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
             </div>
           </button>
           {isWalletConnected && walletAddress && (
-            <div className="mt-2 text-xs text-white/60 break-all">
+            <div className="mt-2 text-xs text-white/60 break-all text-center">
               Connected: {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
             </div>
           )}

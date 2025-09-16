@@ -1,17 +1,22 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useRates } from '../contexts/RatesProvider'
 import { useWallet } from '../contexts/WalletProvider'
 import { useBalance } from '../contexts/BalanceProvider'
 import { useInvoices } from '../contexts/InvoicesProvider'
 import { useLogs } from '../contexts/LogsProvider'
+import { useUser } from '../contexts/UserContext'
 import { paymentsAPI } from '../services/payments'
 import { solanaService } from '../services/solana'
+import { authAPI } from '../services/auth'
 
 function BalanceModule({ onNavigateToSupport }) {
   const [topUpAmount, setTopUpAmount] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [showProcessingModal, setShowProcessingModal] = useState(false)
   const [isRefreshingBalance, setIsRefreshingBalance] = useState(false)
+  const navigate = useNavigate()
+  const { user, clearUser } = useUser()
 
   // Use rates from the /current endpoint via RatesProvider
   const { rates: apiRates, isLoading: ratesLoading, error: ratesError } = useRates()
@@ -167,6 +172,19 @@ function BalanceModule({ onNavigateToSupport }) {
 
   const handleDisconnectWallet = async () => {
     await disconnectWallet()
+  }
+
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout()
+      clearUser()
+      navigate('/')
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Clear user state and redirect even if logout fails
+      clearUser()
+      navigate('/')
+    }
   }
 
   const handleCancelInvoice = async (invoiceId) => {
@@ -731,12 +749,11 @@ function BalanceModule({ onNavigateToSupport }) {
           ) : (
             <>
               {/* Table Header */}
-              <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs" style={{ gridTemplateColumns: '40px 2fr 1fr 1fr 40px 1fr' }}>
+              <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs" style={{ gridTemplateColumns: '40px 2fr 1fr 1fr 1fr' }}>
                 <div className="text-white/60 font-medium">Active</div>
                 <div className="text-white/60 font-medium">Direction</div>
                 <div className="text-white/60 font-medium">Codes</div>
                 <div className="text-white/60 font-medium">Route</div>
-                <div className="text-white/60 font-medium">Priority</div>
                 <div className="text-white/60 font-medium text-right">Cost</div>
               </div>
 
@@ -748,20 +765,20 @@ function BalanceModule({ onNavigateToSupport }) {
                   </div>
                 ) : (
                   displayRates.map((rate) => (
-                    <div key={rate.uniqueKey} className="grid gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs" style={{ gridTemplateColumns: '40px 2fr 1fr 1fr 40px 1fr' }}>
+                    <div key={rate.uniqueKey} className="grid gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs" style={{ gridTemplateColumns: '40px 2fr 1fr 1fr 1fr' }}>
                       <div className="flex items-center justify-center">
                         <div className={`w-2 h-2 rounded-full ${rate.active ? 'bg-green-400' : 'bg-red-400'}`}></div>
                       </div>
                       <div className="text-white">
                         <div className="truncate" title={rate.direction}>
-                          {rate.direction ? (rate.direction.length > 25 ? rate.direction.substring(0, 25) + '...' : rate.direction) : '-'}
+                          {rate.direction ? (rate.direction.length > 35 ? rate.direction.substring(0, 35) + '...' : rate.direction) : '-'}
                         </div>
                       </div>
                       <div className="text-white/70 font-mono relative group">
                         <div className="truncate cursor-help">
-                          {rate.formattedCodes.length > 15 ? rate.formattedCodes.substring(0, 15) + '...' : rate.formattedCodes}
+                          {rate.formattedCodes.length > 20 ? rate.formattedCodes.substring(0, 20) + '...' : rate.formattedCodes}
                         </div>
-                        {rate.formattedCodes.length > 15 && (
+                        {rate.formattedCodes.length > 20 && (
                           <div className="absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
                             {rate.formattedCodes}
                           </div>
@@ -769,11 +786,8 @@ function BalanceModule({ onNavigateToSupport }) {
                       </div>
                       <div className="text-white/70">
                         <div className="truncate" title={rate.routename}>
-                          {rate.routename ? (rate.routename.length > 12 ? rate.routename.substring(0, 12) + '...' : rate.routename) : '-'}
+                          {rate.routename ? (rate.routename.length > 18 ? rate.routename.substring(0, 18) + '...' : rate.routename) : '-'}
                         </div>
-                      </div>
-                      <div className="text-white/70 text-center">
-                        {rate.priority || '-'}
                       </div>
                       <div className="text-white font-mono text-right">
                         {rate.displaycost || '0'} {rate.displaycurrency || ''}

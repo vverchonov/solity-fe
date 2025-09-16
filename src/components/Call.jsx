@@ -5,11 +5,15 @@ import { useCall } from '../contexts/CallProvider'
 import { useUser } from '../contexts/UserContext'
 import { useRates } from '../contexts/RatesProvider'
 import { useLogs } from '../contexts/LogsProvider'
+import { useTele } from '../contexts/TeleProvider'
 import { ratesAPI } from '../services/rates'
 
 function Call({ onNavigateToInvoices, onNavigateToSupport }) {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [callerID, setCallerID] = useState('+12025550123')
+  const [editableCallerID, setEditableCallerID] = useState('+12025550123')
+  const [callerIDError, setCallerIDError] = useState(null)
+  const [isUpdatingCallerID, setIsUpdatingCallerID] = useState(false)
   const [soundDisabled, setSoundDisabled] = useState(false)
   const [callStartTime, setCallStartTime] = useState(null)
   const [callDuration, setCallDuration] = useState(0)
@@ -20,6 +24,9 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
   const [rateError, setRateError] = useState(null)
   // Use LogsProvider for displaying wallet interaction logs
   const { logs, clearLogs } = useLogs()
+
+  // Use TeleProvider for SIP credentials management
+  const { credentials, updateCallerID, hasValidCredentials } = useTele()
 
   // Use CallProvider
   const {
@@ -117,6 +124,62 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
     return () => clearTimeout(timeoutId)
   }, [phoneNumber, getRateByCode])
 
+  // Sync caller ID with TeleProvider credentials
+  useEffect(() => {
+    if (credentials && credentials.callerID) {
+      setCallerID(credentials.callerID)
+      setEditableCallerID(credentials.callerID)
+    }
+  }, [credentials])
+
+  // Debounced caller ID validation and update - validate 2 seconds after user stops editing
+  useEffect(() => {
+    // Skip validation if editableCallerID hasn't changed or is same as current
+    if (!editableCallerID.trim() || editableCallerID === callerID) {
+      setCallerIDError(null)
+      return
+    }
+
+    const validateAndUpdateCallerID = async (newCallerID) => {
+      try {
+        setIsUpdatingCallerID(true)
+        setCallerIDError(null)
+
+        // Validate format: 7-15 characters, digits only (removing + and spaces)
+        const digitsOnly = newCallerID.replace(/[^\d]/g, '')
+        if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+          setCallerIDError('Caller ID must be 7-15 digits')
+          return
+        }
+
+        // Update caller ID through TeleProvider - send only digits
+        const result = await updateCallerID(digitsOnly)
+
+        if (result.success) {
+          setCallerID(newCallerID)
+          console.log('Caller ID updated successfully:', newCallerID)
+        } else {
+          setCallerIDError(result.error || 'Failed to update caller ID')
+          // Revert to original value on error
+          setEditableCallerID(callerID)
+        }
+      } catch (error) {
+        console.error('Error updating caller ID:', error)
+        setCallerIDError('Failed to update caller ID')
+        setEditableCallerID(callerID)
+      } finally {
+        setIsUpdatingCallerID(false)
+      }
+    }
+
+    // Debounce the validation and update by 2 seconds
+    const timeoutId = setTimeout(() => {
+      validateAndUpdateCallerID(editableCallerID)
+    }, 2000)
+
+    return () => clearTimeout(timeoutId)
+  }, [editableCallerID, callerID, updateCallerID])
+
   const formatCallDuration = (seconds) => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
@@ -156,12 +219,12 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
 
   const handleReset = () => {
     setPhoneNumber('')
-    setCallerID('+12025550123')
+    setEditableCallerID('+12025550123')
   }
 
   const randomizeCallerID = () => {
     const randomNum = '+1' + Math.floor(Math.random() * 9000000000 + 1000000000)
-    setCallerID(randomNum)
+    setEditableCallerID(randomNum)
   }
 
 
@@ -274,9 +337,14 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
             <div className="mb-6">
               <label className="text-white/70 text-sm block mb-3">Caller ID</label>
               <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white min-h-[50px] flex items-center">
-                  {callerID}
-                </div>
+                <input
+                  type="text"
+                  value={editableCallerID}
+                  onChange={(e) => setEditableCallerID(e.target.value)}
+                  placeholder="e.g. +1 555 0123"
+                  disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
+                  className={`flex-1 bg-white/5 border ${callerIDError ? 'border-red-400' : 'border-white/10'} rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 min-h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
                 <button
                   onClick={randomizeCallerID}
                   disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
@@ -284,6 +352,18 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
                 >
                   Randomize
                 </button>
+              </div>
+              {/* Status indicators */}
+              <div className="text-gray-400 text-xs mt-2">
+                {isUpdatingCallerID ? (
+                  <span className="text-blue-400">Updating caller ID...</span>
+                ) : callerIDError ? (
+                  <span className="text-red-400">{callerIDError}</span>
+                ) : editableCallerID !== callerID ? (
+                  <span className="text-yellow-400">Changes will be saved automatically</span>
+                ) : (
+                  <span>Enter your caller ID (7-15 digits)</span>
+                )}
               </div>
             </div>
 
