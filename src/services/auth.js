@@ -1,6 +1,6 @@
 import apiClient from '../lib/axios'
 
-// Token management utilities (only access token in localStorage)
+// Token management utilities (access token + user data in localStorage)
 export const tokenUtils = {
   setAccessToken: (accessToken) => {
     localStorage.setItem('accessToken', accessToken)
@@ -10,11 +10,26 @@ export const tokenUtils = {
 
   clearAccessToken: () => {
     localStorage.removeItem('accessToken')
+    localStorage.removeItem('userData')
   },
 
   hasAccessToken: () => {
     const accessToken = tokenUtils.getAccessToken()
     return !!accessToken
+  },
+
+  // Store user data
+  setUserData: (userData) => {
+    localStorage.setItem('userData', JSON.stringify(userData))
+  },
+
+  getUserData: () => {
+    try {
+      const data = localStorage.getItem('userData')
+      return data ? JSON.parse(data) : null
+    } catch {
+      return null
+    }
   },
 
   // Decode JWT token to check expiration
@@ -51,6 +66,9 @@ export const authAPI = {
         userRole,
         accessTokenExpiry
       }
+
+      // Store user data in localStorage
+      tokenUtils.setUserData(user)
 
       return {
         success: true,
@@ -89,6 +107,9 @@ export const authAPI = {
         accessTokenExpiry
       }
 
+      // Store user data in localStorage
+      tokenUtils.setUserData(user)
+
       return {
         success: true,
         data: {
@@ -122,6 +143,9 @@ export const authAPI = {
         balances,
         accessTokenExpiry
       }
+
+      // Store updated user data in localStorage
+      tokenUtils.setUserData(user)
 
       return {
         success: true,

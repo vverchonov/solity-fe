@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { authAPI } from '../services/auth'
+import { authAPI, tokenUtils } from '../services/auth'
 
 const UserContext = createContext()
 
@@ -20,31 +20,61 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const initializeUser = async () => {
       try {
-        if (authAPI.isAuthenticated()) {
-          // Try to refresh token to validate session and get user data
-          const refreshResult = await authAPI.refreshToken()
-          if (refreshResult.success) {
-            console.log('Session restored via token refresh')
-            
-            // Create user object from refresh response
-            const userData = {
-              status: refreshResult.data.status,
-              userRole: refreshResult.data.userRole,
-              balances: refreshResult.data.balances
-            }
-            
-            setUser(userData)
-            console.log('User data restored:', userData)
-            
-            // Set flag to redirect to dashboard
+        const hasToken = authAPI.isAuthenticated()
+
+        if (hasToken) {
+          // First try to get cached user data
+          const cachedUserData = tokenUtils.getUserData()
+
+          if (cachedUserData) {
+            console.log('Using cached user data:', cachedUserData)
+            setUser(cachedUserData)
             setShouldRedirectToDashboard(true)
+            setIsLoading(false)
+
+            // Optionally refresh in background to get latest data
+            authAPI.refreshToken().then((refreshResult) => {
+              if (refreshResult.success) {
+                const updatedUserData = {
+                  status: refreshResult.data.status,
+                  userRole: refreshResult.data.userRole,
+                  balances: refreshResult.data.balances
+                }
+                setUser(updatedUserData)
+                console.log('Background user data updated:', updatedUserData)
+              }
+            }).catch(() => {
+              // Ignore background refresh failures
+              console.log('Background refresh failed, keeping cached data')
+            })
           } else {
-            // Token refresh failed, clear token
-            console.log('Token refresh failed, user needs to login')
+            // No cached data, need to refresh
+            console.log('No cached user data, attempting refresh')
+            const refreshResult = await authAPI.refreshToken()
+            if (refreshResult.success) {
+              const userData = {
+                status: refreshResult.data.status,
+                userRole: refreshResult.data.userRole,
+                balances: refreshResult.data.balances
+              }
+
+              setUser(userData)
+              console.log('User data restored via refresh:', userData)
+              setShouldRedirectToDashboard(true)
+            } else {
+              console.log('Token refresh failed, clearing session')
+              authAPI.logout()
+              setUser(null)
+            }
           }
+        } else {
+          console.log('No valid authentication found')
+          setUser(null)
         }
       } catch (error) {
         console.error('Failed to initialize user:', error)
+        authAPI.logout()
+        setUser(null)
       } finally {
         setIsLoading(false)
       }
