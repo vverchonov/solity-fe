@@ -1,21 +1,111 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Call from './Call'
 import Support from './Support'
 import BalanceModule from './BalanceModule'
 import Scaling from './Scaling'
+import { CallModal } from './CallModal'
 import { useHealth } from '../contexts/HealthProvider'
 import { useUser } from '../contexts/UserContext'
+import { useCall } from '../contexts/CallProvider'
 import { authAPI } from '../services/auth'
 
 function Dashboard() {
   const [activeModule, setActiveModule] = useState('Call')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [callStartTime, setCallStartTime] = useState(null)
+  const [callDuration, setCallDuration] = useState(0)
+  const [callStatus, setCallStatus] = useState('ready')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [soundDisabled, setSoundDisabled] = useState(false)
   const navigate = useNavigate()
   const { health, isServerHealthy, getUnhealthyServices } = useHealth()
   const { user, clearUser } = useUser()
+  const { callState, hangupCall, toggleMute, sendDTMF } = useCall()
 
   const menuItems = ['Call', 'Balance', 'About', 'E-SIM', 'Support']
+
+  // Derived state for call
+  const isInCall = callState.callStatus === 'in-call'
+  const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing'
+  const isMuted = callState.isMuted
+
+  // Call duration effect
+  useEffect(() => {
+    let interval = null
+    if (isInCall && callStartTime) {
+      interval = setInterval(() => {
+        setCallDuration(Math.floor((Date.now() - callStartTime) / 1000))
+      }, 1000)
+    } else {
+      setCallDuration(0)
+    }
+    return () => clearInterval(interval)
+  }, [isInCall, callStartTime])
+
+  // Sync with CallProvider state changes
+  useEffect(() => {
+    if (callState.callStatus === 'in-call' && callStatus !== 'in-call') {
+      if (!callStartTime) {
+        setCallStartTime(Date.now())
+      }
+      setIsModalVisible(true)
+      setCallStatus('in-call')
+    } else if (callState.callStatus === 'calling' && callStatus !== 'ringing' && callStatus !== 'in-call') {
+      setCallStatus('ringing')
+      if (!isModalVisible) {
+        setIsModalVisible(true)
+      }
+    } else if (callState.callStatus === 'idle' && callStatus !== 'ready' && callStatus !== 'ended') {
+      setCallStartTime(null)
+      setCallDuration(0)
+      setIsModalVisible(false)
+      if (callStatus === 'in-call' || callStatus === 'ringing') {
+        setCallStatus('ended')
+        setTimeout(() => setCallStatus('ready'), 5000)
+      } else {
+        setCallStatus('ready')
+      }
+    }
+  }, [callState.callStatus, callStartTime, callStatus, isModalVisible])
+
+  // Call handlers
+  const handleEndCall = async () => {
+    try {
+      await hangupCall()
+      setCallStatus('ended')
+      setCallStartTime(null)
+      setCallDuration(0)
+      setSoundDisabled(false)
+      setIsModalVisible(false)
+      setTimeout(() => {
+        setCallStatus('ready')
+      }, 5000)
+    } catch (error) {
+      console.error('Error ending call:', error)
+    }
+  }
+
+  const handleMute = async () => {
+    try {
+      await toggleMute()
+    } catch (error) {
+      console.error('Error toggling mute:', error)
+    }
+  }
+
+  const handleSoundToggle = () => {
+    setSoundDisabled(!soundDisabled)
+  }
+
+  const handleDTMF = (digit) => {
+    sendDTMF(digit)
+  }
+
+  const handleMinimizeModal = () => {
+    setIsModalVisible(false)
+  }
 
   const handleLogout = async () => {
     try {
@@ -45,7 +135,16 @@ function Dashboard() {
   const renderModule = () => {
     switch (activeModule) {
       case 'Call':
-        return <Call onNavigateToInvoices={navigateToInvoices} onNavigateToSupport={() => setActiveModule('Support')} />
+        return <Call
+          onNavigateToInvoices={navigateToInvoices}
+          onNavigateToSupport={() => setActiveModule('Support')}
+          onCallStateChange={({ phoneNumber: phone, modalVisible, startTime, status }) => {
+            if (phone !== undefined) setPhoneNumber(phone)
+            if (modalVisible !== undefined) setIsModalVisible(modalVisible)
+            if (startTime !== undefined) setCallStartTime(startTime)
+            if (status !== undefined) setCallStatus(status)
+          }}
+        />
       case 'Balance':
         return <BalanceModule onNavigateToSupport={() => setActiveModule('Support')} />
       case 'About':
@@ -335,6 +434,21 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Global Call Modal - Appears on all pages when call is active */}
+      <CallModal
+        isVisible={isCallActive && isModalVisible}
+        phoneNumber={phoneNumber}
+        callDuration={callDuration}
+        isMuted={isMuted}
+        soundDisabled={soundDisabled}
+        callStatus={callState.callStatus === 'calling' ? 'ringing' : callStatus}
+        onEndCall={handleEndCall}
+        onMute={handleMute}
+        onSoundToggle={handleSoundToggle}
+        onDTMF={handleDTMF}
+        onMinimize={handleMinimizeModal}
+      />
     </div>
   )
 }

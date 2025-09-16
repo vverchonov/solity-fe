@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 
-export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, soundDisabled, onEndCall, onMute, onSoundToggle, onDTMF, onMinimize }) {
+export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, soundDisabled, callStatus, onEndCall, onMute, onSoundToggle, onDTMF, onMinimize }) {
   const [showNumpad, setShowNumpad] = useState(false)
   const [position, setPosition] = useState({ x: window.innerWidth / 2 - 160, y: window.innerHeight / 2 - 300 })
   const [isDragging, setIsDragging] = useState(false)
@@ -80,7 +80,13 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
         </button>
         
         <div className="mt-8">
-          <div className="text-sm text-white/60 mb-2">In Call</div>
+          <div className="text-sm text-white/60 mb-2">
+            {callStatus === 'ringing' ? 'Ringing...' :
+             callStatus === 'calling' ? 'Calling...' :
+             callStatus === 'in-call' ? 'In Call' :
+             callStatus === 'connecting' ? 'Connecting...' :
+             'In Call'}
+          </div>
           <div className="text-2xl font-medium text-white mb-2">{phoneNumber}</div>
           <div className="text-lg text-white/70">
             {formatDuration(callDuration)}

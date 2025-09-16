@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import Balance from './Balance'
-import { CallModal } from './CallModal'
 import { useCall } from '../contexts/CallProvider'
 import { useUser } from '../contexts/UserContext'
 import { useLogs } from '../contexts/LogsProvider'
 import { useTele } from '../contexts/TeleProvider'
 import apiClient from '../lib/axios'
 
-function Call({ onNavigateToInvoices, onNavigateToSupport }) {
+function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [callerID, setCallerID] = useState('+12025550123')
   const [editableCallerID, setEditableCallerID] = useState('+12025550123')
@@ -47,23 +46,27 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
 
   // Sync with CallProvider state changes
   useEffect(() => {
-    if (callState.callStatus === 'in-call' && !callStartTime) {
-      setCallStartTime(Date.now())
+    if (callState.callStatus === 'in-call' && callStatus !== 'in-call') {
+      if (!callStartTime) {
+        setCallStartTime(Date.now())
+      }
       setIsModalVisible(true)
       setCallStatus('in-call')
-    } else if (callState.callStatus === 'calling' && callStatus !== 'ringing') {
+    } else if (callState.callStatus === 'calling' && callStatus !== 'ringing' && callStatus !== 'in-call') {
       // When CallProvider reports 'calling', sync our local status to 'ringing'
       setCallStatus('ringing')
       if (!isModalVisible) {
         setIsModalVisible(true)
       }
-    } else if (callState.callStatus === 'idle') {
+    } else if (callState.callStatus === 'idle' && callStatus !== 'ready' && callStatus !== 'ended') {
       setCallStartTime(null)
       setCallDuration(0)
       setIsModalVisible(false)
       if (callStatus === 'in-call' || callStatus === 'ringing') {
         setCallStatus('ended')
         setTimeout(() => setCallStatus('ready'), 5000)
+      } else {
+        setCallStatus('ready')
       }
     }
   }, [callState.callStatus, callStartTime, callStatus, isModalVisible])
@@ -121,6 +124,18 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
 
     return () => clearTimeout(timeoutId)
   }, [editableCallerID, callerID])
+
+  // Communicate call state changes to parent Dashboard
+  useEffect(() => {
+    if (onCallStateChange) {
+      onCallStateChange({
+        phoneNumber: phoneNumber,
+        modalVisible: isModalVisible,
+        startTime: callStartTime,
+        status: callStatus
+      })
+    }
+  }, [phoneNumber, isModalVisible, callStartTime, callStatus, onCallStateChange])
 
   const formatCallDuration = (seconds) => {
     const minutes = Math.floor(seconds / 60)
@@ -465,19 +480,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
         </div>
       </div>
 
-      {/* Call Modal */}
-      <CallModal
-        isVisible={isCallActive && isModalVisible}
-        phoneNumber={phoneNumber}
-        callDuration={callDuration}
-        isMuted={isMuted}
-        soundDisabled={soundDisabled}
-        onEndCall={handleEndCall}
-        onMute={handleMute}
-        onSoundToggle={handleSoundToggle}
-        onDTMF={handleDTMF}
-        onMinimize={handleMinimizeModal}
-      />
     </div>
   )
 }
