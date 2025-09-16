@@ -749,7 +749,7 @@ function BalanceModule({ onNavigateToSupport }) {
           ) : (
             <div className="flex flex-col min-h-0 flex-1">
               {/* Table Header */}
-              <div className="hidden md:grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs items-center flex-shrink-0" style={{ gridTemplateColumns: '60px 1fr 1fr 120px' }}>
+              <div className="hidden md:grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs items-center flex-shrink-0" style={{ gridTemplateColumns: '60px minmax(120px, 1fr) minmax(150px, 1fr) 120px' }}>
                 <div className="text-white/60 font-medium text-center">Active</div>
                 <div className="text-white/60 font-medium">Direction</div>
                 <div className="text-white/60 font-medium">Codes</div>
@@ -766,21 +766,21 @@ function BalanceModule({ onNavigateToSupport }) {
                   displayRates.map((rate) => (
                     <div key={rate.uniqueKey} className="hover:bg-white/5 rounded-lg transition-colors">
                       {/* Desktop Layout */}
-                      <div className="hidden md:grid gap-3 py-2 text-xs items-center" style={{ gridTemplateColumns: '60px 1fr 1fr 120px' }}>
-                        <div className="flex items-center justify-center">
+                      <div className="hidden md:grid gap-3 py-2 text-xs items-start" style={{ gridTemplateColumns: '60px minmax(120px, 1fr) minmax(150px, 1fr) 120px' }}>
+                        <div className="flex items-center justify-center pt-1">
                           <div className={`w-2 h-2 rounded-full ${rate.active ? 'bg-green-400' : 'bg-red-400'}`}></div>
                         </div>
-                        <div className="text-white flex items-center">
-                          <div className="truncate" title={rate.direction}>
+                        <div className="text-white flex items-start">
+                          <div className="break-words min-w-0" title={rate.direction}>
                             {rate.direction || '-'}
                           </div>
                         </div>
-                        <div className="text-white/70 font-mono flex items-start">
-                          <div className="break-words text-xs">
+                        <div className="text-white/70 font-mono flex items-start min-w-0">
+                          <div className="break-all text-xs leading-relaxed">
                             {rate.formattedCodes}
                           </div>
                         </div>
-                        <div className="text-white font-mono text-right flex items-center justify-end">
+                        <div className="text-white font-mono text-right flex items-start justify-end pt-1">
                           <span>{rate.displaycost || '0'} {rate.displaycurrency || ''}</span>
                         </div>
                       </div>
