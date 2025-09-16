@@ -8,29 +8,38 @@ import { UserProvider } from './contexts/UserContext'
 import { RatesProvider } from './contexts/RatesProvider'
 import { HealthProvider } from './contexts/HealthProvider'
 import { WalletProvider } from './contexts/WalletProvider'
+import { BalanceProvider } from './contexts/BalanceProvider'
+import { InvoicesProvider } from './contexts/InvoicesProvider'
+import { LogsProvider } from './contexts/LogsProvider'
 
 function App() {
   return (
     <HealthProvider>
       <ToastProvider>
-        <WalletProvider>
-          <UserProvider>
-            <CallProvider>
-              <Router>
-                <Routes>
-                  <Route path="/" element={<Login />} />
-                  <Route path="/dashboard" element={
-                    <ProtectedRoute>
-                      <RatesProvider>
-                        <Dashboard />
-                      </RatesProvider>
-                    </ProtectedRoute>
-                  } />
-                </Routes>
-              </Router>
-            </CallProvider>
-          </UserProvider>
-        </WalletProvider>
+        <LogsProvider>
+          <WalletProvider>
+            <UserProvider>
+              <InvoicesProvider>
+                <BalanceProvider>
+                  <CallProvider>
+                    <Router>
+                      <Routes>
+                        <Route path="/" element={<Login />} />
+                        <Route path="/dashboard" element={
+                          <ProtectedRoute>
+                            <RatesProvider>
+                              <Dashboard />
+                            </RatesProvider>
+                          </ProtectedRoute>
+                        } />
+                      </Routes>
+                    </Router>
+                  </CallProvider>
+                </BalanceProvider>
+              </InvoicesProvider>
+            </UserProvider>
+          </WalletProvider>
+        </LogsProvider>
       </ToastProvider>
     </HealthProvider>
   )

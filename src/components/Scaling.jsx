@@ -4,7 +4,7 @@ function Scaling() {
       title: "SolityNET Call",
       category: "Telephony",
       status: "Done",
-      description: "We're rolling out the SolityNET calling feature to the public. It took just three months to go from idea to live product—our first step toward becoming the leading crypto-native mobility provider.",
+      description: "We're rolling out the SolityNET calling feature to the public. It took just three months to go from idea to live product - our first step toward becoming the leading crypto-native mobility provider.",
       details: ["Public launch complete", "3 months development", "Crypto-native mobility"],
       impact: 5,
       eta: "2026-02-01",
@@ -24,7 +24,7 @@ function Scaling() {
       title: "SolityNET API",
       category: "Technology",
       status: "In progress",
-      description: "Opening up the SolityNET API brings full integration flexibility. Hook up your own systems—or connect an AI assistant that can place calls on your behalf, from ordering pizza to scheduling business meetings.",
+      description: "Opening up the SolityNET API brings full integration flexibility. Hook up your own systems - or connect an AI assistant that can place calls on your behalf, from ordering pizza to scheduling business meetings.",
       details: ["Full integration flexibility", "AI assistant support", "Business automation"],
       impact: 5,
       eta: "2026-04-01",
@@ -64,7 +64,7 @@ function Scaling() {
 
   const roadmapPhases = [
     {
-      title: "Phase 1 — Foundation",
+      title: "Phase 1 | Foundation",
       subtitle: "Now → 100 concurrent calls",
       progress: 80,
       features: [
@@ -74,7 +74,7 @@ function Scaling() {
       ]
     },
     {
-      title: "Phase 2 — Scale-out",
+      title: "Phase 2 | Scale-out",
       subtitle: "100 → 1,000 concurrent calls",
       progress: 40,
       features: [
@@ -84,7 +84,7 @@ function Scaling() {
       ]
     },
     {
-      title: "Phase 3 — Global",
+      title: "Phase 3 | Global",
       subtitle: "Multi-region + routing policies",
       progress: 10,
       features: [
@@ -94,7 +94,7 @@ function Scaling() {
       ]
     },
     {
-      title: "Phase 4 — Enterprise",
+      title: "Phase 4 | Enterprise",
       subtitle: "Security & compliance uplift",
       progress: 5,
       features: [
@@ -148,43 +148,46 @@ function Scaling() {
         {/* 6 Update Cards Grid - Responsive: 1 column on mobile, 2 on tablet, 3 on desktop */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {serverUpdates.map((update, index) => (
-            <div key={index} className="bg-white/5 border border-white/10 rounded-xl p-4">
-              {/* Update Header */}
-              <div className="mb-3">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                  <h4 className="text-lg font-semibold text-white">
-                    {update.title}
-                  </h4>
-                  <span className={`px-2 py-1 rounded-full text-xs border w-fit ${getStatusStyle(update.status)}`}>
-                    {update.status}
-                  </span>
+            <div key={index} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col">
+              {/* Content Container */}
+              <div className="flex-grow">
+                {/* Update Header */}
+                <div className="mb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                    <h4 className="text-lg font-semibold text-white">
+                      {update.title}
+                    </h4>
+                    <span className={`px-2 py-1 rounded-full text-xs border w-fit text-center ${getStatusStyle(update.status)}`}>
+                      {update.status}
+                    </span>
+                  </div>
+                  <div className="mb-2">
+                    <span className="text-white/60 text-sm">
+                      {update.category}
+                    </span>
+                  </div>
                 </div>
-                <div className="mb-2">
-                  <span className="text-white/60 text-sm">
-                    {update.category}
-                  </span>
-                </div>
+
+                {/* Description */}
+                <p className="text-white/70 text-sm mb-3 leading-relaxed">
+                  {update.description}
+                </p>
+
+                {/* Details List */}
+                <ul className="space-y-1 mb-4">
+                  {update.details.map((detail, detailIndex) => (
+                    <li key={detailIndex} className="flex items-start gap-2">
+                      <span className="text-white/60 text-sm mt-0.5">•</span>
+                      <span className="text-white/60 text-sm leading-relaxed">
+                        {detail}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
-              {/* Description */}
-              <p className="text-white/70 text-sm mb-3 leading-relaxed">
-                {update.description}
-              </p>
-
-              {/* Details List */}
-              <ul className="space-y-1 mb-4">
-                {update.details.map((detail, detailIndex) => (
-                  <li key={detailIndex} className="flex items-start gap-2">
-                    <span className="text-white/60 text-sm mt-0.5">•</span>
-                    <span className="text-white/60 text-sm leading-relaxed">
-                      {detail}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Footer with ETA */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 text-sm">
+              {/* Footer with ETA - Always at bottom */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 text-sm mt-auto">
                 <div className="flex items-center gap-2">
                   <span className="text-white/60">ETA:</span>
                   <div className="flex items-center gap-1">

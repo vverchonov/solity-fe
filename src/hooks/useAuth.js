@@ -23,14 +23,24 @@ export const useAuth = () => {
         setUser(result.data)
         setIsAuthenticated(true)
       } else {
+        // Call logout API before clearing tokens
+        try {
+          await authAPI.logout()
+        } catch (logoutError) {
+          console.error('Logout API call failed during auth check:', logoutError)
+        }
         setUser(null)
         setIsAuthenticated(false)
-        tokenUtils.clearAccessToken()
       }
     } catch (error) {
+      // Call logout API before clearing tokens
+      try {
+        await authAPI.logout()
+      } catch (logoutError) {
+        console.error('Logout API call failed during auth check error:', logoutError)
+      }
       setUser(null)
       setIsAuthenticated(false)
-      tokenUtils.clearAccessToken()
     } finally {
       setLoading(false)
     }
@@ -95,9 +105,14 @@ export const useAuth = () => {
   const refreshAuth = useCallback(async () => {
     const result = await authAPI.ensureValidToken()
     if (!result.success) {
+      // Call logout API before clearing tokens
+      try {
+        await authAPI.logout()
+      } catch (logoutError) {
+        console.error('Logout API call failed during token refresh:', logoutError)
+      }
       setUser(null)
       setIsAuthenticated(false)
-      tokenUtils.clearAccessToken()
       return false
     }
     return true

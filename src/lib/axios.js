@@ -102,6 +102,16 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest)
       } catch (refreshError) {
         processQueue(refreshError, null)
+
+        // Call logout API before clearing tokens and redirecting
+        try {
+          // Use a basic axios call instead of importing authAPI to avoid circular imports
+          await refreshClient.post('/auth/logout')
+        } catch (logoutError) {
+          console.error('Logout API call failed during token refresh:', logoutError)
+          // Continue with logout process even if API call fails
+        }
+
         clearAccessToken()
 
         // Show toast for refresh token error

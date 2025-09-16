@@ -4,9 +4,10 @@ import { CallModal } from './CallModal'
 import { useCall } from '../contexts/CallProvider'
 import { useUser } from '../contexts/UserContext'
 import { useRates } from '../contexts/RatesProvider'
+import { useLogs } from '../contexts/LogsProvider'
 import { ratesAPI } from '../services/rates'
 
-function Call() {
+function Call({ onNavigateToInvoices, onNavigateToSupport }) {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [callerID, setCallerID] = useState('+12025550123')
   const [soundDisabled, setSoundDisabled] = useState(false)
@@ -17,10 +18,8 @@ function Call() {
   const [currentRate, setCurrentRate] = useState(null)
   const [isResolvingRate, setIsResolvingRate] = useState(false)
   const [rateError, setRateError] = useState(null)
-  const [logs, setLogs] = useState([
-    { timestamp: '[12:34:56]', message: 'Session initialized', type: 'info' },
-    { timestamp: '[12:35:12]', message: 'Balance updated: 0.0000 SOL', type: 'success' }
-  ])
+  // Use LogsProvider for displaying wallet interaction logs
+  const { logs, clearLogs } = useLogs()
 
   // Use CallProvider
   const {
@@ -36,7 +35,7 @@ function Call() {
 
   // Use UserProvider
   const { user, isUserInactive } = useUser()
-  
+
   // Use RatesProvider
   const { rates, getRateByCode } = useRates()
 
@@ -85,7 +84,7 @@ function Call() {
       try {
         setIsResolvingRate(true)
         setRateError(null)
-        
+
         const result = await ratesAPI.resolveRate(phone)
         console.log('Rate resolve result:', result)
         if (result.success && result.data.id !== undefined) {
@@ -231,7 +230,7 @@ function Call() {
   }
 
   const handleClearLogs = () => {
-    setLogs([])
+    clearLogs()
   }
 
   const numberPadButtons = [
@@ -307,7 +306,7 @@ function Call() {
                     ? 'bg-red-500 hover:bg-red-600 text-white'
                     : callStatus === 'ended' || (!currentRate && phoneNumber.trim() && !isResolvingRate)
                       ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
-                      : 'bg-white hover:bg-gray-100 text-gray-900'
+                      : 'bg-slate-500 hover:bg-gray-100 text-gray-900'
                     }`}
                 >
                   {isInCall || callState.callStatus === 'calling' ? 'End Call' : 'Call'}
@@ -396,7 +395,7 @@ function Call() {
 
       {/* Balance Card - Below Call Card on mobile/tablet, Right side on desktop */}
       <div className="lg:col-span-4">
-        <Balance />
+        <Balance onNavigateToInvoices={onNavigateToInvoices} onNavigateToSupport={onNavigateToSupport} />
       </div>
 
       {/* Logs Card - Bottom (spans full width) */}
@@ -417,12 +416,22 @@ function Call() {
                 No logs to display
               </div>
             ) : (
-              logs.map((log, index) => (
+              logs.map((log) => (
                 <div
-                  key={index}
-                  className={log.type === 'success' ? 'text-green-400' : 'text-white/60'}
+                  key={log.id}
+                  className={
+                    log.type === 'success' ? 'text-green-400' :
+                    log.type === 'error' ? 'text-red-400' :
+                    log.type === 'warning' ? 'text-yellow-400' :
+                    'text-white/60'
+                  }
                 >
                   <span className="text-blue-300">{log.timestamp}</span> {log.message}
+                  {log.details && (
+                    <div className="ml-4 text-xs text-white/40 mt-1">
+                      {typeof log.details === 'object' ? JSON.stringify(log.details) : log.details}
+                    </div>
+                  )}
                 </div>
               ))
             )}

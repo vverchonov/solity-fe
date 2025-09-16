@@ -30,12 +30,24 @@ function Dashboard() {
     }
   }
 
+  // Function to navigate to Balance module and scroll to invoices
+  const navigateToInvoices = () => {
+    setActiveModule('Balance')
+    // Scroll to invoices table after module changes
+    setTimeout(() => {
+      const invoicesSection = document.getElementById('recent-invoices-section')
+      if (invoicesSection) {
+        invoicesSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100) // Small delay to allow module to render
+  }
+
   const renderModule = () => {
     switch (activeModule) {
       case 'Call':
-        return <Call />
+        return <Call onNavigateToInvoices={navigateToInvoices} onNavigateToSupport={() => setActiveModule('Support')} />
       case 'Balance':
-        return <BalanceModule />
+        return <BalanceModule onNavigateToSupport={() => setActiveModule('Support')} />
       case 'About':
         return (
           <div className="h-full space-y-6">
@@ -52,7 +64,7 @@ function Dashboard() {
             <div className="card p-6">
               <h3 className="text-xl font-bold text-white mb-4">SolityNET</h3>
               <p className="text-white/80 text-base leading-relaxed">
-                SolityNET is a comprehensive solution to decentralize global telephony. At launch, calling will be available in the US and Canada. We can onboard 80+ countries, but to avoid overloading the network we'll expand coverage gradually—adding regions day by day.
+                SolityNET is a comprehensive solution to decentralize global telephony. At launch, calling will be available in the US and Canada. We can onboard 80+ countries, but to avoid overloading the network we'll expand coverage gradually - adding regions day by day.
               </p>
             </div>
 

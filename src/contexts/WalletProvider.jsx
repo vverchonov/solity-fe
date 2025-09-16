@@ -130,7 +130,8 @@ export const WalletProvider = ({ children }) => {
     walletAddress,
     isConnecting,
     connectWallet,
-    disconnectWallet
+    disconnectWallet,
+    walletProvider: isWalletConnected ? window.phantom?.solana : null // Add the actual wallet provider
   }
 
   return (
