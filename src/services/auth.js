@@ -54,7 +54,7 @@ export const authAPI = {
         password
       })
 
-      const { accessToken, id, status, userRole, accessTokenExpiry } = response.data
+      const { accessToken, id, status, userRole, username: responseUsername, accessTokenExpiry } = response.data
 
       if (accessToken) {
         tokenUtils.setAccessToken(accessToken)
@@ -64,6 +64,7 @@ export const authAPI = {
         id,
         status,
         userRole,
+        username: responseUsername,
         accessTokenExpiry
       }
 
@@ -94,7 +95,7 @@ export const authAPI = {
         password
       })
 
-      const { accessToken, id, status, userRole, accessTokenExpiry } = response.data
+      const { accessToken, id, status, userRole, username: responseUsername, accessTokenExpiry } = response.data
 
       if (accessToken) {
         tokenUtils.setAccessToken(accessToken)
@@ -104,6 +105,7 @@ export const authAPI = {
         id,
         status,
         userRole,
+        username: responseUsername,
         accessTokenExpiry
       }
 
@@ -132,14 +134,16 @@ export const authAPI = {
       // The refresh token is sent as an httpOnly cookie automatically
       const response = await apiClient.post('/auth/refresh')
 
-      const { accessToken: newAccessToken, status, userRole, balances, accessTokenExpiry } = response.data
+      const { accessToken: newAccessToken, id, status, userRole, username, balances, accessTokenExpiry } = response.data
 
       tokenUtils.setAccessToken(newAccessToken)
 
       // Create user object from refresh response
       const user = {
+        id,
         status,
         userRole,
+        username,
         balances,
         accessTokenExpiry
       }
@@ -151,8 +155,10 @@ export const authAPI = {
         success: true,
         data: {
           accessToken: newAccessToken,
+          id,
           status,
           userRole,
+          username,
           balances,
           accessTokenExpiry,
           user

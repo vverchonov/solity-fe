@@ -3,10 +3,9 @@ import Balance from './Balance'
 import { CallModal } from './CallModal'
 import { useCall } from '../contexts/CallProvider'
 import { useUser } from '../contexts/UserContext'
-import { useRates } from '../contexts/RatesProvider'
 import { useLogs } from '../contexts/LogsProvider'
 import { useTele } from '../contexts/TeleProvider'
-import { ratesAPI } from '../services/rates'
+import apiClient from '../lib/axios'
 
 function Call({ onNavigateToInvoices, onNavigateToSupport }) {
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -19,14 +18,11 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
   const [callDuration, setCallDuration] = useState(0)
   const [callStatus, setCallStatus] = useState('ready') // 'ready', 'ringing', 'in-call', 'ended'
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [currentRate, setCurrentRate] = useState(null)
-  const [isResolvingRate, setIsResolvingRate] = useState(false)
-  const [rateError, setRateError] = useState(null)
   // Use LogsProvider for displaying wallet interaction logs
   const { logs, clearLogs } = useLogs()
 
   // Use TeleProvider for SIP credentials management
-  const { credentials, updateCallerID, hasValidCredentials } = useTele()
+  const { credentials } = useTele()
 
   // Use CallProvider
   const {
@@ -43,8 +39,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
   // Use UserProvider
   const { user, isUserInactive } = useUser()
 
-  // Use RatesProvider
-  const { rates, getRateByCode } = useRates()
 
   // Derived state from CallProvider
   const isInCall = callState.callStatus === 'in-call'
@@ -79,50 +73,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
     return () => clearInterval(interval)
   }, [isInCall, callStartTime])
 
-  // Debounced rate resolution - resolve rate 2 seconds after user stops typing
-  useEffect(() => {
-    if (!phoneNumber.trim()) {
-      setCurrentRate(null)
-      setRateError(null)
-      return
-    }
-
-    const resolveRate = async (phone) => {
-      try {
-        setIsResolvingRate(true)
-        setRateError(null)
-
-        const result = await ratesAPI.resolveRate(phone)
-        console.log('Rate resolve result:', result)
-        if (result.success && result.data.id !== undefined) {
-          // Find the rate details using the ID from rates provider
-          const rateDetails = rates.find(rate => rate.id === result.data.id)
-          if (rateDetails) {
-            setCurrentRate(rateDetails)
-          } else {
-            setRateError('Rate not found')
-            setCurrentRate(null)
-          }
-        } else {
-          setRateError(result.error || 'Could not resolve rate')
-          setCurrentRate(null)
-        }
-      } catch (error) {
-        console.error('Error resolving rate:', error)
-        setRateError('Rate resolution failed')
-        setCurrentRate(null)
-      } finally {
-        setIsResolvingRate(false)
-      }
-    }
-
-    // Debounce the rate resolution by 2 seconds
-    const timeoutId = setTimeout(() => {
-      resolveRate(phoneNumber)
-    }, 2000)
-
-    return () => clearTimeout(timeoutId)
-  }, [phoneNumber, getRateByCode])
 
   // Sync caller ID with TeleProvider credentials
   useEffect(() => {
@@ -132,7 +82,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
     }
   }, [credentials])
 
-  // Debounced caller ID validation and update - validate 2 seconds after user stops editing
+  // Debounced caller ID validation - validate format only, no API calls
   useEffect(() => {
     // Skip validation if editableCallerID hasn't changed or is same as current
     if (!editableCallerID.trim() || editableCallerID === callerID) {
@@ -140,45 +90,30 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
       return
     }
 
-    const validateAndUpdateCallerID = async (newCallerID) => {
-      try {
-        setIsUpdatingCallerID(true)
-        setCallerIDError(null)
+    const validateCallerID = (newCallerID) => {
+      setIsUpdatingCallerID(true)
+      setCallerIDError(null)
 
-        // Validate format: 7-15 characters, digits only (removing + and spaces)
-        const digitsOnly = newCallerID.replace(/[^\d]/g, '')
-        if (digitsOnly.length < 7 || digitsOnly.length > 15) {
-          setCallerIDError('Caller ID must be 7-15 digits')
-          return
-        }
-
-        // Update caller ID through TeleProvider - send only digits
-        const result = await updateCallerID(digitsOnly)
-
-        if (result.success) {
-          setCallerID(newCallerID)
-          console.log('Caller ID updated successfully:', newCallerID)
-        } else {
-          setCallerIDError(result.error || 'Failed to update caller ID')
-          // Revert to original value on error
-          setEditableCallerID(callerID)
-        }
-      } catch (error) {
-        console.error('Error updating caller ID:', error)
-        setCallerIDError('Failed to update caller ID')
-        setEditableCallerID(callerID)
-      } finally {
-        setIsUpdatingCallerID(false)
+      // Validate format: 7-15 characters, digits only (removing + and spaces)
+      const digitsOnly = newCallerID.replace(/[^\d]/g, '')
+      if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+        setCallerIDError('Caller ID must be 7-15 digits')
+      } else {
+        // Update local caller ID state for display
+        setCallerID(newCallerID)
+        console.log('Caller ID validated:', newCallerID)
       }
+
+      setIsUpdatingCallerID(false)
     }
 
-    // Debounce the validation and update by 2 seconds
+    // Debounce the validation by 2 seconds
     const timeoutId = setTimeout(() => {
-      validateAndUpdateCallerID(editableCallerID)
+      validateCallerID(editableCallerID)
     }, 2000)
 
     return () => clearTimeout(timeoutId)
-  }, [editableCallerID, callerID, updateCallerID])
+  }, [editableCallerID, callerID])
 
   const formatCallDuration = (seconds) => {
     const minutes = Math.floor(seconds / 60)
@@ -209,18 +144,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
     setPhoneNumber(prev => prev + num)
   }
 
-  const handleClear = () => {
-    setPhoneNumber('')
-  }
-
-  const handleDelete = () => {
-    setPhoneNumber(prev => prev.slice(0, -1))
-  }
-
-  const handleReset = () => {
-    setPhoneNumber('')
-    setEditableCallerID('+12025550123')
-  }
 
   const randomizeCallerID = () => {
     const randomNum = '+1' + Math.floor(Math.random() * 9000000000 + 1000000000)
@@ -239,7 +162,38 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
       console.log('Starting call...')
 
       try {
-        await makeCall(phoneNumber, callerID)
+        // Step 1: Request extension setup
+        console.log('📞 Requesting extension setup...')
+        const callerIDDigits = editableCallerID.replace(/[^\d]/g, '')
+        const extensionResponse = await apiClient.patch('/tele/extension', {
+          callerID: callerIDDigits
+        })
+
+        if (extensionResponse.status !== 200) {
+          throw new Error('Failed to setup extension')
+        }
+
+        console.log('📞 Extension setup successful, fetching credentials...')
+
+        // Step 2: Get fresh credentials
+        console.log('📞 Fetching fresh credentials...')
+        const credentialsResponse = await apiClient.get('/tele/credentials')
+
+        if (credentialsResponse.status !== 200) {
+          throw new Error('Failed to get credentials')
+        }
+
+        const freshCredentials = credentialsResponse.data
+
+        console.log('📞 Using credentials for call:', {
+          extension: freshCredentials.extension,
+          domain: freshCredentials.domain,
+          wss: freshCredentials.wss,
+          callerID: freshCredentials.callerID
+        })
+
+        // Step 3: Make call with fresh credentials
+        await makeCall(phoneNumber, freshCredentials.callerID || callerID, freshCredentials)
         setIsModalVisible(true)
         console.log('Call initiated')
       } catch (error) {
@@ -356,11 +310,9 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
               {/* Status indicators */}
               <div className="text-gray-400 text-xs mt-2">
                 {isUpdatingCallerID ? (
-                  <span className="text-blue-400">Updating caller ID...</span>
+                  <span className="text-blue-400">Validating caller ID...</span>
                 ) : callerIDError ? (
                   <span className="text-red-400">{callerIDError}</span>
-                ) : editableCallerID !== callerID ? (
-                  <span className="text-yellow-400">Changes will be saved automatically</span>
                 ) : (
                   <span>Enter your caller ID (7-15 digits)</span>
                 )}
@@ -381,38 +333,16 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
                 />
                 <button
                   onClick={isInCall || callState.callStatus === 'calling' ? handleEndCall : handleStartCall}
-                  disabled={callStatus === 'ended' || (!isInCall && callState.callStatus !== 'calling' && phoneNumber.trim() && (!currentRate || isResolvingRate))}
+                  disabled={callStatus === 'ended' || (!isInCall && callState.callStatus !== 'calling' && !phoneNumber.trim())}
                   className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] ${isInCall || callState.callStatus === 'calling'
                     ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : callStatus === 'ended' || (!currentRate && phoneNumber.trim() && !isResolvingRate)
+                    : callStatus === 'ended' || !phoneNumber.trim()
                       ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
                       : 'bg-slate-500 hover:bg-gray-100 text-gray-900'
                     }`}
                 >
                   {isInCall || callState.callStatus === 'calling' ? 'End Call' : 'Call'}
                 </button>
-              </div>
-              <div className="text-gray-400 text-xs mt-2">
-                {isResolvingRate ? (
-                  <span className="text-blue-400">Resolving rate...</span>
-                ) : currentRate ? (
-                  <span>
-                    {currentRate.displaycost > 0 ? (
-                      `${currentRate.displaycurrency}${currentRate.displaycost} per minute`
-                    ) : (
-                      'Rate not available'
-                    )}
-                    {currentRate.routename && (
-                      <span className="ml-2 text-white/40">via {currentRate.routename}</span>
-                    )}
-                  </span>
-                ) : phoneNumber.trim() ? (
-                  <span className="text-red-400">
-                    {rateError || 'Enter valid phone number'}
-                  </span>
-                ) : (
-                  <span>Enter phone number to see rate</span>
-                )}
               </div>
             </div>
 

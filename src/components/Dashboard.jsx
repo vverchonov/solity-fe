@@ -106,7 +106,8 @@ function Dashboard() {
         )
     }
   }
-  console.log("user = ", user)
+  console.log("user object in Dashboard = ", user)
+  console.log("user.username = ", user?.username)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-black">
@@ -148,16 +149,14 @@ function Dashboard() {
                 {/* Username, Status & Logout - Always Visible */}
                 <div className="flex items-center gap-3">
                   {/* Username */}
-                  <div className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 flex items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <div className="w-5 h-5 bg-white/10 rounded-full flex items-center justify-center">
                       <svg className="w-3 h-3 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
                     <span className="text-white/80 text-[0.5rem] text-center font-medium">
-                      {user?.userRole === 'admin' ? 'Admin User' :
-                        user?.userRole === 'premium' ? 'Premium User' :
-                          'Standard User'}
+                      {user?.username || 'User'}
                     </span>
                   </div>
 
@@ -295,7 +294,7 @@ function Dashboard() {
 
 
                 {/* Username Section */}
-                <div className="w-full px-3 py-3 bg-white/5 border border-white/10 rounded-lg">
+                <div className="w-full px-3 py-3">
                   <div className="flex items-center justify-start gap-3">
                     <div className="w-6 h-6 bg-white/10 rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,9 +302,7 @@ function Dashboard() {
                       </svg>
                     </div>
                     <div className="text-white/80 text-sm font-medium">
-                      {user?.userRole === 'admin' ? 'Admin User' :
-                        user?.userRole === 'premium' ? 'Premium User' :
-                          'Standard User'}
+                      {user?.username || 'User'}
                     </div>
                   </div>
                 </div>

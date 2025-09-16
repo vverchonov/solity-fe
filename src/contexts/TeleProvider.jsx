@@ -286,56 +286,19 @@ export const TeleProvider = ({ children }) => {
     }
   }, [refreshTimer])
 
-  // Initialize credentials when user is available
+  // Initialize credentials when user is available - clear old credentials but don't fetch new ones
   useEffect(() => {
-    const initializeCredentials = async () => {
-      if (!user) {
-        console.log('📞 TeleProvider: No user authenticated, clearing credentials')
-        clearCredentials()
-        return
-      }
-
-      console.log('📞 TeleProvider: User authenticated, initializing credentials')
-
-      // Try to get cached credentials first
-      const cachedCredentials = sessionStorage.getItem('sipCredentials')
-
-      if (cachedCredentials) {
-        try {
-          const parsedCredentials = JSON.parse(cachedCredentials)
-          const cacheAge = Date.now() - (parsedCredentials.cachedAt || 0)
-
-          // Use cached credentials if less than 5 minutes old
-          if (cacheAge < 5 * 60 * 1000) {
-            console.log('📞 TeleProvider: Using cached credentials')
-            setCredentials(parsedCredentials)
-
-            // Schedule refresh if TTL is available
-            if (parsedCredentials.ttl) {
-              const expiryTime = (parsedCredentials.cachedAt || Date.now()) + (parsedCredentials.ttl * 1000)
-              const timeUntilExpiry = expiryTime - Date.now()
-
-              if (timeUntilExpiry > 0) {
-                setCredentialsExpiry(expiryTime)
-                scheduleCredentialsRefresh(timeUntilExpiry / 1000)
-              } else {
-                // Credentials expired, fetch fresh ones
-                fetchCredentials(true)
-              }
-            }
-            return
-          }
-        } catch (error) {
-          console.error('📞 TeleProvider: Error parsing cached credentials:', error)
-        }
-      }
-
-      // Fetch fresh credentials
-      fetchCredentials()
+    if (!user) {
+      console.log('📞 TeleProvider: No user authenticated, clearing credentials')
+      clearCredentials()
+      return
     }
 
-    initializeCredentials()
-  }, [user, fetchCredentials, clearCredentials, scheduleCredentialsRefresh])
+    console.log('📞 TeleProvider: User authenticated, credentials will be fetched when needed (before making calls)')
+
+    // Clear any old cached credentials when user logs in
+    sessionStorage.removeItem('sipCredentials')
+  }, [user, clearCredentials])
 
   // Cleanup on unmount
   useEffect(() => {

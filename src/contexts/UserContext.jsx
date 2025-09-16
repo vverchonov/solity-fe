@@ -26,7 +26,7 @@ export const UserProvider = ({ children }) => {
           // First try to get cached user data
           const cachedUserData = tokenUtils.getUserData()
 
-          if (cachedUserData) {
+          if (cachedUserData && cachedUserData.username) {
             console.log('Using cached user data:', cachedUserData)
             setUser(cachedUserData)
             setShouldRedirectToDashboard(true)
@@ -35,11 +35,7 @@ export const UserProvider = ({ children }) => {
             // Optionally refresh in background to get latest data
             authAPI.refreshToken().then((refreshResult) => {
               if (refreshResult.success) {
-                const updatedUserData = {
-                  status: refreshResult.data.status,
-                  userRole: refreshResult.data.userRole,
-                  balances: refreshResult.data.balances
-                }
+                const updatedUserData = refreshResult.data.user
                 setUser(updatedUserData)
                 console.log('Background user data updated:', updatedUserData)
               }
@@ -52,11 +48,7 @@ export const UserProvider = ({ children }) => {
             console.log('No cached user data, attempting refresh')
             const refreshResult = await authAPI.refreshToken()
             if (refreshResult.success) {
-              const userData = {
-                status: refreshResult.data.status,
-                userRole: refreshResult.data.userRole,
-                balances: refreshResult.data.balances
-              }
+              const userData = refreshResult.data.user
 
               setUser(userData)
               console.log('User data restored via refresh:', userData)

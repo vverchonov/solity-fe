@@ -159,24 +159,101 @@ export const CallProvider = ({ children }) => {
         }
     };
 
-    const makeCall = async (targetNumber, callerID) => {
-        if (!simpleUserRef.current || !targetNumber || !callerID) {
-            addLog('Cannot make call: not connected or no target number/caller ID set');
+    const makeCall = async (targetNumber, callerID, credentials = null) => {
+        if (!targetNumber || !callerID) {
+            addLog('Cannot make call: no target number or caller ID provided');
             return;
         }
 
         try {
-            addLog(`Setting Caller ID to ${callerID}`);
-            const ok = await updateCallerID(callerID);
-            if (!ok) {
-                addLog('Call aborted due to Caller ID update failure');
+            // If credentials are provided, create new SIP client with fresh credentials
+            if (credentials) {
+                addLog('Setting up SIP client with fresh credentials...');
+
+                const options = {
+                    aor: `sip:${credentials.extension}@${credentials.domain}`,
+                    media: {
+                        constraints: { audio: true, video: false },
+                        remote: { audio: getAudioElement('remoteAudio') }
+                    },
+                    userAgentOptions: {
+                        authorizationUsername: credentials.extension,
+                        authorizationPassword: credentials.password,
+                        displayName: DISPLAY_NAME
+                    }
+                };
+
+                const simpleUser = new Web.SimpleUser(credentials.wss, options);
+                simpleUserRef.current = simpleUser;
+
+                // Set up event handlers
+                simpleUser.delegate = {
+                    onCallReceived: () => {
+                        addLog('Incoming call received');
+                        setCallState(prev => ({ ...prev, callStatus: 'incoming' }));
+                    },
+                    onCallAnswered: () => {
+                        addLog('Call answered');
+                        setCallState(prev => ({ ...prev, callStatus: 'in-call' }));
+                    },
+                    onCallHangup: () => {
+                        addLog('Call ended');
+                        setCallState(prev => ({
+                            ...prev,
+                            callStatus: 'idle',
+                            currentCall: null,
+                            isMuted: false,
+                            isOnHold: false
+                        }));
+                    },
+                    onCallHold: (held) => {
+                        addLog(held ? 'Call put on hold' : 'Call resumed from hold');
+                        setCallState(prev => ({ ...prev, isOnHold: held }));
+                    },
+                    onRegistered: () => {
+                        addLog('SIP client registered');
+                        setCallState(prev => ({ ...prev, isRegistered: true }));
+                    },
+                    onUnregistered: () => {
+                        addLog('SIP client unregistered');
+                        setCallState(prev => ({ ...prev, isRegistered: false }));
+                    },
+                    onServerConnect: () => {
+                        addLog('Connected to SIP server');
+                        setCallState(prev => ({ ...prev, isConnected: true }));
+                    },
+                    onServerDisconnect: () => {
+                        addLog('Disconnected from SIP server');
+                        setCallState(prev => ({
+                            ...prev,
+                            isConnected: false,
+                            isRegistered: false,
+                            callStatus: 'idle',
+                            currentCall: null
+                        }));
+                    }
+                };
+
+                // Connect to SIP server but skip registration (already registered on server)
+                await simpleUser.connect();
+                addLog('SIP client connected (extension already registered)');
+                setCallState(prev => ({
+                    ...prev,
+                    currentCall: simpleUser,
+                    isConnected: true,
+                    isRegistered: true // Mark as registered since extension is already registered
+                }));
+            }
+
+            if (!simpleUserRef.current) {
+                addLog('Cannot make call: SIP client not available');
                 return;
             }
 
-            addLog(`Calling ${targetNumber}...`);
+            addLog(`Calling ${targetNumber} with caller ID ${callerID}...`);
             setCallState(prev => ({ ...prev, callStatus: 'calling', remoteNumber: targetNumber }));
 
-            const target = `sip:${targetNumber}@${DOMAIN_URL}`;
+            const target = `sip:${targetNumber}@${credentials?.domain || DOMAIN_URL}`;
             await simpleUserRef.current.call(target);
 
         } catch (error) {
