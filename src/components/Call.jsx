@@ -42,6 +42,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
 
   // Derived state from CallProvider
   const isInCall = callState.callStatus === 'in-call'
+  const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing'
   const isMuted = callState.isMuted
 
   // Sync with CallProvider state changes
@@ -50,16 +51,22 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
       setCallStartTime(Date.now())
       setIsModalVisible(true)
       setCallStatus('in-call')
+    } else if (callState.callStatus === 'calling' && callStatus !== 'ringing') {
+      // When CallProvider reports 'calling', sync our local status to 'ringing'
+      setCallStatus('ringing')
+      if (!isModalVisible) {
+        setIsModalVisible(true)
+      }
     } else if (callState.callStatus === 'idle') {
       setCallStartTime(null)
       setCallDuration(0)
       setIsModalVisible(false)
-      if (callStatus === 'in-call') {
+      if (callStatus === 'in-call' || callStatus === 'ringing') {
         setCallStatus('ended')
         setTimeout(() => setCallStatus('ready'), 5000)
       }
     }
-  }, [callState.callStatus, callStartTime, callStatus])
+  }, [callState.callStatus, callStartTime, callStatus, isModalVisible])
 
   useEffect(() => {
     let interval = null
@@ -165,15 +172,24 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
         // Step 1: Request extension setup
         console.log('📞 Requesting extension setup...')
         const callerIDDigits = editableCallerID.replace(/[^\d]/g, '')
-        const extensionResponse = await apiClient.patch('/tele/extension', {
-          callerID: callerIDDigits
-        })
 
-        if (extensionResponse.status !== 200) {
-          throw new Error('Failed to setup extension')
+        try {
+          const extensionResponse = await apiClient.patch('/tele/extension', {
+            callerID: callerIDDigits
+          })
+
+          if (extensionResponse.status === 200) {
+            console.log('📞 Extension setup successful, fetching credentials...')
+          }
+        } catch (error) {
+          // Check if error is "CallerID is the same" - this is OK, continue
+          const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || ''
+          if (errorMessage.includes('CallerID is the same')) {
+            console.log('📞 CallerID already set, continuing to credentials...')
+          } else {
+            throw new Error(`Failed to setup extension: ${errorMessage}`)
+          }
         }
-
-        console.log('📞 Extension setup successful, fetching credentials...')
 
         // Step 2: Get fresh credentials
         console.log('📞 Fetching fresh credentials...')
@@ -193,8 +209,8 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
         })
 
         // Step 3: Make call with fresh credentials
+        setIsModalVisible(true) // Show modal before making call
         await makeCall(phoneNumber, freshCredentials.callerID || callerID, freshCredentials)
-        setIsModalVisible(true)
         console.log('Call initiated')
       } catch (error) {
         setCallStatus('ready')
@@ -451,7 +467,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport }) {
 
       {/* Call Modal */}
       <CallModal
-        isVisible={isInCall && isModalVisible}
+        isVisible={isCallActive && isModalVisible}
         phoneNumber={phoneNumber}
         callDuration={callDuration}
         isMuted={isMuted}
