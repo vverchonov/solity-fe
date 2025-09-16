@@ -234,25 +234,26 @@ function Call() {
   ]
 
   return (
-    <div className="grid grid-cols-12 grid-rows-2 gap-6 h-full">
-      {/* Call Card - Top Left */}
-      <div className={`col-span-8 card p-4 flex justify-center relative ${isUserInactive() ? 'overflow-hidden' : ''}`}>
+    <div className="flex flex-col lg:grid lg:grid-cols-12 lg:grid-rows-2 gap-6 h-full">
+      {/* Call Card - Top (or full width on mobile) */}
+      <div className={`lg:col-span-8 card p-4 flex justify-center relative ${isUserInactive() ? 'overflow-hidden' : ''}`}>
         {/* Always show the call interface */}
         <div className={`flex flex-row w-full gap-4 ${isUserInactive() ? 'blur-sm pointer-events-none' : ''}`}>
           <div className='w-full'>
             {/* Status */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
               <span className={getStatusPill().className}>{getStatusPill().text}</span>
               {isInCall && !isModalVisible && (
                 <button
                   onClick={handleShowModal}
-                  className="bg-green-500/20 border border-green-400/30 text-green-100 px-3 py-1 rounded-full text-sm hover:bg-green-500/30 hover:scale-105 transition-all cursor-pointer flex items-center gap-2"
+                  className="bg-green-500/20 border border-green-400/30 text-green-100 px-3 py-1 rounded-full text-sm hover:bg-green-500/30 hover:scale-105 transition-all cursor-pointer flex items-center gap-2 w-fit"
                 >
                   <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
-                  {formatCallDuration(callDuration)} • Click to expand
+                  <span className="hidden sm:inline">{formatCallDuration(callDuration)} • Click to expand</span>
+                  <span className="sm:hidden">{formatCallDuration(callDuration)}</span>
                 </button>
               )}
               {isInCall && isModalVisible && (
@@ -265,14 +266,14 @@ function Call() {
             {/* Caller ID */}
             <div className="mb-6">
               <label className="text-white/70 text-sm block mb-3">Caller ID</label>
-              <div className="flex gap-3 items-center">
-                <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white min-h-[50px] flex items-center">
                   {callerID}
                 </div>
                 <button
                   onClick={randomizeCallerID}
                   disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
-                  className={`bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-xl text-sm transition-all whitespace-nowrap w-32 h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-xl text-sm transition-all whitespace-nowrap sm:w-32 h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Randomize
                 </button>
@@ -282,7 +283,7 @@ function Call() {
             {/* Phone Input */}
             <div className="mb-6">
               <label className="text-white/70 text-sm block mb-3">To (phone)</label>
-              <div className="flex gap-3 items-center">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   value={phoneNumber}
@@ -294,7 +295,7 @@ function Call() {
                 <button
                   onClick={isInCall || callState.callStatus === 'calling' ? handleEndCall : handleStartCall}
                   disabled={callStatus === 'ended' || (!isInCall && callState.callStatus !== 'calling' && phoneNumber.trim() && (!currentRate || isResolvingRate))}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap w-32 h-[50px] ${isInCall || callState.callStatus === 'calling'
+                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] ${isInCall || callState.callStatus === 'calling'
                     ? 'bg-red-500 hover:bg-red-600 text-white'
                     : callStatus === 'ended' || (!currentRate && phoneNumber.trim() && !isResolvingRate)
                       ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
@@ -330,7 +331,7 @@ function Call() {
 
             {/* Call Control Buttons - Only show when in call and modal is not visible */}
             {isInCall && !isModalVisible && (
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleMute}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${isMuted
@@ -355,8 +356,8 @@ function Call() {
 
           </div>
 
-          {/* Number Pad */}
-          <div className="w-3/12 flex justify-center h-fit my-auto hidden">
+          {/* Number Pad - Hidden on mobile, available on larger screens */}
+          <div className="w-3/12 justify-center h-fit my-auto hidden lg:flex">
             <div className="grid grid-cols-3 gap-4">
               {numberPadButtons.flat().map((btn) => (
                 <button
@@ -374,7 +375,7 @@ function Call() {
         {/* Inactive User Overlay */}
         {isUserInactive() && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-none z-10">
-            <div className="text-center">
+            <div className="text-center px-4">
               <h3 className="text-xl font-semibold text-white mb-2">Account Inactive</h3>
               <p className="text-white/70 text-base">
                 Please top up your balance to activate your account and start making calls.
@@ -385,14 +386,13 @@ function Call() {
 
       </div>
 
-
-      {/* Balance Card - Top Right */}
-      <div className="col-span-4">
+      {/* Balance Card - Below Call Card on mobile/tablet, Right side on desktop */}
+      <div className="lg:col-span-4">
         <Balance />
       </div>
 
-      {/* Logs Card - Bottom (spans both columns) */}
-      <div className="col-span-12 card p-4 h-fit">
+      {/* Logs Card - Bottom (spans full width) */}
+      <div className="lg:col-span-12 card p-4 h-fit">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg text-white/70">Logs</h3>
           <button className="text-white/60 hover:text-white text-sm transition-all">

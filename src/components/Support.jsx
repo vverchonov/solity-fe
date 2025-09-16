@@ -40,8 +40,8 @@ function Support() {
 
   return (
     <div className="space-y-6 h-full overflow-y-auto">
-      {/* Social Links Grid */}
-      <div className="grid grid-cols-3 gap-6">
+      {/* Social Links Grid - Responsive: 1 column on mobile, 2 on tablet, 3 on desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {socialLinks.map((link) => (
           <div key={link.name} className="card p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -50,20 +50,20 @@ function Support() {
               </div>
               <h3 className="text-xl font-semibold text-white">{link.name}</h3>
             </div>
-            
+
             <p className="text-white/60 text-sm mb-6 leading-relaxed">
               {link.description}
             </p>
-            
+
             <div className="mb-4">
               <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
-                <span className="text-white/80 font-mono text-sm">{link.handle}</span>
+                <span className="text-white/80 font-mono text-sm break-all">{link.handle}</span>
               </div>
             </div>
-            
-            <button 
+
+            <button
               onClick={() => window.open(link.url, '_blank')}
-              className="w-full bg-white/10 hover:bg-white/15 text-white py-3 rounded-xl transition-all font-medium"
+              className="w-full bg-white/10 hover:bg-white/15 text-white py-3 rounded-xl transition-all font-medium min-h-[48px] touch-manipulation"
             >
               {link.buttonText}
             </button>
@@ -73,8 +73,8 @@ function Support() {
 
       {/* Copy Session Logs */}
       <div className="card p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+          <div className="flex-1">
             <h3 className="text-xl font-semibold text-white mb-2">Attach session logs</h3>
             <p className="text-white/60 text-sm">
               If you contact support, include your session logs to help us resolve issues faster.
@@ -82,7 +82,7 @@ function Support() {
           </div>
           <button
             onClick={handleCopyLogs}
-            className="bg-white hover:bg-gray-100 text-gray-900 px-8 py-3 rounded-xl font-semibold transition-all whitespace-nowrap"
+            className="bg-white hover:bg-gray-100 text-gray-900 px-8 py-3 rounded-xl font-semibold transition-all whitespace-nowrap min-h-[48px] touch-manipulation w-full sm:w-auto"
           >
             Copy session logs
           </button>

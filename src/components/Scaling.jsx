@@ -145,17 +145,17 @@ function Scaling() {
           Edit the JSON in updatesData (near the bottom of this file) to keep this list fresh.
         </p>
 
-        {/* 6 Update Cards Grid */}
-        <div className="grid grid-cols-3 gap-4">
+        {/* 6 Update Cards Grid - Responsive: 1 column on mobile, 2 on tablet, 3 on desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {serverUpdates.map((update, index) => (
             <div key={index} className="bg-white/5 border border-white/10 rounded-xl p-4">
               {/* Update Header */}
               <div className="mb-3">
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                   <h4 className="text-lg font-semibold text-white">
                     {update.title}
                   </h4>
-                  <span className={`px-2 py-1 rounded-full text-xs border ${getStatusStyle(update.status)}`}>
+                  <span className={`px-2 py-1 rounded-full text-xs border w-fit ${getStatusStyle(update.status)}`}>
                     {update.status}
                   </span>
                 </div>
@@ -167,7 +167,7 @@ function Scaling() {
               </div>
 
               {/* Description */}
-              <p className="text-white/70 text-sm mb-3">
+              <p className="text-white/70 text-sm mb-3 leading-relaxed">
                 {update.description}
               </p>
 
@@ -176,7 +176,7 @@ function Scaling() {
                 {update.details.map((detail, detailIndex) => (
                   <li key={detailIndex} className="flex items-start gap-2">
                     <span className="text-white/60 text-sm mt-0.5">•</span>
-                    <span className="text-white/60 text-sm">
+                    <span className="text-white/60 text-sm leading-relaxed">
                       {detail}
                     </span>
                   </li>
@@ -184,7 +184,7 @@ function Scaling() {
               </ul>
 
               {/* Footer with ETA */}
-              <div className="flex items-center justify-end text-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="text-white/60">ETA:</span>
                   <div className="flex items-center gap-1">
@@ -214,13 +214,13 @@ function Scaling() {
           </h3>
         </div>
 
-        {/* 4 Phase Cards Grid */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* 4 Phase Cards Grid - Responsive: 1 column on mobile, 2 on tablet+ */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {roadmapPhases.map((phase, index) => (
             <div key={index} className="bg-white/5 border border-white/10 rounded-xl p-4">
               {/* Phase Header */}
-              <div className="flex justify-between items-start mb-3">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
+                <div className="flex-1">
                   <h4 className="text-lg font-semibold text-white mb-1">
                     {phase.title}
                   </h4>
@@ -228,7 +228,7 @@ function Scaling() {
                     {phase.subtitle}
                   </p>
                 </div>
-                <span className="text-white/80 text-sm font-medium">
+                <span className="text-white/80 text-sm font-medium bg-white/10 px-2 py-1 rounded-full w-fit">
                   {phase.progress}%
                 </span>
               </div>
@@ -246,7 +246,7 @@ function Scaling() {
                 {phase.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start gap-2">
                     <span className="text-white/60 text-sm mt-0.5">•</span>
-                    <span className="text-white/70 text-sm">
+                    <span className="text-white/70 text-sm leading-relaxed">
                       {feature}
                     </span>
                   </li>
