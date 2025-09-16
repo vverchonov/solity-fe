@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useWallet } from '../contexts/WalletProvider'
 
 function Balance() {
   const [customAmount, setCustomAmount] = useState('')
+  const { isWalletConnected, walletAddress, isConnecting, connectWallet, disconnectWallet } = useWallet()
 
   const quickAmounts = [0.1, 0.5, 1, 2]
 
@@ -16,6 +18,17 @@ function Balance() {
       handleAddBalance(amount)
       setCustomAmount('')
     }
+  }
+
+  const handleConnectWallet = async () => {
+    const result = await connectWallet()
+    if (!result.success) {
+      console.error('Failed to connect wallet:', result.error)
+    }
+  }
+
+  const handleDisconnectWallet = async () => {
+    await disconnectWallet()
   }
 
   return (
@@ -45,7 +58,12 @@ function Balance() {
             <button
               key={amount}
               onClick={() => setCustomAmount(amount.toString())}
-              className="px-3 py-2 rounded-xl text-sm font-medium transition-all bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20"
+              disabled={!isWalletConnected}
+              className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
+                isWalletConnected
+                  ? 'bg-white/5 hover:bg-white/10 text-white border-white/10 hover:border-white/20'
+                  : 'bg-gray-600 text-gray-400 border-gray-600 cursor-not-allowed'
+              }`}
             >
               {amount}
             </button>
@@ -64,16 +82,52 @@ function Balance() {
             placeholder="Enter SOL amount"
             step="0.01"
             min="0"
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
+            disabled={!isWalletConnected}
+            className={`flex-1 border rounded-xl px-3 py-2 text-sm transition-all ${
+              isWalletConnected
+                ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10'
+                : 'bg-gray-600 border-gray-600 text-gray-400 placeholder-gray-500 cursor-not-allowed'
+            }`}
           />
           <button
             onClick={handleAddCustomAmount}
-            disabled={!customAmount || parseFloat(customAmount) <= 0}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-all"
+            disabled={!isWalletConnected || !customAmount || parseFloat(customAmount) <= 0}
+            className={`px-4 py-2 text-white text-sm font-medium rounded-xl transition-all ${
+              isWalletConnected && customAmount && parseFloat(customAmount) > 0
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gray-600 cursor-not-allowed'
+            }`}
           >
             Add
           </button>
         </div>
+      </div>
+
+      {/* Wallet Connection */}
+      <div className="mb-4">
+        <button
+          onClick={isWalletConnected ? handleDisconnectWallet : handleConnectWallet}
+          disabled={isConnecting}
+          className={`w-full py-3 rounded-xl text-sm font-medium transition-all ${
+            isConnecting
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : isWalletConnected
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-purple-600 hover:bg-purple-700 text-white'
+          }`}
+        >
+          {isConnecting
+            ? 'Connecting...'
+            : isWalletConnected
+              ? 'Disconnect Wallet'
+              : 'Connect Phantom Wallet'
+          }
+        </button>
+        {isWalletConnected && walletAddress && (
+          <div className="mt-2 text-xs text-white/60 break-all">
+            Connected: {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
+          </div>
+        )}
       </div>
     </div>
   )
