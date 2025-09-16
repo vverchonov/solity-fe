@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useRates } from '../contexts/RatesProvider'
+import { useWallet } from '../contexts/WalletProvider'
 
 function BalanceModule() {
   const [topUpAmount, setTopUpAmount] = useState('')
@@ -7,6 +8,9 @@ function BalanceModule() {
 
   // Use rates from the /current endpoint via RatesProvider
   const { rates: apiRates, isLoading: ratesLoading, error: ratesError } = useRates()
+
+  // Use wallet provider
+  const { isWalletConnected, walletAddress, isConnecting, connectWallet, disconnectWallet } = useWallet()
 
   // Use actual rates from API or fallback to empty array
   const rates = apiRates || []
@@ -20,6 +24,17 @@ function BalanceModule() {
 
   const handleAddFunds = () => {
     console.log('Adding funds:', topUpAmount)
+  }
+
+  const handleConnectWallet = async () => {
+    const result = await connectWallet()
+    if (!result.success) {
+      console.error('Failed to connect wallet:', result.error)
+    }
+  }
+
+  const handleDisconnectWallet = async () => {
+    await disconnectWallet()
   }
 
   // Filter and search rates - adapted for new data structure
@@ -84,6 +99,33 @@ function BalanceModule() {
               <p className="text-yellow-400 text-sm mt-1">
                 Low balance — please top up before a call.
               </p>
+
+              {/* Wallet Connection */}
+              <div className="mt-3">
+                <button
+                  onClick={isWalletConnected ? handleDisconnectWallet : handleConnectWallet}
+                  disabled={isConnecting}
+                  className={`w-full py-2 px-4 rounded-xl text-sm font-medium transition-all ${
+                    isConnecting
+                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                      : isWalletConnected
+                        ? 'bg-red-600 hover:bg-red-700 text-white'
+                        : 'bg-purple-600 hover:bg-purple-700 text-white'
+                  }`}
+                >
+                  {isConnecting
+                    ? 'Connecting...'
+                    : isWalletConnected
+                      ? 'Disconnect Wallet'
+                      : 'Connect Phantom Wallet'
+                  }
+                </button>
+                {isWalletConnected && walletAddress && (
+                  <div className="mt-1 text-xs text-white/60 break-all text-center">
+                    Connected: {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -97,7 +139,12 @@ function BalanceModule() {
                 value={topUpAmount}
                 onChange={(e) => setTopUpAmount(e.target.value)}
                 placeholder="Enter custom amount"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 text-sm"
+                disabled={!isWalletConnected}
+                className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none transition-all ${
+                  isWalletConnected
+                    ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:border-blue-400'
+                    : 'bg-gray-600 border-gray-600 text-gray-400 placeholder-gray-500 cursor-not-allowed'
+                }`}
               />
 
               {/* Quick Top-up Buttons */}
@@ -106,10 +153,14 @@ function BalanceModule() {
                   <button
                     key={amount}
                     onClick={() => handleQuickTopUp(amount)}
-                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${topUpAmount === amount.toString()
-                        ? 'bg-white text-gray-900'
-                        : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
-                      }`}
+                    disabled={!isWalletConnected}
+                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
+                      !isWalletConnected
+                        ? 'bg-gray-600 text-gray-400 border-gray-600 cursor-not-allowed'
+                        : topUpAmount === amount.toString()
+                          ? 'bg-white text-gray-900 border-white'
+                          : 'bg-white/5 hover:bg-white/10 text-white border-white/10'
+                    }`}
                   >
                     {amount}
                   </button>
@@ -118,7 +169,12 @@ function BalanceModule() {
 
               <button
                 onClick={handleAddFunds}
-                className="w-full bg-white hover:bg-gray-100 text-gray-900 py-2 rounded-xl font-medium transition-all text-sm"
+                disabled={!isWalletConnected}
+                className={`w-full py-2 rounded-xl font-medium transition-all text-sm ${
+                  isWalletConnected
+                    ? 'bg-white hover:bg-gray-100 text-gray-900'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                }`}
               >
                 Add Funds
               </button>
@@ -164,9 +220,8 @@ function BalanceModule() {
         ) : (
           <>
             {/* Table Header */}
-            <div className="grid grid-cols-7 gap-3 pb-4 border-b border-white/10 mb-4 text-xs">
+            <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs" style={{ gridTemplateColumns: '40px 2fr 1fr 1fr 40px 1fr' }}>
               <div className="text-white/60 font-medium">Active</div>
-              <div className="text-white/60 font-medium">ID</div>
               <div className="text-white/60 font-medium">Direction</div>
               <div className="text-white/60 font-medium">Codes</div>
               <div className="text-white/60 font-medium">Route</div>
@@ -182,33 +237,30 @@ function BalanceModule() {
                 </div>
               ) : (
                 displayRates.map((rate) => (
-                  <div key={rate.uniqueKey} className="grid grid-cols-7 gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs">
-                    <div className="flex items-center">
+                  <div key={rate.uniqueKey} className="grid gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs" style={{ gridTemplateColumns: '40px 2fr 1fr 1fr 40px 1fr' }}>
+                    <div className="flex items-center justify-center">
                       <div className={`w-2 h-2 rounded-full ${rate.active ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                    </div>
-                    <div className="text-white/70 font-mono">
-                      {rate.displayId}
                     </div>
                     <div className="text-white">
                       <div className="truncate" title={rate.direction}>
-                        {rate.direction ? (rate.direction.length > 15 ? rate.direction.substring(0, 15) + '...' : rate.direction) : '-'}
+                        {rate.direction ? (rate.direction.length > 25 ? rate.direction.substring(0, 25) + '...' : rate.direction) : '-'}
                       </div>
                     </div>
                     <div className="text-white/70 font-mono">
                       <div className="truncate" title={rate.codes}>
-                        {rate.codes ? (rate.codes.toString().length > 20 ? rate.codes.toString().substring(0, 20) + '...' : rate.codes) : '-'}
+                        {rate.codes ? (rate.codes.toString().length > 15 ? rate.codes.toString().substring(0, 15) + '...' : rate.codes) : '-'}
                       </div>
                     </div>
                     <div className="text-white/70">
                       <div className="truncate" title={rate.routename}>
-                        {rate.routename ? (rate.routename.length > 10 ? rate.routename.substring(0, 10) + '...' : rate.routename) : '-'}
+                        {rate.routename ? (rate.routename.length > 12 ? rate.routename.substring(0, 12) + '...' : rate.routename) : '-'}
                       </div>
                     </div>
                     <div className="text-white/70 text-center">
                       {rate.priority || '-'}
                     </div>
                     <div className="text-white font-mono text-right">
-                      {rate.displaycost || '-'} {rate.displaycurrency || ''}
+                      {rate.displaycost || '0'} {rate.displaycurrency || ''}
                     </div>
                   </div>
                 ))
