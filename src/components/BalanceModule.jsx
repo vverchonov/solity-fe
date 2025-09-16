@@ -110,7 +110,7 @@ function BalanceModule() {
                       ? 'bg-white/10 text-white/40 cursor-not-allowed'
                       : isWalletConnected
                         ? 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/20'
-                        : 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/20'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
                   }`}
                 >
                   {isConnecting
