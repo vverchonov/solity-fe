@@ -34,6 +34,14 @@ function Login() {
     }
   }, [user, isLoading, shouldRedirectToDashboard, navigate, clearRedirectFlag])
 
+  // Reset reCAPTCHA when switching between login/register
+  useEffect(() => {
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset()
+      setRecaptchaToken(null)
+    }
+  }, [isLogin])
+
   // Show loading screen while checking authentication
   if (isLoading) {
     return (
@@ -53,14 +61,6 @@ function Login() {
   const handleRecaptchaExpired = () => {
     setRecaptchaToken(null)
   }
-
-  // Reset reCAPTCHA when switching between login/register
-  useEffect(() => {
-    if (recaptchaRef.current) {
-      recaptchaRef.current.reset()
-      setRecaptchaToken(null)
-    }
-  }, [isLogin])
 
   const handleInputChange = (e) => {
     setFormData({
