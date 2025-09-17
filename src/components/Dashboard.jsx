@@ -14,6 +14,7 @@ function Dashboard() {
   const [activeModule, setActiveModule] = useState('Call')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isModalMinimized, setIsModalMinimized] = useState(false)
   const [callStartTime, setCallStartTime] = useState(null)
   const [callDuration, setCallDuration] = useState(0)
   const [callStatus, setCallStatus] = useState('ready')
@@ -56,11 +57,15 @@ function Dashboard() {
       if (!callStartTime) {
         setCallStartTime(Date.now())
       }
-      setIsModalVisible(true)
+      // Only show modal if user hasn't explicitly minimized it
+      if (!isModalMinimized) {
+        setIsModalVisible(true)
+      }
       setCallStatus('in-call')
     } else if (callState.callStatus === 'calling' && callStatus !== 'ringing' && callStatus !== 'in-call') {
       setCallStatus('ringing')
-      if (!isModalVisible) {
+      // Only show modal if user hasn't explicitly minimized it and it's not already visible
+      if (!isModalVisible && !isModalMinimized) {
         setIsModalVisible(true)
       }
       // Set 3-minute timeout for ringing calls
@@ -72,6 +77,7 @@ function Dashboard() {
           setCallStartTime(null)
           setCallDuration(0)
           setIsModalVisible(false)
+          setIsModalMinimized(false)
           setTimeout(() => setCallStatus('ready'), 3000)
         } catch (error) {
           console.error('Error canceling timed out call:', error)
@@ -88,10 +94,11 @@ function Dashboard() {
       setCallStartTime(null)
       setCallDuration(0)
       setIsModalVisible(false)
+      setIsModalMinimized(false) // Reset minimize state when call ends
       setCallStatus('ended')
       setTimeout(() => setCallStatus('ready'), 5000)
     }
-  }, [callState.callStatus, callStartTime, callStatus, isModalVisible, ringingTimeout, hangupCall])
+  }, [callState.callStatus, callStartTime, callStatus, isModalVisible, isModalMinimized, ringingTimeout, hangupCall])
 
   // Call handlers
   const handleEndCall = async () => {
@@ -133,6 +140,7 @@ function Dashboard() {
 
   const handleMinimizeModal = () => {
     setIsModalVisible(false)
+    setIsModalMinimized(true)
   }
 
   // Cleanup timeout on unmount
@@ -297,13 +305,13 @@ function Dashboard() {
                     {/* In Call Indicator - Compact */}
                     {(callStatus === 'in-call' || callStatus === 'ringing') && (
                       <button
-                        onClick={() => setIsModalVisible(true)}
-                        className="w-4 h-4 bg-green-500 hover:bg-green-400 rounded-full flex items-center justify-center transition-all"
+                        onClick={() => {
+                          setIsModalVisible(true)
+                          setIsModalMinimized(false)
+                        }}
+                        className="w-2 h-2 bg-green-500 hover:bg-green-400 rounded-full transition-all"
                         title="In call - Click to show call modal"
                       >
-                        <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
                       </button>
                     )}
                   </div>
@@ -453,14 +461,13 @@ function Dashboard() {
                     {/* In Call Indicator - Expanded */}
                     {(callStatus === 'in-call' || callStatus === 'ringing') && (
                       <button
-                        onClick={() => setIsModalVisible(true)}
-                        className="flex items-center gap-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/40 text-green-400 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-                        title="Click to show call modal"
+                        onClick={() => {
+                          setIsModalVisible(true)
+                          setIsModalMinimized(false)
+                        }}
+                        className="w-3 h-3 bg-green-500 hover:bg-green-400 rounded-full transition-all"
+                        title="In call - Click to show call modal"
                       >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                        In call
                       </button>
                     )}
                   </div>
