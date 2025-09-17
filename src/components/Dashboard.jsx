@@ -183,9 +183,8 @@ function Dashboard() {
         return <Call
           onNavigateToInvoices={navigateToInvoices}
           onNavigateToSupport={() => setActiveModule('Support')}
-          onCallStateChange={({ phoneNumber: phone, modalVisible, startTime, status }) => {
+          onCallStateChange={({ phoneNumber: phone, startTime, status }) => {
             if (phone !== undefined) setPhoneNumber(phone)
-            if (modalVisible !== undefined) setIsModalVisible(modalVisible)
             if (startTime !== undefined) setCallStartTime(startTime)
             if (status !== undefined) setCallStatus(status)
           }}
