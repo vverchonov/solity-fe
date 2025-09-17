@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useLogs } from '../contexts/LogsProvider'
 
 function Support() {
