@@ -278,6 +278,7 @@
     "fillAllFields": "Please fill in all required fields",
     "usernameTooShort": "Username must be at least 3 characters long",
     "usernameTooLong": "Username must be no more than 30 characters long",
+    "usernameInvalidFormat": "Only letters, numbers and underscores allowed",
     "passwordTooShort": "Password must be at least 12 characters long",
     "passwordNeedsUppercase": "Password must contain at least one uppercase letter",
     "passwordNeedsLowercase": "Password must contain at least one lowercase letter",

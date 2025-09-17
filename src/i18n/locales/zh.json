@@ -278,6 +278,7 @@
     "fillAllFields": "请填写所有必填字段",
     "usernameTooShort": "用户名必须至少3个字符",
     "usernameTooLong": "用户名不能超过30个字符",
+    "usernameInvalidFormat": "只允许字母、数字和下划线",
     "passwordTooShort": "密码必须至少12个字符",
     "passwordNeedsUppercase": "密码必须包含至少一个大写字母",
     "passwordNeedsLowercase": "密码必须包含至少一个小写字母",

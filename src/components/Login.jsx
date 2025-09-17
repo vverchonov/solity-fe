@@ -166,6 +166,9 @@ function Login() {
     if (username.length > 30) {
       return t('login.usernameTooLong')
     }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      return t('login.usernameInvalidFormat')
+    }
     return null
   }
 

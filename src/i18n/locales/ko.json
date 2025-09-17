@@ -278,6 +278,7 @@
     "fillAllFields": "모든 필수 항목을 입력해주세요",
     "usernameTooShort": "사용자명은 최소 3자 이상이어야 합니다",
     "usernameTooLong": "사용자명은 30자 이하여야 합니다",
+    "usernameInvalidFormat": "문자, 숫자, 밑줄만 허용됩니다",
     "passwordTooShort": "비밀번호는 최소 12자 이상이어야 합니다",
     "passwordNeedsUppercase": "비밀번호에는 대문자가 최소 1개 포함되어야 합니다",
     "passwordNeedsLowercase": "비밀번호에는 소문자가 최소 1개 포함되어야 합니다",
