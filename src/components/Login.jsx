@@ -254,7 +254,7 @@ function Login() {
         <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-12 mx-auto">
 
           {/* Welcome Card */}
-          <div className="w-full lg:w-1/2 card p-4 sm:p-6 lg:p-12 min-w-0 flex-shrink-0 mx-auto">
+          <div className="w-full lg:w-1/2 card p-4 sm:p-6 lg:p-12 min-w-0 flex-shrink-0 mx-auto flex items-center">
             <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
               <div className="w-full text-center lg:text-left">
                 <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white mb-3 lg:mb-4 break-words">
@@ -405,9 +405,8 @@ function Login() {
                   {!isLogin && (
                     <div className="mt-2 space-y-1">
                       {getPasswordRequirements(formData.password).map((requirement) => (
-                        <div key={requirement.key} className={`text-xs flex items-center gap-1 transition-colors ${
-                          requirement.met ? 'text-green-400' : 'text-red-400'
-                        }`}>
+                        <div key={requirement.key} className={`text-xs flex items-center gap-1 transition-colors ${requirement.met ? 'text-green-400' : 'text-red-400'
+                          }`}>
                           {requirement.met ? (
                             <svg className="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
