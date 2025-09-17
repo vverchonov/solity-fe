@@ -588,7 +588,7 @@ function BalanceModule({ onNavigateToSupport }) {
                       <span className="text-blue-400 text-sm font-medium">{t('balance.paymentProcessing')}</span>
                     </div>
                     <p className="text-white/70 text-xs">
-                      {t('balance.paymentProcessingMessage', { amount: formatInvoiceAmount(latestProcessingInvoice.lamports) })}
+                      {t('balance.paymentProcessingMessage').replace('{amount}', formatInvoiceAmount(latestProcessingInvoice.lamports))}
                     </p>
                   </div>
                 )}
@@ -984,8 +984,8 @@ function BalanceModule({ onNavigateToSupport }) {
               {/* Results Info */}
               <div className="mt-4 pt-4 border-t border-white/10 flex-shrink-0">
                 <div className="text-white/50 text-sm">
-                  {t('balance.showingRates', { count: displayRates.length, total: filteredRates.length })}
-                  {searchQuery && ` (${t('balance.filteredFrom', { total: rates.length })})`}
+                  {t('balance.showingRates').replace('{count}', displayRates.length).replace('{total}', filteredRates.length)}
+                  {searchQuery && ` (${t('balance.filteredFrom').replace('{total}', rates.length)})`}
                 </div>
               </div>
             </div>

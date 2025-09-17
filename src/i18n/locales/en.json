@@ -49,7 +49,14 @@
     "numpad": "Numpad",
     "microphoneMuted": "Microphone muted",
     "soundDisabled": "Sound disabled",
-    "callInProgress": "Call in progress"
+    "callInProgress": "Call in progress",
+    "checkRate": "Check Rate",
+    "checking": "Checking...",
+    "rateInfo": "Rate Information",
+    "costPerMinute": "Cost per minute",
+    "destination": "Destination",
+    "enterPhoneFirst": "Please enter a phone number first",
+    "rateCheckFailed": "Failed to check rate"
   },
   "status": {
     "idle": "Idle",

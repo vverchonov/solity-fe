@@ -49,7 +49,14 @@
     "numpad": "숫자 키패드",
     "microphoneMuted": "마이크 음소거됨",
     "soundDisabled": "소리 비활성화됨",
-    "callInProgress": "통화 진행 중"
+    "callInProgress": "통화 진행 중",
+    "checkRate": "요금 확인",
+    "checking": "확인 중...",
+    "rateInfo": "요금 정보",
+    "costPerMinute": "분당 비용",
+    "destination": "목적지",
+    "enterPhoneFirst": "먼저 전화번호를 입력해 주세요",
+    "rateCheckFailed": "요금 확인에 실패했습니다"
   },
   "status": {
     "idle": "대기",

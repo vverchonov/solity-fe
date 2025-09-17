@@ -49,7 +49,14 @@
     "numpad": "数字键盘",
     "microphoneMuted": "麦克风已静音",
     "soundDisabled": "声音已禁用",
-    "callInProgress": "通话进行中"
+    "callInProgress": "通话进行中",
+    "checkRate": "查看费率",
+    "checking": "查询中...",
+    "rateInfo": "费率信息",
+    "costPerMinute": "每分钟费用",
+    "destination": "目的地",
+    "enterPhoneFirst": "请先输入电话号码",
+    "rateCheckFailed": "查询费率失败"
   },
   "status": {
     "idle": "空闲",

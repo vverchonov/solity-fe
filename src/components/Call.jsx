@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Balance from './Balance'
 import { useCall } from '../contexts/CallProvider'
 import { useUser } from '../contexts/UserContext'
@@ -17,6 +17,9 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
   const [callStartTime, setCallStartTime] = useState(null)
   const [callDuration, setCallDuration] = useState(0)
   const [callStatus, setCallStatus] = useState('ready') // 'ready', 'ringing', 'in-call', 'ended'
+  const [rateInfo, setRateInfo] = useState(null)
+  const [isCheckingRate, setIsCheckingRate] = useState(false)
+  const [rateError, setRateError] = useState(null)
   // Use LogsProvider for displaying wallet interaction logs
   const { logs, clearLogs } = useLogs()
 
@@ -132,6 +135,16 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
     }
   }, [phoneNumber, callStartTime, callStatus, onCallStateChange])
 
+  // Reset rate info when phone number actually changes
+  const previousPhoneNumberRef = useRef(phoneNumber)
+  useEffect(() => {
+    if (phoneNumber !== previousPhoneNumberRef.current) {
+      setRateInfo(null)
+      setRateError(null)
+      previousPhoneNumberRef.current = phoneNumber
+    }
+  }, [phoneNumber])
+
   const formatCallDuration = (seconds) => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
@@ -179,6 +192,30 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
   const handleSoundToggle = () => {
     setSoundDisabled(!soundDisabled)
+  }
+
+  const handleCheckRate = async () => {
+    if (!phoneNumber.trim()) {
+      setRateError(t('call.enterPhoneFirst'))
+      return
+    }
+
+    setIsCheckingRate(true)
+    setRateError(null)
+    setRateInfo(null)
+
+    try {
+      // Remove all non-numeric characters from phone number
+      const numbersOnly = phoneNumber.replace(/[^\d]/g, '')
+      const response = await apiClient.get(`/rates/resolve/?number=${encodeURIComponent(numbersOnly)}`)
+      console.log('Rate check response:', response.data)
+      setRateInfo(response.data)
+    } catch (error) {
+      console.error('Rate check error:', error)
+      setRateError(error.response?.data?.error || t('call.rateCheckFailed'))
+    } finally {
+      setIsCheckingRate(false)
+    }
   }
 
   const handleStartCall = async () => {
@@ -357,6 +394,33 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                 >
                   {(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') ? t('call.endCall') : t('call.startCall')}
                 </button>
+              </div>
+
+              {/* Check Rate Button */}
+              <div className="mt-3 flex items-center gap-3">
+                <button
+                  onClick={handleCheckRate}
+                  disabled={isCheckingRate || !phoneNumber.trim() || isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'}
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${isCheckingRate || !phoneNumber.trim() || isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'
+                    ? 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
+                    : 'bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-600/30 hover:border-blue-600/50'
+                    }`}
+                >
+                  {isCheckingRate ? t('call.checking') : t('call.checkRate')}
+                </button>
+
+                {/* Rate Display */}
+                <div className="text-white/60 text-xs">
+                  {isCheckingRate ? (
+                    '...'
+                  ) : rateInfo && rateInfo.rates && rateInfo.rates.length > 0 && rateInfo.rates[0].displaycost !== undefined ? (
+                    `${rateInfo.rates[0].displaycost} ${rateInfo.rates[0].displaycurrency || 'SOL'}/min`
+                  ) : rateError ? (
+                    '~'
+                  ) : (
+                    ''
+                  )}
+                </div>
               </div>
             </div>
 
