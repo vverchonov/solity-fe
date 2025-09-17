@@ -72,7 +72,13 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
       <div className="relative p-6 text-center drag-handle">
         <button
           className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-all"
-          onClick={onMinimize}
+          onClick={(e) => {
+            e.stopPropagation()
+            onMinimize()
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation()
+          }}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -91,6 +97,11 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
           <div className="text-lg text-white/70">
             {formatDuration(callDuration)}
           </div>
+          {(callStatus === 'ringing' || callStatus === 'calling') && (
+            <div className="text-xs text-white/50 mt-3 text-center max-w-48 mx-auto">
+              Connection can take up to ~2 minutes
+            </div>
+          )}
         </div>
       </div>
 

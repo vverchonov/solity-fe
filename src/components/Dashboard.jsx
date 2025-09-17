@@ -19,6 +19,7 @@ function Dashboard() {
   const [callStatus, setCallStatus] = useState('ready')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [soundDisabled, setSoundDisabled] = useState(false)
+  const [ringingTimeout, setRingingTimeout] = useState(null)
   const navigate = useNavigate()
   const { health, isServerHealthy, getUnhealthyServices } = useHealth()
   const { user, clearUser } = useUser()
@@ -47,6 +48,11 @@ function Dashboard() {
   // Sync with CallProvider state changes
   useEffect(() => {
     if (callState.callStatus === 'in-call' && callStatus !== 'in-call') {
+      // Clear ringing timeout when call connects
+      if (ringingTimeout) {
+        clearTimeout(ringingTimeout)
+        setRingingTimeout(null)
+      }
       if (!callStartTime) {
         setCallStartTime(Date.now())
       }
@@ -57,22 +63,44 @@ function Dashboard() {
       if (!isModalVisible) {
         setIsModalVisible(true)
       }
-    } else if (callState.callStatus === 'idle' && callStatus !== 'ready' && callStatus !== 'ended') {
+      // Set 3-minute timeout for ringing calls
+      const timeout = setTimeout(async () => {
+        console.log('Call timeout: 3 minutes of ringing, canceling call')
+        try {
+          await hangupCall()
+          setCallStatus('ended')
+          setCallStartTime(null)
+          setCallDuration(0)
+          setIsModalVisible(false)
+          setTimeout(() => setCallStatus('ready'), 3000)
+        } catch (error) {
+          console.error('Error canceling timed out call:', error)
+        }
+      }, 3 * 60 * 1000) // 3 minutes
+      setRingingTimeout(timeout)
+    } else if (callState.callStatus === 'idle' && (callStatus === 'in-call' || callStatus === 'ringing')) {
+      // Only transition to 'ended' if we were actually in a call or ringing
+      // Clear ringing timeout when call ends
+      if (ringingTimeout) {
+        clearTimeout(ringingTimeout)
+        setRingingTimeout(null)
+      }
       setCallStartTime(null)
       setCallDuration(0)
       setIsModalVisible(false)
-      if (callStatus === 'in-call' || callStatus === 'ringing') {
-        setCallStatus('ended')
-        setTimeout(() => setCallStatus('ready'), 5000)
-      } else {
-        setCallStatus('ready')
-      }
+      setCallStatus('ended')
+      setTimeout(() => setCallStatus('ready'), 5000)
     }
-  }, [callState.callStatus, callStartTime, callStatus, isModalVisible])
+  }, [callState.callStatus, callStartTime, callStatus, isModalVisible, ringingTimeout, hangupCall])
 
   // Call handlers
   const handleEndCall = async () => {
     try {
+      // Clear ringing timeout if active
+      if (ringingTimeout) {
+        clearTimeout(ringingTimeout)
+        setRingingTimeout(null)
+      }
       await hangupCall()
       setCallStatus('ended')
       setCallStartTime(null)
@@ -106,6 +134,15 @@ function Dashboard() {
   const handleMinimizeModal = () => {
     setIsModalVisible(false)
   }
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (ringingTimeout) {
+        clearTimeout(ringingTimeout)
+      }
+    }
+  }, [ringingTimeout])
 
   const handleLogout = async () => {
     try {
@@ -257,6 +294,18 @@ function Dashboard() {
                     <span className="text-white/80 text-[0.5rem] text-center font-medium">
                       {user?.username || 'User'}
                     </span>
+                    {/* In Call Indicator - Compact */}
+                    {(callStatus === 'in-call' || callStatus === 'ringing') && (
+                      <button
+                        onClick={() => setIsModalVisible(true)}
+                        className="w-4 h-4 bg-green-500 hover:bg-green-400 rounded-full flex items-center justify-center transition-all"
+                        title="In call - Click to show call modal"
+                      >
+                        <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
 
                   {/* Compact Server Status */}
@@ -395,15 +444,30 @@ function Dashboard() {
 
                 {/* Username Section */}
                 <div className="w-full px-3 py-3">
-                  <div className="flex items-center justify-start gap-3">
-                    <div className="w-6 h-6 bg-white/10 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 bg-white/10 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <div className="text-white/80 text-sm font-medium">
+                        {user?.username || 'User'}
+                      </div>
                     </div>
-                    <div className="text-white/80 text-sm font-medium">
-                      {user?.username || 'User'}
-                    </div>
+                    {/* In Call Indicator - Expanded */}
+                    {(callStatus === 'in-call' || callStatus === 'ringing') && (
+                      <button
+                        onClick={() => setIsModalVisible(true)}
+                        className="flex items-center gap-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/40 text-green-400 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                        title="Click to show call modal"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        In call
+                      </button>
+                    )}
                   </div>
                 </div>
 
