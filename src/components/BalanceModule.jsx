@@ -71,7 +71,6 @@ function BalanceModule({ onNavigateToSupport }) {
 
   const handlePayPreparedInvoice = async (invoiceData) => {
     const invoiceId = invoiceData.invoice || invoiceData.id
-    console.log('💳 Paying prepared invoice:', invoiceData)
     logTransactionStart(invoiceId, (invoiceData.lamports / 1e9))
 
     if (!walletProvider) {
@@ -82,23 +81,17 @@ function BalanceModule({ onNavigateToSupport }) {
 
     try {
       // Execute Solana payment using the prepared invoice data
-      console.log('🔗 Executing Solana payment...')
       const paymentResult = await solanaService.executePayment(invoiceData, walletProvider)
 
       if (paymentResult.success) {
-        console.log('🎉 Payment executed successfully:', paymentResult.signature)
         const invoiceId = invoiceData.invoice || invoiceData.id
         logTransactionSigned(paymentResult.signature, invoiceId)
         logTransactionConfirmed(paymentResult.signature, invoiceId)
 
         // Complete the invoice with the transaction signature
-        console.log('📝 Completing invoice with signature...')
-        console.log('📝 Invoice data for completion:', invoiceData)
-        console.log('📝 Using invoice ID:', invoiceId)
         const completeResult = await paymentsAPI.completeInvoice(invoiceId, paymentResult.signature)
 
         if (completeResult.success) {
-          console.log('✅ Invoice completed successfully')
           logInvoiceStatusUpdate(invoiceId, 'pending', 'processing')
 
           // Refetch invoices and journal immediately after successful completion
@@ -106,7 +99,6 @@ function BalanceModule({ onNavigateToSupport }) {
             refreshInvoices(),
             fetchJournal()
           ])
-          console.log('✅ BalanceModule: Invoices and journal refreshed after payment completion')
         } else {
           console.error('❌ Failed to complete invoice:', completeResult.error)
         }
@@ -261,7 +253,6 @@ function BalanceModule({ onNavigateToSupport }) {
       })
 
       // 2. Execute Solana payment using the invoice data
-      console.log('🔗 Executing Solana payment...')
       console.log('🔗 Wallet provider check:', {
         hasWalletProvider: !!walletProvider,
         hasPublicKey: !!walletProvider?.publicKey,
@@ -270,19 +261,15 @@ function BalanceModule({ onNavigateToSupport }) {
       const paymentResult = await solanaService.executePayment(invoiceData, walletProvider)
 
       if (paymentResult.success) {
-        console.log('🎉 Payment executed successfully:', paymentResult.signature)
         logTransactionSigned(paymentResult.signature, invoiceId)
         logTransactionConfirmed(paymentResult.signature, invoiceId)
 
         // Complete the invoice with the transaction signature
-        console.log('📝 Completing invoice with signature...')
         console.log('📝 Original invoice ID:', invoiceId)
         console.log('📝 Invoice data received:', invoiceData)
-        console.log('📝 Using invoice ID:', invoiceId)
         const completeResult = await paymentsAPI.completeInvoice(invoiceId, paymentResult.signature)
 
         if (completeResult.success) {
-          console.log('✅ Invoice completed successfully')
           logInvoiceStatusUpdate(invoiceId, 'pending', 'processing')
 
           // Refetch invoices and journal immediately after successful completion
@@ -290,7 +277,6 @@ function BalanceModule({ onNavigateToSupport }) {
             refreshInvoices(),
             fetchJournal()
           ])
-          console.log('✅ BalanceModule: Invoices and journal refreshed after payment completion')
         } else {
           console.error('❌ Failed to complete invoice:', completeResult.error)
         }
@@ -543,8 +529,8 @@ function BalanceModule({ onNavigateToSupport }) {
                     onClick={handleRefreshBalance}
                     disabled={isRefreshingBalance}
                     className={`p-2 rounded-lg transition-all ${isRefreshingBalance
-                        ? 'text-white/40 cursor-not-allowed'
-                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                      ? 'text-white/40 cursor-not-allowed'
+                      : 'text-white/60 hover:text-white hover:bg-white/5'
                       }`}
                     title="Refresh balance"
                   >
@@ -582,8 +568,8 @@ function BalanceModule({ onNavigateToSupport }) {
                         onClick={() => handlePayInvoice(firstPendingInvoice.id)}
                         disabled={!isWalletConnected}
                         className={`flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all ${isWalletConnected
-                            ? 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-600/30 hover:border-green-600/50'
-                            : 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
+                          ? 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-600/30 hover:border-green-600/50'
+                          : 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
                           }`}
                       >
                         Pay Invoice
@@ -612,10 +598,10 @@ function BalanceModule({ onNavigateToSupport }) {
                     onClick={isWalletConnected ? handleDisconnectWallet : handleConnectWallet}
                     disabled={isConnecting}
                     className={`w-full py-2 px-4 rounded-xl text-sm font-medium transition-all ${isConnecting
-                        ? 'bg-white/10 text-white/40 cursor-not-allowed'
-                        : isWalletConnected
-                          ? 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/20'
-                          : 'bg-blue-600/30 hover:bg-blue-600/40 text-white shadow-lg hover:shadow-xl'
+                      ? 'bg-white/10 text-white/40 cursor-not-allowed'
+                      : isWalletConnected
+                        ? 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/20'
+                        : 'bg-blue-600/30 hover:bg-blue-600/40 text-white shadow-lg hover:shadow-xl'
                       }`}
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -651,10 +637,10 @@ function BalanceModule({ onNavigateToSupport }) {
                       onClick={() => handleQuickTopUp(amount)}
                       disabled={!isWalletConnected || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice}
                       className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${!isWalletConnected || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice
-                          ? 'bg-gray-600 text-gray-400 border-gray-600 cursor-not-allowed'
-                          : topUpAmount === amount.toString()
-                            ? 'bg-white text-gray-900 border-white'
-                            : 'bg-white/5 hover:bg-white/10 text-white border-white/10'
+                        ? 'bg-gray-600 text-gray-400 border-gray-600 cursor-not-allowed'
+                        : topUpAmount === amount.toString()
+                          ? 'bg-white text-gray-900 border-white'
+                          : 'bg-white/5 hover:bg-white/10 text-white border-white/10'
                         }`}
                     >
                       {amount}
@@ -694,8 +680,8 @@ function BalanceModule({ onNavigateToSupport }) {
                     placeholder="Enter SOL amount"
                     disabled={!isWalletConnected || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice}
                     className={`flex-1 border rounded-xl px-3 py-2 text-sm focus:outline-none transition-all ${isWalletConnected && !isTopUpLoading && !hasActiveInvoice() && !firstPendingInvoice && !latestProcessingInvoice
-                        ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:border-blue-400'
-                        : 'bg-gray-600 border-gray-600 text-gray-400 placeholder-gray-500 cursor-not-allowed'
+                      ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:border-blue-400'
+                      : 'bg-gray-600 border-gray-600 text-gray-400 placeholder-gray-500 cursor-not-allowed'
                       }`}
                   />
                   <button
@@ -705,8 +691,8 @@ function BalanceModule({ onNavigateToSupport }) {
                     }}
                     disabled={!isWalletConnected || !topUpAmount || parseFloat(topUpAmount) <= 0 || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice}
                     className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isWalletConnected && topUpAmount && parseFloat(topUpAmount) > 0 && !isTopUpLoading && !hasActiveInvoice() && !firstPendingInvoice && !latestProcessingInvoice
-                        ? 'bg-white hover:bg-gray-100 text-gray-900'
-                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                      ? 'bg-white hover:bg-gray-100 text-gray-900'
+                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       }`}
                   >
                     {isTopUpLoading ? 'Preparing...' : hasActiveInvoice() ? 'Invoice Active' : firstPendingInvoice ? 'Pending Invoice' : latestProcessingInvoice ? 'Payment Processing' : 'Add'}
@@ -732,21 +718,19 @@ function BalanceModule({ onNavigateToSupport }) {
           <div className="flex gap-1 mb-4 bg-white/5 p-1 rounded-lg">
             <button
               onClick={() => setActiveTab('invoices')}
-              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                activeTab === 'invoices'
-                  ? 'bg-white text-gray-900'
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
+              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'invoices'
+                ? 'bg-white text-gray-900'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+                }`}
             >
               Invoices ({displayInvoices.length})
             </button>
             <button
               onClick={() => setActiveTab('journal')}
-              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                activeTab === 'journal'
-                  ? 'bg-white text-gray-900'
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
+              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'journal'
+                ? 'bg-white text-gray-900'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+                }`}
             >
               Journal ({displayJournal.length})
             </button>
@@ -809,12 +793,7 @@ function BalanceModule({ onNavigateToSupport }) {
                   )}
                 </div>
 
-                {/* Invoices Results Info */}
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <div className="text-white/50 text-sm">
-                    Showing {displayInvoices.length} of {invoices.length} invoices
-                  </div>
-                </div>
+
               </>
             )
           ) : (
@@ -865,12 +844,7 @@ function BalanceModule({ onNavigateToSupport }) {
                   )}
                 </div>
 
-                {/* Journal Results Info */}
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <div className="text-white/50 text-sm">
-                    Showing {displayJournal.length} of {journal.length} journal entries
-                  </div>
-                </div>
+
               </>
             )
           )}
@@ -948,7 +922,7 @@ function BalanceModule({ onNavigateToSupport }) {
                           <span>{rate.displaycost || '0'} {rate.displaycurrency || ''}</span>
                         </div>
                       </div>
-                      
+
                       {/* Mobile Layout */}
                       <div className="md:hidden p-3 space-y-2 text-xs">
                         <div className="flex items-center justify-between">
