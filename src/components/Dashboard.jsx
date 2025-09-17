@@ -64,8 +64,8 @@ function Dashboard() {
       setCallStatus('in-call')
     } else if (callState.callStatus === 'calling' && callStatus !== 'ringing' && callStatus !== 'in-call') {
       setCallStatus('ringing')
-      // Only show modal if user hasn't explicitly minimized it and it's not already visible
-      if (!isModalVisible && !isModalMinimized) {
+      // Only show modal if user hasn't explicitly minimized it
+      if (!isModalMinimized) {
         setIsModalVisible(true)
       }
       // Set 3-minute timeout for ringing calls
@@ -98,7 +98,7 @@ function Dashboard() {
       setCallStatus('ended')
       setTimeout(() => setCallStatus('ready'), 5000)
     }
-  }, [callState.callStatus, callStartTime, callStatus, isModalVisible, isModalMinimized, ringingTimeout, hangupCall])
+  }, [callState.callStatus, callStartTime, callStatus, isModalMinimized, ringingTimeout, hangupCall])
 
   // Call handlers
   const handleEndCall = async () => {
