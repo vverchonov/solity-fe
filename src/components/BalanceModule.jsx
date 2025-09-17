@@ -76,7 +76,6 @@ function BalanceModule({ onNavigateToSupport }) {
     logTransactionStart(invoiceId, (invoiceData.lamports / 1e9))
 
     if (!walletProvider) {
-      console.error('❌ Wallet not connected')
       logTransactionError('Wallet not connected', invoiceId)
       return
     }
@@ -102,7 +101,6 @@ function BalanceModule({ onNavigateToSupport }) {
             fetchJournal()
           ])
         } else {
-          console.error('❌ Failed to complete invoice:', completeResult.error)
         }
 
         // Show processing modal
@@ -119,50 +117,37 @@ function BalanceModule({ onNavigateToSupport }) {
           ])
         }, 1000)
       } else {
-        console.error('❌ Failed to execute payment:', paymentResult.error)
 
         if (paymentResult.userRejected) {
-          console.log('ℹ️ Payment rejected by user')
           logTransactionRejected(invoiceId)
         } else {
           logTransactionError(paymentResult.error, invoiceId)
         }
       }
     } catch (error) {
-      console.error('❌ Error in prepared invoice payment process:', error)
       logTransactionError(error.message, invoiceId)
     }
   }
 
   const handleAddFunds = async () => {
-    console.log('🔘 handleAddFunds called - wallet connected:', isWalletConnected, 'amount:', topUpAmount)
 
     if (!isWalletConnected) {
-      console.log('❌ Wallet not connected')
       return
     }
 
     const amount = parseFloat(topUpAmount)
     if (amount <= 0) {
-      console.log('❌ Invalid amount:', amount)
       return
     }
 
-    console.log('💰 Adding funds:', amount)
     const result = await topUpBalance(amount)
 
     if (result.success) {
-      console.log('✅ Invoice prepared:', result.data)
       logInvoicePrepare(amount, true, result.data.invoice)
-      console.log('📝 Prepared invoice data structure:', JSON.stringify(result.data, null, 2))
-      console.log('📝 Available keys in prepared invoice:', Object.keys(result.data))
-      console.log('📝 Invoice ID field:', result.data.id)
-      console.log('📝 Invoice field:', result.data.invoice)
       // Now pay the prepared invoice using the same flow as "Pay Invoice" button
       await handlePayPreparedInvoice(result.data)
       setTopUpAmount('')
     } else {
-      console.error('❌ Failed to prepare invoice:', result.error)
       logInvoicePrepare(amount, false)
       // Show error message
     }
@@ -171,7 +156,6 @@ function BalanceModule({ onNavigateToSupport }) {
   const handleConnectWallet = async () => {
     const result = await connectWallet()
     if (!result.success) {
-      console.error('Failed to connect wallet:', result.error)
     }
   }
 
@@ -185,7 +169,6 @@ function BalanceModule({ onNavigateToSupport }) {
       clearUser()
       navigate('/')
     } catch (error) {
-      console.error('Logout error:', error)
       // Clear user state and redirect even if logout fails
       clearUser()
       navigate('/')
@@ -193,11 +176,9 @@ function BalanceModule({ onNavigateToSupport }) {
   }
 
   const handleCancelInvoice = async (invoiceId) => {
-    console.log('🚫 Cancelling invoice:', invoiceId)
     const result = await cancelInvoiceFromProvider(invoiceId)
 
     if (result && result.success) {
-      console.log('✅ Invoice cancelled successfully')
       logInvoiceCancel(invoiceId, true)
 
       // Refresh invoices, journal, and balance to update all state and re-enable buttons
@@ -206,60 +187,38 @@ function BalanceModule({ onNavigateToSupport }) {
         fetchJournal(),
         refreshBalance()
       ])
-      console.log('✅ BalanceModule: Invoices, journal, and balance refreshed after invoice cancellation')
 
       // Force a small delay to ensure UI updates properly
-      setTimeout(() => {
-        console.log('✅ BalanceModule: Top-up buttons should now be enabled')
-      }, 100)
+
     } else {
-      console.error('❌ Failed to cancel invoice:', result?.error)
       logInvoiceCancel(invoiceId, false)
     }
   }
 
   const handlePayInvoice = async (invoiceId) => {
-    console.log('💳 Paying invoice:', invoiceId)
     logTransactionStart(invoiceId, 0) // Amount will be updated when we get invoice details
 
     if (!walletProvider) {
-      console.error('❌ Wallet not connected')
       logTransactionError('Wallet not connected', invoiceId)
       return
     }
 
     try {
       // 1. Get invoice details by ID
-      console.log('📄 Getting invoice details...')
       const invoiceResult = await paymentsAPI.getInvoiceById(invoiceId)
 
       if (!invoiceResult.success) {
-        console.error('❌ Failed to get invoice details:', invoiceResult.error)
         logTransactionError(`Failed to get invoice details: ${invoiceResult.error}`, invoiceId)
         return
       }
 
       const invoiceResponse = invoiceResult.data
-      console.log('📄 Invoice response received:', invoiceResponse)
 
       // Extract the actual invoice data from the nested structure
       const invoiceData = invoiceResponse.invoice || invoiceResponse
-      console.log('📄 Extracted invoice data:', invoiceData)
-      console.log('📄 Invoice data structure check:', {
-        hasLamports: 'lamports' in invoiceData,
-        hasToAddress: 'toAddress' in invoiceData,
-        hasMemo: 'memo' in invoiceData,
-        lamports: invoiceData.lamports,
-        toAddress: invoiceData.toAddress,
-        memo: invoiceData.memo
-      })
 
       // 2. Execute Solana payment using the invoice data
-      console.log('🔗 Wallet provider check:', {
-        hasWalletProvider: !!walletProvider,
-        hasPublicKey: !!walletProvider?.publicKey,
-        publicKey: walletProvider?.publicKey?.toBase58?.()
-      })
+
       const paymentResult = await solanaService.executePayment(invoiceData, walletProvider)
 
       if (paymentResult.success) {
@@ -267,8 +226,6 @@ function BalanceModule({ onNavigateToSupport }) {
         logTransactionConfirmed(paymentResult.signature, invoiceId)
 
         // Complete the invoice with the transaction signature
-        console.log('📝 Original invoice ID:', invoiceId)
-        console.log('📝 Invoice data received:', invoiceData)
         const completeResult = await paymentsAPI.completeInvoice(invoiceId, paymentResult.signature)
 
         if (completeResult.success) {
@@ -280,7 +237,6 @@ function BalanceModule({ onNavigateToSupport }) {
             fetchJournal()
           ])
         } else {
-          console.error('❌ Failed to complete invoice:', completeResult.error)
         }
 
         // Show processing modal
@@ -297,17 +253,14 @@ function BalanceModule({ onNavigateToSupport }) {
           ])
         }, 1000)
       } else {
-        console.error('❌ Failed to execute payment:', paymentResult.error)
 
         if (paymentResult.userRejected) {
-          console.log('ℹ️ Payment rejected by user')
           logTransactionRejected(invoiceId)
         } else {
           logTransactionError(paymentResult.error, invoiceId)
         }
       }
     } catch (error) {
-      console.error('❌ Error in pay invoice process:', error)
       logTransactionError(error.message, invoiceId)
     }
   }
@@ -316,17 +269,13 @@ function BalanceModule({ onNavigateToSupport }) {
     setIsJournalLoading(true)
     setJournalError(null)
     try {
-      console.log('🔄 Fetching journal...')
       const response = await apiClient.get('/user/journal')
       if (response.data && response.data.journal) {
         setJournal(response.data.journal)
-        console.log('✅ Journal fetched:', response.data.journal.length, 'entries')
       } else {
-        console.error('❌ No journal data in response')
         setJournalError('No journal data received')
       }
     } catch (error) {
-      console.error('❌ Error fetching journal:', error)
       setJournalError(error.response?.data?.error || error.message || 'Failed to fetch journal')
     } finally {
       setIsJournalLoading(false)
@@ -336,11 +285,9 @@ function BalanceModule({ onNavigateToSupport }) {
   const handleRefreshBalance = async () => {
     setIsRefreshingBalance(true)
     try {
-      console.log('🔄 Refreshing balance, invoices, and journal...')
       const result = await paymentsAPI.getBalance()
 
       if (result.success) {
-        console.log('✅ Balance refreshed:', result.data)
         // The BalanceProvider will automatically update when we call refreshBalance
         refreshBalance()
         // Also refresh invoices and journal
@@ -348,12 +295,9 @@ function BalanceModule({ onNavigateToSupport }) {
           refreshInvoices(),
           fetchJournal()
         ])
-        console.log('✅ BalanceModule: Invoices and journal refreshed during balance refresh')
       } else {
-        console.error('❌ Failed to refresh balance:', result.error)
       }
     } catch (error) {
-      console.error('❌ Error refreshing balance:', error)
     } finally {
       setIsRefreshingBalance(false)
     }
@@ -368,7 +312,6 @@ function BalanceModule({ onNavigateToSupport }) {
   const firstPendingInvoice = useMemo(() => {
     const pendingInvoices = getPendingInvoices()
     const result = pendingInvoices.length > 0 ? pendingInvoices[0] : null
-    console.log('🔄 BalanceModule: firstPendingInvoice updated:', result?.id || 'none')
     return result
   }, [invoices, getPendingInvoices])
 
@@ -376,9 +319,6 @@ function BalanceModule({ onNavigateToSupport }) {
   const latestProcessingInvoice = useMemo(() => {
     const processingInvoices = invoices.filter(invoice => invoice.status === 'processing')
     const result = processingInvoices.length > 0 ? processingInvoices[0] : null
-    console.log('🔄 BalanceModule: latestProcessingInvoice updated:', result?.id || 'none')
-    console.log('🔄 BalanceModule: Processing invoices count:', processingInvoices.length)
-    console.log('🔄 BalanceModule: All invoices statuses:', invoices.map(inv => ({ id: inv.id, status: inv.status })))
     return result
   }, [invoices])
 
@@ -687,7 +627,6 @@ function BalanceModule({ onNavigateToSupport }) {
                   />
                   <button
                     onClick={() => {
-                      console.log('🔴 Add button clicked!')
                       handleAddFunds()
                     }}
                     disabled={!isWalletConnected || !topUpAmount || parseFloat(topUpAmount) <= 0 || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice}

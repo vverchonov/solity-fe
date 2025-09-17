@@ -34,11 +34,9 @@ export const BalanceProvider = ({ children }) => {
   const fetchBalance = async () => {
     // Don't fetch if no user is authenticated
     if (!user) {
-      console.log('💰 BalanceProvider: Cannot fetch balance - no user authenticated')
       return
     }
 
-    console.log('💰 BalanceProvider: Fetching user balance...')
     setIsLoading(true)
     setError(null)
 
@@ -46,12 +44,10 @@ export const BalanceProvider = ({ children }) => {
       const result = await paymentsAPI.getBalance()
 
       if (result.success) {
-        console.log('💰 BalanceProvider: Balance fetched successfully:', result.data.balances)
         setBalance(result.data.balances)
 
         // Update user status if it has changed
         if (user && result.data.balances.status !== user.status) {
-          console.log('💰 BalanceProvider: User status changed from', user.status, 'to', result.data.balances.status)
           updateUser({
             ...user,
             status: result.data.balances.status
@@ -61,11 +57,9 @@ export const BalanceProvider = ({ children }) => {
         // Store in session storage for quick access
         sessionStorage.setItem('userBalance', JSON.stringify(result.data.balances))
       } else {
-        console.error('💰 BalanceProvider: Failed to fetch balance:', result.error)
         setError(result.error)
       }
     } catch (error) {
-      console.error('💰 BalanceProvider: Error fetching balance:', error)
       setError('Failed to fetch balance')
     } finally {
       setIsLoading(false)
@@ -77,11 +71,9 @@ export const BalanceProvider = ({ children }) => {
     const initializeBalance = () => {
       // Only fetch balance if user is authenticated
       if (!user) {
-        console.log('💰 BalanceProvider: No user authenticated, skipping balance fetch')
         return
       }
 
-      console.log('💰 BalanceProvider: User authenticated, initializing balance')
 
       // Try to get cached balance first
       const cachedBalance = sessionStorage.getItem('userBalance')
@@ -89,10 +81,8 @@ export const BalanceProvider = ({ children }) => {
       if (cachedBalance) {
         try {
           const parsedBalance = JSON.parse(cachedBalance)
-          console.log('💰 BalanceProvider: Using cached balance:', parsedBalance)
           setBalance(parsedBalance)
         } catch (error) {
-          console.error('💰 BalanceProvider: Error parsing cached balance:', error)
         }
       }
 
@@ -105,12 +95,9 @@ export const BalanceProvider = ({ children }) => {
 
   // Top up balance function
   const topUpBalance = async (solAmount) => {
-    console.log('🔥 BalanceProvider: topUpBalance called with', solAmount, 'SOL')
-    console.log('🔥 BalanceProvider: user:', !!user, 'walletProvider:', !!walletProvider)
 
     // Don't allow top-up if no user is authenticated
     if (!user) {
-      console.log('💰 BalanceProvider: Cannot top-up balance - no user authenticated')
       return {
         success: false,
         error: 'User not authenticated'
@@ -119,14 +106,12 @@ export const BalanceProvider = ({ children }) => {
 
     // Don't allow top-up if wallet is not connected
     if (!walletProvider) {
-      console.log('💰 BalanceProvider: Cannot top-up balance - wallet not connected')
       return {
         success: false,
         error: 'Wallet not connected'
       }
     }
 
-    console.log('💰 BalanceProvider: Starting top-up for', solAmount, 'SOL')
     setIsTopUpLoading(true)
     setError(null)
 
@@ -134,13 +119,11 @@ export const BalanceProvider = ({ children }) => {
       // Convert SOL to lamports
       const lamports = paymentsUtils.solToLamports(solAmount)
 
-      console.log('💰 BalanceProvider: Preparing invoice for', lamports, 'lamports')
 
       // Prepare invoice
       const prepareResult = await paymentsAPI.prepareInvoice(lamports)
 
       if (prepareResult.success) {
-        console.log('💰 BalanceProvider: Invoice prepared successfully:', prepareResult.data)
         setActiveInvoice(prepareResult.data)
 
         // Invalidate invoices cache since we got 200 from prepare
@@ -152,7 +135,6 @@ export const BalanceProvider = ({ children }) => {
           data: prepareResult.data
         }
       } else {
-        console.error('💰 BalanceProvider: Failed to prepare invoice:', prepareResult.error)
         setError(prepareResult.error)
 
         return {
@@ -161,7 +143,6 @@ export const BalanceProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('💰 BalanceProvider: Error in top-up process:', error)
       const errorMessage = 'Failed to process payment'
       setError(errorMessage)
 
@@ -178,7 +159,6 @@ export const BalanceProvider = ({ children }) => {
   const cancelInvoice = async () => {
     if (!activeInvoice) return
 
-    console.log('💰 BalanceProvider: Cancelling invoice:', activeInvoice.invoice)
     setIsLoading(true)
 
     try {
@@ -188,14 +168,12 @@ export const BalanceProvider = ({ children }) => {
       const result = await paymentsAPI.cancelInvoice(invoiceId)
 
       if (result.success) {
-        console.log('💰 BalanceProvider: Invoice cancelled successfully')
         setActiveInvoice(null)
 
         return {
           success: true
         }
       } else {
-        console.error('💰 BalanceProvider: Failed to cancel invoice:', result.error)
         setError(result.error)
 
         return {
@@ -204,7 +182,6 @@ export const BalanceProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('💰 BalanceProvider: Error cancelling invoice:', error)
       const errorMessage = 'Failed to cancel invoice'
       setError(errorMessage)
 
@@ -219,7 +196,6 @@ export const BalanceProvider = ({ children }) => {
 
   // Clear active invoice (when paid or expired)
   const clearActiveInvoice = () => {
-    console.log('💰 BalanceProvider: Clearing active invoice')
     setActiveInvoice(null)
   }
 

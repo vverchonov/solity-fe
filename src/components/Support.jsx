@@ -9,7 +9,6 @@ function Support() {
     if (logs.length === 0) {
       const noLogsMessage = t('support.noLogsAvailable')
       navigator.clipboard.writeText(noLogsMessage)
-      console.log('No logs message copied to clipboard')
       return
     }
 
@@ -23,7 +22,6 @@ function Support() {
     }).join('\n')
 
     navigator.clipboard.writeText(formattedLogs)
-    console.log('Session logs copied to clipboard', `${logs.length} logs copied`)
   }
 
   const socialLinks = [

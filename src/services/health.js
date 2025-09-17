@@ -12,7 +12,6 @@ export const healthAPI = {
         data: response.data // Should contain { api: boolean, db: boolean, tele: boolean }
       }
     } catch (error) {
-      console.error('Health check failed:', error)
       return {
         success: false,
         error: error.response?.data?.message || 'Health check failed',

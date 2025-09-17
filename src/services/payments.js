@@ -12,7 +12,6 @@ export const paymentsAPI = {
         data: response.data
       }
     } catch (error) {
-      console.error('Get balance failed:', error)
       return {
         success: false,
         error: error.response?.data?.error || 'Failed to get balance'
@@ -35,7 +34,6 @@ export const paymentsAPI = {
         data: response.data
       }
     } catch (error) {
-      console.error('Get journal failed:', error)
       return {
         success: false,
         error: error.response?.data?.error || 'Failed to get journal'
@@ -55,7 +53,6 @@ export const paymentsAPI = {
         data: response.data
       }
     } catch (error) {
-      console.error('Prepare invoice failed:', error)
       return {
         success: false,
         error: error.response?.data?.error || 'Failed to prepare invoice'
@@ -75,7 +72,6 @@ export const paymentsAPI = {
         data: response.data
       }
     } catch (error) {
-      console.error('Cancel invoice failed:', error)
       return {
         success: false,
         error: error.response?.data?.error || 'Failed to cancel invoice'
@@ -98,7 +94,6 @@ export const paymentsAPI = {
         data: response.data
       }
     } catch (error) {
-      console.error('Get invoices failed:', error)
       return {
         success: false,
         error: error.response?.data?.error || 'Failed to get invoices'
@@ -116,7 +111,6 @@ export const paymentsAPI = {
         data: response.data
       }
     } catch (error) {
-      console.error('Get invoice by ID failed:', error)
       return {
         success: false,
         error: error.response?.data?.error || 'Failed to get invoice'
@@ -127,12 +121,10 @@ export const paymentsAPI = {
   // Complete Invoice (mark as processing with signature)
   completeInvoice: async (invoiceId, signature) => {
     try {
-      console.log('📝 paymentsAPI.completeInvoice called with:', { invoiceId, signature })
       const requestBody = {
         id: invoiceId,
         signature: signature
       }
-      console.log('📝 Request body for complete invoice:', requestBody)
 
       const response = await apiClient.post('/user/invoices/complete', requestBody)
 
@@ -141,8 +133,6 @@ export const paymentsAPI = {
         data: response.data
       }
     } catch (error) {
-      console.error('Complete invoice failed:', error)
-      console.error('Complete invoice error details:', error.response?.data)
       return {
         success: false,
         error: error.response?.data?.error || 'Failed to complete invoice'

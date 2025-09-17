@@ -12,7 +12,6 @@ export const ratesAPI = {
         data: response.data
       }
     } catch (error) {
-      console.error('Failed to get current rates:', error)
       return {
         success: false,
         error: error.response?.data?.message || 'Failed to get rates'
@@ -32,7 +31,6 @@ export const ratesAPI = {
         data: response.data
       }
     } catch (error) {
-      console.error('Failed to resolve rate:', error)
       return {
         success: false,
         error: error.response?.data?.message || 'Failed to resolve rate'

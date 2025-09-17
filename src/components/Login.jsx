@@ -176,7 +176,6 @@ function Login() {
     e.preventDefault()
     e.stopPropagation()
 
-    console.log('Form submitted:', { isLogin, formData })
 
     if (!formData.username || !formData.password) {
       addToast(t('login.fillAllFields'), 'error')
@@ -209,23 +208,18 @@ function Login() {
     }
 
     setLoading(true)
-    console.log('Starting authentication request...')
 
     try {
       let result
       if (isLogin) {
-        console.log('Making login request...')
         result = await authAPI.login(formData.username, formData.password, recaptchaToken)
       } else {
-        console.log('Making register request...')
         result = await authAPI.register(formData.username, formData.password, recaptchaToken)
       }
 
-      console.log('Authentication result:', result)
 
       if (result.success) {
         // Store user data in context
-        console.log('Current user:', result.data.user)
         updateUser(result.data.user)
         addToast(isLogin ? t('login.loginSuccessful') : t('login.accountCreated'), 'success')
         navigate('/dashboard')
@@ -233,7 +227,6 @@ function Login() {
         addToast(result.error || t('login.authenticationFailed'), 'error')
       }
     } catch (error) {
-      console.error('Authentication error:', error)
       addToast(error.message || t('login.authenticationFailed'), 'error')
     } finally {
       setLoading(false)

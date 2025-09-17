@@ -80,7 +80,6 @@ export const authAPI = {
         }
       }
     } catch (error) {
-      console.error('Login failed:', error)
       return {
         success: false,
         error: error.response?.data?.message || 'Login failed'
@@ -122,7 +121,6 @@ export const authAPI = {
         }
       }
     } catch (error) {
-      console.error('Registration failed:', error)
       return {
         success: false,
         error: error.response?.data?.message || 'Registration failed'
@@ -167,7 +165,6 @@ export const authAPI = {
         }
       }
     } catch (error) {
-      console.error('Token refresh failed:', error)
       tokenUtils.clearAccessToken()
       return {
         success: false,
@@ -188,7 +185,6 @@ export const authAPI = {
         success: true
       }
     } catch (error) {
-      console.error('Logout failed:', error)
       // Clear access token even if server request fails
       tokenUtils.clearAccessToken()
       return {

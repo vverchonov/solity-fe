@@ -110,7 +110,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
       } else {
         // Update local caller ID state for display
         setCallerID(newCallerID)
-        console.log('Caller ID validated:', newCallerID)
       }
 
       setIsUpdatingCallerID(false)
@@ -208,10 +207,8 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
       // Remove all non-numeric characters from phone number
       const numbersOnly = phoneNumber.replace(/[^\d]/g, '')
       const response = await apiClient.get(`/rates/resolve/?number=${encodeURIComponent(numbersOnly)}`)
-      console.log('Rate check response:', response.data)
       setRateInfo(response.data)
     } catch (error) {
-      console.error('Rate check error:', error)
       setRateError(error.response?.data?.error || t('call.rateCheckFailed'))
     } finally {
       setIsCheckingRate(false)
@@ -222,11 +219,9 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
     if (phoneNumber.trim()) {
       setCallStatus('preparing')
       setCallStartTime(Date.now())
-      console.log('Starting call...')
 
       try {
         // Step 1: Request extension setup
-        console.log('📞 Requesting extension setup...')
         const callerIDDigits = editableCallerID.replace(/[^\d]/g, '')
 
         try {
@@ -235,20 +230,17 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
           })
 
           if (extensionResponse.status === 200) {
-            console.log('📞 Extension setup successful, fetching credentials...')
           }
         } catch (error) {
           // Check if error is "CallerID is the same" - this is OK, continue
           const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || ''
           if (errorMessage.includes('CallerID is the same')) {
-            console.log('📞 CallerID already set, continuing to credentials...')
           } else {
             throw new Error(`Failed to setup extension: ${errorMessage}`)
           }
         }
 
         // Step 2: Get fresh credentials
-        console.log('📞 Fetching fresh credentials...')
         const credentialsResponse = await apiClient.get('/tele/credentials')
 
         if (credentialsResponse.status !== 200) {
@@ -257,26 +249,18 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
         const freshCredentials = credentialsResponse.data
 
-        console.log('📞 Using credentials for call:', {
-          extension: freshCredentials.extension,
-          domain: freshCredentials.domain,
-          wss: freshCredentials.wss,
-          callerID: freshCredentials.callerID
-        })
+
 
         // Step 3: Make call with fresh credentials
         setCallStatus('ringing') // Now actually start ringing
         await makeCall(phoneNumber, freshCredentials.callerID || callerID, freshCredentials)
-        console.log('Call initiated')
       } catch (error) {
         setCallStatus('ready')
-        console.error('Call failed:', error)
       }
     }
   }
 
   const handleEndCall = async () => {
-    console.log('Call ended')
 
     try {
       await hangupCall()
@@ -292,12 +276,10 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
         setCallStatus('ready')
       }, 5000)
     } catch (error) {
-      console.error('Error ending call:', error)
     }
   }
 
   const handleDTMF = (digit) => {
-    console.log('DTMF digit pressed:', digit)
     sendDTMF(digit)
   }
 
@@ -305,7 +287,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
     try {
       await toggleMute()
     } catch (error) {
-      console.error('Error toggling mute:', error)
     }
   }
 

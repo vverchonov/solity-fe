@@ -37,17 +37,13 @@ export const LogsProvider = ({ children }) => {
     const consoleMessage = `${logEntry.timestamp} ${message}`
     switch (type) {
       case 'success':
-        console.log(`✅ ${consoleMessage}`, details || '')
         break
       case 'error':
-        console.error(`❌ ${consoleMessage}`, details || '')
         break
       case 'warning':
-        console.warn(`⚠️ ${consoleMessage}`, details || '')
         break
       case 'info':
       default:
-        console.log(`ℹ️ ${consoleMessage}`, details || '')
         break
     }
   }

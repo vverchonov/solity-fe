@@ -29,11 +29,9 @@ export const TeleProvider = ({ children }) => {
   // Fetch SIP credentials
   const fetchCredentials = useCallback(async (forceRefresh = false) => {
     if (!user) {
-      console.log('📞 TeleProvider: Cannot fetch credentials - no user authenticated')
       return
     }
 
-    console.log('📞 TeleProvider: Fetching SIP credentials...', { forceRefresh })
     setIsLoading(true)
     setError(null)
 
@@ -41,7 +39,6 @@ export const TeleProvider = ({ children }) => {
       const result = await sipAPI.getCredentials()
 
       if (result.success) {
-        console.log('📞 TeleProvider: Credentials fetched successfully')
         setCredentials(result.data)
 
         // Calculate expiry time if TTL is provided
@@ -57,11 +54,9 @@ export const TeleProvider = ({ children }) => {
           cachedAt: Date.now()
         }))
       } else {
-        console.error('📞 TeleProvider: Failed to fetch credentials:', result.error)
         setError(result.error)
       }
     } catch (error) {
-      console.error('📞 TeleProvider: Error fetching credentials:', error)
       setError('Failed to fetch SIP credentials')
     } finally {
       setIsLoading(false)
@@ -78,10 +73,8 @@ export const TeleProvider = ({ children }) => {
     // Refresh 5 minutes before expiry, or halfway through if TTL is less than 10 minutes
     const refreshIn = ttlSeconds > 600 ? (ttlSeconds - 300) * 1000 : (ttlSeconds / 2) * 1000
 
-    console.log(`📞 TeleProvider: Scheduling credentials refresh in ${refreshIn / 1000} seconds`)
 
     const timer = setTimeout(() => {
-      console.log('📞 TeleProvider: Auto-refreshing credentials due to TTL expiry')
       fetchCredentials(true)
     }, refreshIn)
 
@@ -94,7 +87,6 @@ export const TeleProvider = ({ children }) => {
       return { success: false, error: 'User not authenticated' }
     }
 
-    console.log('📞 TeleProvider: Refreshing SIP password...')
     setIsLoading(true)
     setError(null)
 
@@ -102,7 +94,6 @@ export const TeleProvider = ({ children }) => {
       const result = await sipAPI.refreshPassword()
 
       if (result.success) {
-        console.log('📞 TeleProvider: Password refreshed successfully')
 
         // Update credentials with new password
         if (credentials) {
@@ -128,12 +119,10 @@ export const TeleProvider = ({ children }) => {
 
         return { success: true, data: result.data }
       } else {
-        console.error('📞 TeleProvider: Failed to refresh password:', result.error)
         setError(result.error)
         return { success: false, error: result.error }
       }
     } catch (error) {
-      console.error('📞 TeleProvider: Error refreshing password:', error)
       const errorMsg = 'Failed to refresh SIP password'
       setError(errorMsg)
       return { success: false, error: errorMsg }
@@ -148,7 +137,6 @@ export const TeleProvider = ({ children }) => {
       return { success: false, error: 'User not authenticated' }
     }
 
-    console.log('📞 TeleProvider: Updating caller ID...', callerID)
     setIsLoading(true)
     setError(null)
 
@@ -156,7 +144,6 @@ export const TeleProvider = ({ children }) => {
       const result = await sipAPI.updateCallerID(callerID)
 
       if (result.success) {
-        console.log('📞 TeleProvider: Caller ID updated successfully')
 
         // Update credentials with new caller ID
         if (credentials) {
@@ -175,12 +162,10 @@ export const TeleProvider = ({ children }) => {
 
         return { success: true, data: result.data }
       } else {
-        console.error('📞 TeleProvider: Failed to update caller ID:', result.error)
         setError(result.error)
         return { success: false, error: result.error }
       }
     } catch (error) {
-      console.error('📞 TeleProvider: Error updating caller ID:', error)
       const errorMsg = 'Failed to update caller ID'
       setError(errorMsg)
       return { success: false, error: errorMsg }
@@ -195,21 +180,17 @@ export const TeleProvider = ({ children }) => {
       return { success: false, error: 'User not authenticated' }
     }
 
-    console.log('📞 TeleProvider: Getting connection status...')
 
     try {
       const result = await sipAPI.getConnectionStatus()
 
       if (result.success) {
-        console.log('📞 TeleProvider: Connection status retrieved')
         setConnectionStatus(result.data)
         return { success: true, data: result.data }
       } else {
-        console.error('📞 TeleProvider: Failed to get connection status:', result.error)
         return { success: false, error: result.error }
       }
     } catch (error) {
-      console.error('📞 TeleProvider: Error getting connection status:', error)
       return { success: false, error: 'Failed to get connection status' }
     }
   }, [user])
@@ -217,25 +198,20 @@ export const TeleProvider = ({ children }) => {
   // Fetch available caller IDs
   const fetchAvailableCallerIDs = useCallback(async () => {
     if (!user) {
-      console.log('📞 TeleProvider: Cannot fetch caller IDs - no user authenticated')
       return
     }
 
-    console.log('📞 TeleProvider: Fetching available caller IDs...')
 
     try {
       const result = await sipAPI.getAvailableCallerIDs()
 
       if (result.success) {
-        console.log('📞 TeleProvider: Available caller IDs fetched successfully')
         setAvailableCallerIDs(result.data.callerIDs || [])
         return { success: true, data: result.data }
       } else {
-        console.error('📞 TeleProvider: Failed to fetch available caller IDs:', result.error)
         return { success: false, error: result.error }
       }
     } catch (error) {
-      console.error('📞 TeleProvider: Error fetching available caller IDs:', error)
       return { success: false, error: 'Failed to fetch available caller IDs' }
     }
   }, [user])
@@ -246,21 +222,17 @@ export const TeleProvider = ({ children }) => {
       return { success: false, error: 'User not authenticated or no credentials' }
     }
 
-    console.log('📞 TeleProvider: Testing SIP connection...')
     setIsLoading(true)
 
     try {
       const result = await sipAPI.testConnection()
 
       if (result.success) {
-        console.log('📞 TeleProvider: Connection test completed')
         return { success: true, data: result.data }
       } else {
-        console.error('📞 TeleProvider: Connection test failed:', result.error)
         return { success: false, error: result.error }
       }
     } catch (error) {
-      console.error('📞 TeleProvider: Error testing connection:', error)
       return { success: false, error: 'Failed to test connection' }
     } finally {
       setIsLoading(false)
@@ -269,7 +241,6 @@ export const TeleProvider = ({ children }) => {
 
   // Clear credentials
   const clearCredentials = useCallback(() => {
-    console.log('📞 TeleProvider: Clearing credentials')
     setCredentials(null)
     setConnectionStatus(null)
     setAvailableCallerIDs([])
@@ -289,12 +260,10 @@ export const TeleProvider = ({ children }) => {
   // Initialize credentials when user is available - clear old credentials but don't fetch new ones
   useEffect(() => {
     if (!user) {
-      console.log('📞 TeleProvider: No user authenticated, clearing credentials')
       clearCredentials()
       return
     }
 
-    console.log('📞 TeleProvider: User authenticated, credentials will be fetched when needed (before making calls)')
 
     // Clear any old cached credentials when user logs in
     sessionStorage.removeItem('sipCredentials')

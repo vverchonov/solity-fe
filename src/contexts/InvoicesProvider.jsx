@@ -24,11 +24,9 @@ export const InvoicesProvider = ({ children }) => {
   // Fetch invoices from API
   const fetchInvoices = useCallback(async (offset = 0, limit = 20, reset = false) => {
     if (!user) {
-      console.log('💳 InvoicesProvider: Cannot fetch invoices - no user authenticated')
       return
     }
 
-    console.log('💳 InvoicesProvider: Fetching invoices...', { offset, limit, reset })
     setIsLoading(true)
     setError(null)
 
@@ -36,7 +34,6 @@ export const InvoicesProvider = ({ children }) => {
       const result = await paymentsAPI.getInvoices(offset, limit)
 
       if (result.success) {
-        console.log('💳 InvoicesProvider: Invoices fetched successfully:', result.data)
 
         const newInvoices = result.data.invoices || []
         const totalCount = result.data.total || 0
@@ -59,11 +56,9 @@ export const InvoicesProvider = ({ children }) => {
           sessionStorage.setItem('userInvoices', JSON.stringify(newInvoices))
         }
       } else {
-        console.error('💳 InvoicesProvider: Failed to fetch invoices:', result.error)
         setError(result.error)
       }
     } catch (error) {
-      console.error('💳 InvoicesProvider: Error fetching invoices:', error)
       setError('Failed to fetch invoices')
     } finally {
       setIsLoading(false)
@@ -74,11 +69,9 @@ export const InvoicesProvider = ({ children }) => {
   useEffect(() => {
     const initializeInvoices = () => {
       if (!user) {
-        console.log('💳 InvoicesProvider: No user authenticated, skipping invoices fetch')
         return
       }
 
-      console.log('💳 InvoicesProvider: User authenticated, initializing invoices')
 
       // Try to get cached invoices first
       const cachedInvoices = sessionStorage.getItem('userInvoices')
@@ -86,11 +79,9 @@ export const InvoicesProvider = ({ children }) => {
       if (cachedInvoices) {
         try {
           const parsedInvoices = JSON.parse(cachedInvoices)
-          console.log('💳 InvoicesProvider: Using cached invoices:', parsedInvoices)
           setInvoices(parsedInvoices)
           setCurrentOffset(parsedInvoices.length)
         } catch (error) {
-          console.error('💳 InvoicesProvider: Error parsing cached invoices:', error)
         }
       }
 
@@ -109,7 +100,6 @@ export const InvoicesProvider = ({ children }) => {
 
   // Refresh invoices (invalidate cache and refetch)
   const refreshInvoices = async () => {
-    console.log('💳 InvoicesProvider: Refreshing invoices...')
     setCurrentOffset(0)
     setHasMore(true)
     await fetchInvoices(0, 20, true)
@@ -117,7 +107,6 @@ export const InvoicesProvider = ({ children }) => {
 
   // Invalidate invoices cache - call this after prepare invoice success
   const invalidateInvoices = () => {
-    console.log('💳 InvoicesProvider: Invalidating invoices cache')
 
     // Clear cached data
     sessionStorage.removeItem('userInvoices')
@@ -139,13 +128,11 @@ export const InvoicesProvider = ({ children }) => {
       }
     }
 
-    console.log('💳 InvoicesProvider: Fetching invoice by ID:', invoiceId)
 
     try {
       const result = await paymentsAPI.getInvoiceById(invoiceId)
       return result
     } catch (error) {
-      console.error('💳 InvoicesProvider: Error fetching invoice by ID:', error)
       return {
         success: false,
         error: 'Failed to fetch invoice'
@@ -177,13 +164,11 @@ export const InvoicesProvider = ({ children }) => {
       }
     }
 
-    console.log('💳 InvoicesProvider: Cancelling invoice:', invoiceId)
 
     try {
       const result = await paymentsAPI.cancelInvoice(invoiceId)
 
       if (result.success) {
-        console.log('💳 InvoicesProvider: Invoice cancelled successfully')
 
         // Update local invoice status to cancelled
         setInvoices(prevInvoices =>
@@ -202,14 +187,12 @@ export const InvoicesProvider = ({ children }) => {
           data: result.data
         }
       } else {
-        console.error('💳 InvoicesProvider: Failed to cancel invoice:', result.error)
         return {
           success: false,
           error: result.error
         }
       }
     } catch (error) {
-      console.error('💳 InvoicesProvider: Error cancelling invoice:', error)
       return {
         success: false,
         error: 'Failed to cancel invoice'

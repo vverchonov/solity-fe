@@ -27,7 +27,6 @@ export const useAuth = () => {
         try {
           await authAPI.logout()
         } catch (logoutError) {
-          console.error('Logout API call failed during auth check:', logoutError)
         }
         setUser(null)
         setIsAuthenticated(false)
@@ -37,7 +36,6 @@ export const useAuth = () => {
       try {
         await authAPI.logout()
       } catch (logoutError) {
-        console.error('Logout API call failed during auth check error:', logoutError)
       }
       setUser(null)
       setIsAuthenticated(false)
@@ -91,7 +89,6 @@ export const useAuth = () => {
       // Redirect to home page
       window.location.href = '/'
     } catch (error) {
-      console.error('Logout error:', error)
       // Clear local state even if server call fails
       setUser(null)
       setIsAuthenticated(false)
@@ -109,7 +106,6 @@ export const useAuth = () => {
       try {
         await authAPI.logout()
       } catch (logoutError) {
-        console.error('Logout API call failed during token refresh:', logoutError)
       }
       setUser(null)
       setIsAuthenticated(false)

@@ -79,7 +79,6 @@ function Dashboard() {
       }
       // Set 3-minute timeout for ringing calls
       const timeout = setTimeout(async () => {
-        console.log('Call timeout: 3 minutes of ringing, canceling call')
         try {
           await hangupCall()
           setCallStatus('ended')
@@ -89,7 +88,6 @@ function Dashboard() {
           setIsModalMinimized(false)
           setTimeout(() => setCallStatus('ready'), 3000)
         } catch (error) {
-          console.error('Error canceling timed out call:', error)
         }
       }, 3 * 60 * 1000) // 3 minutes
       setRingingTimeout(timeout)
@@ -127,7 +125,6 @@ function Dashboard() {
         setCallStatus('ready')
       }, 5000)
     } catch (error) {
-      console.error('Error ending call:', error)
     }
   }
 
@@ -135,7 +132,6 @@ function Dashboard() {
     try {
       await toggleMute()
     } catch (error) {
-      console.error('Error toggling mute:', error)
     }
   }
 
@@ -167,7 +163,6 @@ function Dashboard() {
       clearUser()
       navigate('/')
     } catch (error) {
-      console.error('Logout error:', error)
       // Clear user state and redirect even if logout fails
       clearUser()
       navigate('/')
@@ -258,8 +253,6 @@ function Dashboard() {
         )
     }
   }
-  console.log("user object in Dashboard = ", user)
-  console.log("user.username = ", user?.username)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-black">

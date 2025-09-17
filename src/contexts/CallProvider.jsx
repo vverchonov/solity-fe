@@ -129,7 +129,6 @@ export const CallProvider = ({ children }) => {
 
         } catch (error) {
             addLog(`Connection failed: ${error}`);
-            console.error('Connection failed:', error);
         }
     };
 

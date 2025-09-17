@@ -40,7 +40,6 @@ export const HealthProvider = ({ children }) => {
         
         setLastChecked(new Date())
       } catch (error) {
-        console.error('Error checking health:', error)
         setHealth({
           api: false,
           db: false,
@@ -88,7 +87,6 @@ export const HealthProvider = ({ children }) => {
       }
       setLastChecked(new Date())
     } catch (error) {
-      console.error('Error refreshing health:', error)
       setHealth({
         api: false,
         db: false,

@@ -5,12 +5,10 @@ export const sipAPI = {
   // Get SIP credentials for user
   getCredentials: async () => {
     try {
-      console.log('📞 SIP: Getting SIP credentials...')
 
       const response = await apiClient.get('/tele/credentials')
 
       if (response.data) {
-        console.log('📞 SIP: Credentials retrieved successfully')
 
         return {
           success: true,
@@ -30,7 +28,6 @@ export const sipAPI = {
         error: 'No credentials data received'
       }
     } catch (error) {
-      console.error('📞 SIP: Error getting credentials:', error)
 
       return {
         success: false,
@@ -42,14 +39,12 @@ export const sipAPI = {
   // Update caller ID using the new extension endpoint
   updateCallerID: async (callerID) => {
     try {
-      console.log('📞 SIP: Updating caller ID...', callerID)
 
       const response = await apiClient.patch('/tele/extension', {
         callerID: callerID
       })
 
       if (response.data) {
-        console.log('📞 SIP: Caller ID updated successfully')
 
         return {
           success: true,
@@ -65,7 +60,6 @@ export const sipAPI = {
         error: 'No response data received'
       }
     } catch (error) {
-      console.error('📞 SIP: Error updating caller ID:', error)
 
       return {
         success: false,
@@ -77,12 +71,10 @@ export const sipAPI = {
   // Refresh/rotate SIP password
   refreshPassword: async () => {
     try {
-      console.log('📞 SIP: Refreshing SIP password...')
 
       const response = await apiClient.post('/tele/refresh-password')
 
       if (response.data) {
-        console.log('📞 SIP: Password refreshed successfully')
 
         return {
           success: true,
@@ -99,7 +91,6 @@ export const sipAPI = {
         error: 'No response data received'
       }
     } catch (error) {
-      console.error('📞 SIP: Error refreshing password:', error)
 
       return {
         success: false,
@@ -111,12 +102,10 @@ export const sipAPI = {
   // Get SIP connection status
   getConnectionStatus: async () => {
     try {
-      console.log('📞 SIP: Getting connection status...')
 
       const response = await apiClient.get('/tele/status')
 
       if (response.data) {
-        console.log('📞 SIP: Status retrieved successfully')
 
         return {
           success: true,
@@ -134,7 +123,6 @@ export const sipAPI = {
         error: 'No status data received'
       }
     } catch (error) {
-      console.error('📞 SIP: Error getting status:', error)
 
       return {
         success: false,
@@ -146,12 +134,10 @@ export const sipAPI = {
   // Test SIP connection
   testConnection: async () => {
     try {
-      console.log('📞 SIP: Testing SIP connection...')
 
       const response = await apiClient.post('/tele/test-connection')
 
       if (response.data) {
-        console.log('📞 SIP: Connection test completed')
 
         return {
           success: true,
@@ -169,7 +155,6 @@ export const sipAPI = {
         error: 'No test result received'
       }
     } catch (error) {
-      console.error('📞 SIP: Error testing connection:', error)
 
       return {
         success: false,
@@ -181,12 +166,10 @@ export const sipAPI = {
   // Get available caller ID numbers
   getAvailableCallerIDs: async () => {
     try {
-      console.log('📞 SIP: Getting available caller IDs...')
 
       const response = await apiClient.get('/tele/available-caller-ids')
 
       if (response.data) {
-        console.log('📞 SIP: Available caller IDs retrieved successfully')
 
         return {
           success: true,
@@ -203,7 +186,6 @@ export const sipAPI = {
         error: 'No caller ID data received'
       }
     } catch (error) {
-      console.error('📞 SIP: Error getting available caller IDs:', error)
 
       return {
         success: false,
@@ -215,7 +197,6 @@ export const sipAPI = {
   // Verify caller ID ownership
   verifyCallerID: async (callerID, verificationCode) => {
     try {
-      console.log('📞 SIP: Verifying caller ID...', callerID)
 
       const response = await apiClient.post('/tele/verify-caller-id', {
         callerID: callerID,
@@ -223,7 +204,6 @@ export const sipAPI = {
       })
 
       if (response.data) {
-        console.log('📞 SIP: Caller ID verification completed')
 
         return {
           success: true,
@@ -240,7 +220,6 @@ export const sipAPI = {
         error: 'No verification result received'
       }
     } catch (error) {
-      console.error('📞 SIP: Error verifying caller ID:', error)
 
       return {
         success: false,
@@ -252,14 +231,12 @@ export const sipAPI = {
   // Request caller ID verification
   requestCallerIDVerification: async (callerID) => {
     try {
-      console.log('📞 SIP: Requesting caller ID verification...', callerID)
 
       const response = await apiClient.post('/tele/request-caller-id-verification', {
         callerID: callerID
       })
 
       if (response.data) {
-        console.log('📞 SIP: Caller ID verification requested successfully')
 
         return {
           success: true,
@@ -277,7 +254,6 @@ export const sipAPI = {
         error: 'No verification request data received'
       }
     } catch (error) {
-      console.error('📞 SIP: Error requesting caller ID verification:', error)
 
       return {
         success: false,
@@ -332,7 +308,6 @@ export const sipUtils = {
         path: sipUrl.pathname
       }
     } catch (error) {
-      console.error('📞 SIP: Error parsing SIP URL:', error)
       return null
     }
   },

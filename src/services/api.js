@@ -11,7 +11,6 @@ export const callAPI = {
       })
       return response.data
     } catch (error) {
-      console.error('Failed to start call:', error)
       throw error
     }
   },
@@ -22,7 +21,6 @@ export const callAPI = {
       const response = await apiClient.post(`/calls/${callId}/end`)
       return response.data
     } catch (error) {
-      console.error('Failed to end call:', error)
       throw error
     }
   },
@@ -35,7 +33,6 @@ export const callAPI = {
       })
       return response.data
     } catch (error) {
-      console.error('Failed to send DTMF:', error)
       throw error
     }
   },
@@ -46,7 +43,6 @@ export const callAPI = {
       const response = await apiClient.get(`/calls/${callId}`)
       return response.data
     } catch (error) {
-      console.error('Failed to get call status:', error)
       throw error
     }
   }
@@ -60,7 +56,6 @@ export const balanceAPI = {
       const response = await apiClient.get('/balance')
       return response.data
     } catch (error) {
-      console.error('Failed to get balance:', error)
       throw error
     }
   },
@@ -71,7 +66,6 @@ export const balanceAPI = {
       const response = await apiClient.get('/balance/history')
       return response.data
     } catch (error) {
-      console.error('Failed to get balance history:', error)
       throw error
     }
   }
@@ -85,7 +79,6 @@ export const userAPI = {
       const response = await apiClient.get('/user/profile')
       return response.data
     } catch (error) {
-      console.error('Failed to get profile:', error)
       throw error
     }
   },
@@ -96,7 +89,6 @@ export const userAPI = {
       const response = await apiClient.put('/user/settings', settings)
       return response.data
     } catch (error) {
-      console.error('Failed to update settings:', error)
       throw error
     }
   },
@@ -107,7 +99,6 @@ export const userAPI = {
       const response = await apiClient.put('/user/profile', profileData)
       return response.data
     } catch (error) {
-      console.error('Failed to update profile:', error)
       throw error
     }
   },
@@ -121,7 +112,6 @@ export const userAPI = {
       })
       return response.data
     } catch (error) {
-      console.error('Failed to change password:', error)
       throw error
     }
   }

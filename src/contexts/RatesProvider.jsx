@@ -26,14 +26,11 @@ export const RatesProvider = ({ children }) => {
         const result = await ratesAPI.getCurrentRates()
         if (result.success) {
           setRates(result.data.rates || result.data || [])
-          console.log('Call rates loaded:', result.data)
         } else {
           setError(result.error)
-          console.error('Failed to load rates:', result.error)
         }
       } catch (error) {
         setError('Failed to load rates')
-        console.error('Error loading rates:', error)
       } finally {
         setIsLoading(false)
       }
@@ -63,14 +60,11 @@ export const RatesProvider = ({ children }) => {
       const result = await ratesAPI.getCurrentRates()
       if (result.success) {
         setRates(result.data.rates || result.data || [])
-        console.log('Rates refreshed:', result.data)
       } else {
         setError(result.error)
-        console.error('Failed to refresh rates:', result.error)
       }
     } catch (error) {
       setError('Failed to refresh rates')
-      console.error('Error refreshing rates:', error)
     } finally {
       setIsLoading(false)
     }
