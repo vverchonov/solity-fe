@@ -16,7 +16,7 @@ export const useBalance = () => {
 }
 
 export const BalanceProvider = ({ children }) => {
-  const { user } = useUser() // Get user from UserContext
+  const { user, updateUser } = useUser() // Get user from UserContext
   const { walletProvider } = useWallet() // Get wallet provider for signing transactions
   const { invalidateInvoices } = useInvoices() // Get invalidateInvoices function
 
@@ -48,6 +48,15 @@ export const BalanceProvider = ({ children }) => {
       if (result.success) {
         console.log('💰 BalanceProvider: Balance fetched successfully:', result.data.balances)
         setBalance(result.data.balances)
+
+        // Update user status if it has changed
+        if (user && result.data.balances.status !== user.status) {
+          console.log('💰 BalanceProvider: User status changed from', user.status, 'to', result.data.balances.status)
+          updateUser({
+            ...user,
+            status: result.data.balances.status
+          })
+        }
 
         // Store in session storage for quick access
         sessionStorage.setItem('userBalance', JSON.stringify(result.data.balances))

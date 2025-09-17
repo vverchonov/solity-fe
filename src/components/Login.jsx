@@ -80,9 +80,10 @@ function Login() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
+    const processedValue = name === 'username' ? value.trim() : value
     setFormData({
       ...formData,
-      [name]: value
+      [name]: processedValue
     })
 
     // Real-time validation for password fields during registration
