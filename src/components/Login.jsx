@@ -34,6 +34,7 @@ function Login() {
     }
   }, [user, isLoading, shouldRedirectToDashboard, navigate, clearRedirectFlag])
 
+
   // Reset reCAPTCHA when switching between login/register
   useEffect(() => {
     if (recaptchaRef.current) {
@@ -365,16 +366,16 @@ function Login() {
               </form>
 
             </div>
-              {isLogin && (
-                <div className="text-center">
-                  <button
-                    onClick={() => addToast(t('login.contactSupport'), 'info')}
-                    className="text-sm mt-2 text-white/70 hover:text-white"
-                  >
-                    {t('login.forgotPassword')}
-                  </button>
-                </div>
-              )}
+            {isLogin && (
+              <div className="text-center">
+                <button
+                  onClick={() => addToast(t('login.contactSupport'), 'info')}
+                  className="text-sm mt-2 text-white/70 hover:text-white"
+                >
+                  {t('login.forgotPassword')}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
