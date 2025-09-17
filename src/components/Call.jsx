@@ -141,8 +141,8 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
     const status = isInCall ? 'in-call' : (callState.callStatus === 'calling' ? 'ringing' : callStatus)
 
     switch (status) {
-      case 'creating':
-        return { text: 'Creating call...', className: 'bg-blue-500/20 border border-blue-400/30 text-blue-100 px-3 py-1 rounded-full text-sm' }
+      case 'preparing':
+        return { text: 'Preparing call...', className: 'bg-blue-500/20 border border-blue-400/30 text-blue-100 px-3 py-1 rounded-full text-sm' }
       case 'ringing':
       case 'calling':
         return { text: 'Ringing...', className: 'bg-yellow-500/20 border border-yellow-400/30 text-yellow-100 px-3 py-1 rounded-full text-sm' }
@@ -174,14 +174,9 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
   const handleStartCall = async () => {
     if (phoneNumber.trim()) {
-      setCallStatus('creating')
+      setCallStatus('preparing')
       setCallStartTime(Date.now())
       console.log('Starting call...')
-
-      // Show "Creating call..." for at least 3 seconds
-      setTimeout(() => {
-        setCallStatus('ringing')
-      }, 3000)
 
       try {
         // Step 1: Request extension setup
@@ -224,6 +219,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
         })
 
         // Step 3: Make call with fresh credentials
+        setCallStatus('ringing') // Now actually start ringing
         await makeCall(phoneNumber, freshCredentials.callerID || callerID, freshCredentials)
         console.log('Call initiated')
       } catch (error) {
@@ -323,7 +319,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                 ) : callerIDError ? (
                   <span className="text-red-400">{callerIDError}</span>
                 ) : (
-                  <span>Enter your caller ID (7-15 digits)</span>
+                  <span>Enter your caller ID(phone number)</span>
                 )}
               </div>
             </div>
@@ -337,20 +333,20 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="e.g. +44 20 7946 0958"
-                  disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'creating'}
-                  className={`flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 ${isInCall || callState.callStatus === 'calling' || callStatus === 'creating' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'}
+                  className={`flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 ${isInCall || callState.callStatus === 'calling' || callStatus === 'preparing' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
                 <button
-                  onClick={(isInCall || callState.callStatus === 'calling' || callStatus === 'creating') ? handleEndCall : handleStartCall}
-                  disabled={callStatus === 'ended' || (!(isInCall || callState.callStatus === 'calling' || callStatus === 'creating') && !phoneNumber.trim())}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] border ${(isInCall || callState.callStatus === 'calling' || callStatus === 'creating')
+                  onClick={(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') ? handleEndCall : handleStartCall}
+                  disabled={callStatus === 'ended' || (!(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') && !phoneNumber.trim())}
+                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] border ${(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing')
                     ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-600/30 hover:border-red-600/50'
                     : callStatus === 'ended' || !phoneNumber.trim()
                       ? 'bg-gray-600/20 text-gray-500 border-gray-600/30 cursor-not-allowed'
                       : 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-600/30 hover:border-green-600/50'
                     }`}
                 >
-                  {(isInCall || callState.callStatus === 'calling' || callStatus === 'creating') ? 'End Call' : 'Call'}
+                  {(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') ? 'End Call' : 'Call'}
                 </button>
               </div>
             </div>

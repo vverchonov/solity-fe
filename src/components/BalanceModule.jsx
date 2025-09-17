@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRates } from '../contexts/RatesProvider'
 import { useWallet } from '../contexts/WalletProvider'
@@ -9,12 +9,17 @@ import { useUser } from '../contexts/UserContext'
 import { paymentsAPI } from '../services/payments'
 import { solanaService } from '../services/solana'
 import { authAPI } from '../services/auth'
+import apiClient from '../lib/axios'
 
 function BalanceModule({ onNavigateToSupport }) {
   const [topUpAmount, setTopUpAmount] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [showProcessingModal, setShowProcessingModal] = useState(false)
   const [isRefreshingBalance, setIsRefreshingBalance] = useState(false)
+  const [activeTab, setActiveTab] = useState('invoices')
+  const [journal, setJournal] = useState([])
+  const [isJournalLoading, setIsJournalLoading] = useState(false)
+  const [journalError, setJournalError] = useState(null)
   const navigate = useNavigate()
   const { user, clearUser } = useUser()
 
@@ -96,9 +101,12 @@ function BalanceModule({ onNavigateToSupport }) {
           console.log('✅ Invoice completed successfully')
           logInvoiceStatusUpdate(invoiceId, 'pending', 'processing')
 
-          // Refetch invoices immediately after successful completion
-          await refreshInvoices()
-          console.log('✅ BalanceModule: Invoices refreshed after payment completion')
+          // Refetch invoices and journal immediately after successful completion
+          await Promise.all([
+            refreshInvoices(),
+            fetchJournal()
+          ])
+          console.log('✅ BalanceModule: Invoices and journal refreshed after payment completion')
         } else {
           console.error('❌ Failed to complete invoice:', completeResult.error)
         }
@@ -109,9 +117,12 @@ function BalanceModule({ onNavigateToSupport }) {
         // Refresh balance immediately after showing modal
         handleRefreshBalance()
 
-        // Also refresh invoices after successful payment (additional refresh)
+        // Also refresh invoices and journal after successful payment (additional refresh)
         setTimeout(() => {
-          refreshInvoices()
+          Promise.all([
+            refreshInvoices(),
+            fetchJournal()
+          ])
         }, 1000)
       } else {
         console.error('❌ Failed to execute payment:', paymentResult.error)
@@ -195,12 +206,13 @@ function BalanceModule({ onNavigateToSupport }) {
       console.log('✅ Invoice cancelled successfully')
       logInvoiceCancel(invoiceId, true)
 
-      // Refresh both invoices and balance to update all state and re-enable buttons
+      // Refresh invoices, journal, and balance to update all state and re-enable buttons
       await Promise.all([
         refreshInvoices(),
+        fetchJournal(),
         refreshBalance()
       ])
-      console.log('✅ BalanceModule: Invoices and balance refreshed after invoice cancellation')
+      console.log('✅ BalanceModule: Invoices, journal, and balance refreshed after invoice cancellation')
 
       // Force a small delay to ensure UI updates properly
       setTimeout(() => {
@@ -273,9 +285,12 @@ function BalanceModule({ onNavigateToSupport }) {
           console.log('✅ Invoice completed successfully')
           logInvoiceStatusUpdate(invoiceId, 'pending', 'processing')
 
-          // Refetch invoices immediately after successful completion
-          await refreshInvoices()
-          console.log('✅ BalanceModule: Invoices refreshed after payment completion')
+          // Refetch invoices and journal immediately after successful completion
+          await Promise.all([
+            refreshInvoices(),
+            fetchJournal()
+          ])
+          console.log('✅ BalanceModule: Invoices and journal refreshed after payment completion')
         } else {
           console.error('❌ Failed to complete invoice:', completeResult.error)
         }
@@ -286,9 +301,12 @@ function BalanceModule({ onNavigateToSupport }) {
         // Refresh balance immediately after showing modal
         handleRefreshBalance()
 
-        // Also refresh invoices after successful payment
+        // Also refresh invoices and journal after successful payment
         setTimeout(() => {
-          refreshInvoices()
+          Promise.all([
+            refreshInvoices(),
+            fetchJournal()
+          ])
         }, 1000)
       } else {
         console.error('❌ Failed to execute payment:', paymentResult.error)
@@ -306,19 +324,43 @@ function BalanceModule({ onNavigateToSupport }) {
     }
   }
 
+  const fetchJournal = async () => {
+    setIsJournalLoading(true)
+    setJournalError(null)
+    try {
+      console.log('🔄 Fetching journal...')
+      const response = await apiClient.get('/user/journal')
+      if (response.data && response.data.journal) {
+        setJournal(response.data.journal)
+        console.log('✅ Journal fetched:', response.data.journal.length, 'entries')
+      } else {
+        console.error('❌ No journal data in response')
+        setJournalError('No journal data received')
+      }
+    } catch (error) {
+      console.error('❌ Error fetching journal:', error)
+      setJournalError(error.response?.data?.error || error.message || 'Failed to fetch journal')
+    } finally {
+      setIsJournalLoading(false)
+    }
+  }
+
   const handleRefreshBalance = async () => {
     setIsRefreshingBalance(true)
     try {
-      console.log('🔄 Refreshing balance and invoices...')
+      console.log('🔄 Refreshing balance, invoices, and journal...')
       const result = await paymentsAPI.getBalance()
 
       if (result.success) {
         console.log('✅ Balance refreshed:', result.data)
         // The BalanceProvider will automatically update when we call refreshBalance
         refreshBalance()
-        // Also refresh invoices
-        await refreshInvoices()
-        console.log('✅ BalanceModule: Invoices refreshed during balance refresh')
+        // Also refresh invoices and journal
+        await Promise.all([
+          refreshInvoices(),
+          fetchJournal()
+        ])
+        console.log('✅ BalanceModule: Invoices and journal refreshed during balance refresh')
       } else {
         console.error('❌ Failed to refresh balance:', result.error)
       }
@@ -328,6 +370,11 @@ function BalanceModule({ onNavigateToSupport }) {
       setIsRefreshingBalance(false)
     }
   }
+
+  // Fetch journal on component mount
+  useEffect(() => {
+    fetchJournal()
+  }, [])
 
   // Get the first pending invoice (most recent incomplete one) - memoized for performance
   const firstPendingInvoice = useMemo(() => {
@@ -378,8 +425,41 @@ function BalanceModule({ onNavigateToSupport }) {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
-  // Get recent invoices (limit to first 10)
+  // Helper functions for journal display
+  const formatJournalAmount = (lamports) => {
+    const amount = Math.abs(lamports / 1e9)
+    return amount.toFixed(4) + ' SOL'
+  }
+
+  const getJournalTypeColor = (kind) => {
+    switch (kind) {
+      case 'deposit':
+        return 'text-green-400'
+      case 'withdrawal':
+        return 'text-red-400'
+      case 'call':
+        return 'text-blue-400'
+      case 'sms':
+        return 'text-purple-400'
+      default:
+        return 'text-white/70'
+    }
+  }
+
+  const formatJournalKind = (kind) => {
+    const kindMap = {
+      deposit: 'Deposit',
+      withdrawal: 'Withdrawal',
+      call: 'Call',
+      sms: 'SMS',
+      other: 'Other'
+    }
+    return kindMap[kind] || kind
+  }
+
+  // Get recent invoices and journal entries (limit to first 10)
   const displayInvoices = invoices.slice(0, 10)
+  const displayJournal = journal.slice(0, 10)
 
   // Filter and search rates - adapted for new data structure
   const filteredRates = rates.filter(rate => {
@@ -637,78 +717,162 @@ function BalanceModule({ onNavigateToSupport }) {
           </div>
         </div>
 
-        {/* Invoices Table Card */}
+        {/* Invoices & Journal Card */}
         <div id="recent-invoices-section" className="card p-6 h-96 flex-shrink-0">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                 <div className="w-3 h-3 bg-white/40 rounded-full"></div>
               </div>
-              <h3 className="text-xl font-semibold text-white">Recent Invoices</h3>
+              <h3 className="text-xl font-semibold text-white">Recent Activity</h3>
             </div>
           </div>
 
-          {invoicesLoading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-              <span className="ml-3 text-white/70">Loading invoices...</span>
-            </div>
-          ) : invoicesError ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <div className="text-red-400 text-sm mb-2">Failed to load invoices</div>
-                <div className="text-white/60 text-xs">{invoicesError}</div>
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* Table Header */}
-              <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs w-full" style={{ gridTemplateColumns: 'minmax(120px, 25%) minmax(120px, 20%) minmax(80px, 15%) minmax(120px, 20%) minmax(120px, 20%)' }}>
-                <div className="text-white/60 font-medium">Invoice ID</div>
-                <div className="text-white/60 font-medium">Amount</div>
-                <div className="text-white/60 font-medium">Status</div>
-                <div className="text-white/60 font-medium">Paid At</div>
-                <div className="text-white/60 font-medium">Expires</div>
-              </div>
+          {/* Tabs */}
+          <div className="flex gap-1 mb-4 bg-white/5 p-1 rounded-lg">
+            <button
+              onClick={() => setActiveTab('invoices')}
+              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'invoices'
+                  ? 'bg-white text-gray-900'
+                  : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Invoices ({displayInvoices.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('journal')}
+              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'journal'
+                  ? 'bg-white text-gray-900'
+                  : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Journal ({displayJournal.length})
+            </button>
+          </div>
 
-              {/* Table Rows */}
-              <div className="space-y-2 h-48 overflow-y-auto">
-                {displayInvoices.length === 0 ? (
-                  <div className="text-center py-8 text-white/60">
-                    No invoices found.
-                  </div>
-                ) : (
-                  displayInvoices.map((invoice) => (
-                    <div key={invoice.id} className="grid gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs w-full" style={{ gridTemplateColumns: 'minmax(120px, 25%) minmax(120px, 20%) minmax(80px, 15%) minmax(120px, 20%) minmax(120px, 20%)' }}>
-                      <div className="text-white/70 font-mono">
-                        <div className="truncate" title={invoice.id}>
-                          {invoice.id ? invoice.id.substring(0, 12) + '...' : '-'}
-                        </div>
-                      </div>
-                      <div className="text-white font-mono">
-                        {formatInvoiceAmount(invoice.lamports)}
-                      </div>
-                      <div className={`font-medium ${getStatusColor(invoice.status)}`}>
-                        {formatInvoiceStatus(invoice.status)}
-                      </div>
-                      <div className="text-white/70">
-                        {formatDate(invoice.paidAt)}
-                      </div>
-                      <div className="text-white/70">
-                        {formatDate(invoice.expiresAt)}
-                      </div>
-                    </div>
-                  ))
-                )}
+          {/* Tab Content */}
+          {activeTab === 'invoices' ? (
+            /* Invoices Tab Content */
+            invoicesLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                <span className="ml-3 text-white/70">Loading invoices...</span>
               </div>
-
-              {/* Results Info */}
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <div className="text-white/50 text-sm">
-                  Showing {displayInvoices.length} of {invoices.length} invoices
+            ) : invoicesError ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <div className="text-red-400 text-sm mb-2">Failed to load invoices</div>
+                  <div className="text-white/60 text-xs">{invoicesError}</div>
                 </div>
               </div>
-            </>
+            ) : (
+              <>
+                {/* Invoices Table Header */}
+                <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs w-full" style={{ gridTemplateColumns: 'minmax(120px, 25%) minmax(120px, 20%) minmax(80px, 15%) minmax(120px, 20%) minmax(120px, 20%)' }}>
+                  <div className="text-white/60 font-medium">Invoice ID</div>
+                  <div className="text-white/60 font-medium">Amount</div>
+                  <div className="text-white/60 font-medium">Status</div>
+                  <div className="text-white/60 font-medium">Paid At</div>
+                  <div className="text-white/60 font-medium">Expires</div>
+                </div>
+
+                {/* Invoices Table Rows */}
+                <div className="space-y-2 h-48 overflow-y-auto">
+                  {displayInvoices.length === 0 ? (
+                    <div className="text-center py-8 text-white/60">
+                      No invoices found.
+                    </div>
+                  ) : (
+                    displayInvoices.map((invoice) => (
+                      <div key={invoice.id} className="grid gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs w-full" style={{ gridTemplateColumns: 'minmax(120px, 25%) minmax(120px, 20%) minmax(80px, 15%) minmax(120px, 20%) minmax(120px, 20%)' }}>
+                        <div className="text-white/70 font-mono">
+                          <div className="truncate" title={invoice.id}>
+                            {invoice.id ? invoice.id.substring(0, 12) + '...' : '-'}
+                          </div>
+                        </div>
+                        <div className="text-white font-mono">
+                          {formatInvoiceAmount(invoice.lamports)}
+                        </div>
+                        <div className={`font-medium ${getStatusColor(invoice.status)}`}>
+                          {formatInvoiceStatus(invoice.status)}
+                        </div>
+                        <div className="text-white/70">
+                          {formatDate(invoice.paidAt)}
+                        </div>
+                        <div className="text-white/70">
+                          {formatDate(invoice.expiresAt)}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Invoices Results Info */}
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <div className="text-white/50 text-sm">
+                    Showing {displayInvoices.length} of {invoices.length} invoices
+                  </div>
+                </div>
+              </>
+            )
+          ) : (
+            /* Journal Tab Content */
+            isJournalLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                <span className="ml-3 text-white/70">Loading journal...</span>
+              </div>
+            ) : journalError ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <div className="text-red-400 text-sm mb-2">Failed to load journal</div>
+                  <div className="text-white/60 text-xs">{journalError}</div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Journal Table Header */}
+                <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs w-full" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+                  <div className="text-white/60 font-medium">Type</div>
+                  <div className="text-white/60 font-medium">Amount</div>
+                  <div className="text-white/60 font-medium">Reference</div>
+                </div>
+
+                {/* Journal Table Rows */}
+                <div className="space-y-2 h-48 overflow-y-auto">
+                  {displayJournal.length === 0 ? (
+                    <div className="text-center py-8 text-white/60">
+                      No journal entries found.
+                    </div>
+                  ) : (
+                    displayJournal.map((entry) => (
+                      <div key={entry.id} className="grid gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs w-full" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+                        <div className={`font-medium ${getJournalTypeColor(entry.kind)}`}>
+                          {formatJournalKind(entry.kind)}
+                        </div>
+                        <div className={`font-mono ${entry.lamports < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                          {entry.lamports < 0 ? '-' : '+'}{formatJournalAmount(entry.lamports)}
+                        </div>
+                        <div className="text-white/70 font-mono">
+                          <div className="truncate" title={entry.reference}>
+                            {entry.reference ? entry.reference.substring(0, 20) + '...' : '-'}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Journal Results Info */}
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <div className="text-white/50 text-sm">
+                    Showing {displayJournal.length} of {journal.length} journal entries
+                  </div>
+                </div>
+              </>
+            )
           )}
         </div>
 
