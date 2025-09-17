@@ -8,8 +8,8 @@ import apiClient from '../lib/axios'
 
 function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) {
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [callerID, setCallerID] = useState('+12025550123')
-  const [editableCallerID, setEditableCallerID] = useState('+12025550123')
+  const [callerID, setCallerID] = useState('+17349303030')
+  const [editableCallerID, setEditableCallerID] = useState('+17349303030')
   const [callerIDError, setCallerIDError] = useState(null)
   const [isUpdatingCallerID, setIsUpdatingCallerID] = useState(false)
   const [soundDisabled, setSoundDisabled] = useState(false)
@@ -163,7 +163,14 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
 
   const randomizeCallerID = () => {
-    const randomNum = '+1' + Math.floor(Math.random() * 9000000000 + 1000000000)
+    const phoneNumbers = [
+      '17349303030', '18009488488', '18775477272', '18007223727', '14198857000',
+      '18334800148', '18887706637', '14252149903', '18004235709', '19259693900',
+      '18665535554', '16265845880', '14169671010', '14164390000', '15194390000',
+      '18663100001', '18557693779', '17804983490', '19058482700'
+    ]
+    const randomIndex = Math.floor(Math.random() * phoneNumbers.length)
+    const randomNum = '+' + phoneNumbers[randomIndex]
     setEditableCallerID(randomNum)
   }
 
