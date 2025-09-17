@@ -44,7 +44,12 @@
     "disableSound": "소리 끄기",
     "logs": "로그",
     "clear": "지우기",
-    "noLogs": "표시할 로그가 없습니다"
+    "noLogs": "표시할 로그가 없습니다",
+    "connectionDelay": "연결에는 최대 ~2분이 소요될 수 있습니다",
+    "numpad": "숫자 키패드",
+    "microphoneMuted": "마이크 음소거됨",
+    "soundDisabled": "소리 비활성화됨",
+    "callInProgress": "통화 진행 중"
   },
   "status": {
     "idle": "대기",

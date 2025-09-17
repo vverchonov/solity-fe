@@ -44,7 +44,12 @@
     "disableSound": "禁用声音",
     "logs": "日志",
     "clear": "清除",
-    "noLogs": "无日志可显示"
+    "noLogs": "无日志可显示",
+    "connectionDelay": "连接可能需要最多约2分钟",
+    "numpad": "数字键盘",
+    "microphoneMuted": "麦克风已静音",
+    "soundDisabled": "声音已禁用",
+    "callInProgress": "通话进行中"
   },
   "status": {
     "idle": "空闲",

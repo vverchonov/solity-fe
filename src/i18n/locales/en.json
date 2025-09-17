@@ -44,7 +44,12 @@
     "disableSound": "Disable Sound",
     "logs": "Logs",
     "clear": "Clear",
-    "noLogs": "No logs to display"
+    "noLogs": "No logs to display",
+    "connectionDelay": "Connection can take up to ~2 minutes",
+    "numpad": "Numpad",
+    "microphoneMuted": "Microphone muted",
+    "soundDisabled": "Sound disabled",
+    "callInProgress": "Call in progress"
   },
   "status": {
     "idle": "Idle",

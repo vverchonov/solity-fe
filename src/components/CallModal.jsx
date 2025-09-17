@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
+import { useI18n } from '../contexts/I18nProvider'
 
 export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, soundDisabled, callStatus, onEndCall, onMute, onSoundToggle, onDTMF, onMinimize }) {
   const [showNumpad, setShowNumpad] = useState(false)
+  const { t } = useI18n()
 
   const [position, setPosition] = useState({ x: window.innerWidth / 2 - 160, y: window.innerHeight / 2 - 300 })
   const [isDragging, setIsDragging] = useState(false)
@@ -88,11 +90,11 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
         <div className="mt-8">
           <div className="text-sm text-white/60 mb-2">
-            {callStatus === 'ringing' ? 'Ringing...' :
-              callStatus === 'calling' ? 'Calling...' :
-                callStatus === 'in-call' ? 'In Call' :
-                  callStatus === 'connecting' ? 'Connecting...' :
-                    'In Call'}
+            {callStatus === 'ringing' ? t('status.ringing') :
+              callStatus === 'calling' ? t('status.connecting') :
+                callStatus === 'in-call' ? t('status.inCall') :
+                  callStatus === 'connecting' ? t('status.connecting') :
+                    t('status.inCall')}
           </div>
           <div className="text-2xl font-medium text-white mb-2">{phoneNumber}</div>
           <div className="text-lg text-white/70">
@@ -100,7 +102,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
           </div>
           {(callStatus === 'ringing' || callStatus === 'calling') && (
             <div className="text-xs text-white/50 mt-3 text-center max-w-48 mx-auto">
-              Connection can take up to ~2 minutes
+              {t('call.connectionDelay')}
             </div>
           )}
         </div>
@@ -110,7 +112,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
       {showNumpad ? (
         <div className="px-6 py-2">
           <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-medium text-white/70">Numpad</h3>
+            <h3 className="text-sm font-medium text-white/70">{t('call.numpad')}</h3>
             <button
               className="h-6 w-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-all"
               onClick={toggleNumpad}
@@ -146,9 +148,9 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
           {/* Call Status */}
           <div className="px-6 py-4 text-center">
             <div className="text-sm text-white/60">
-              {isMuted && 'Microphone muted'}
-              {soundDisabled && !isMuted && 'Sound disabled'}
-              {!isMuted && !soundDisabled && 'Call in progress'}
+              {isMuted && t('call.microphoneMuted')}
+              {soundDisabled && !isMuted && t('call.soundDisabled')}
+              {!isMuted && !soundDisabled && t('call.callInProgress')}
             </div>
           </div>
         </>
