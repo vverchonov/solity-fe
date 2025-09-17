@@ -486,14 +486,14 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
           <button
             onClick={isWalletConnected ? handleDisconnectWallet : handleConnectWallet}
             disabled={isConnecting}
-            className={`w-full py-3 rounded-xl text-sm font-medium transition-all ${isConnecting
+            className={`w-full py-3 rounded-xl text-sm font-medium transition-all h-12 ${isConnecting
               ? 'bg-white/10 text-white/40 cursor-not-allowed'
               : isWalletConnected
                 ? 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/20'
                 : 'bg-blue-600/30 hover:bg-blue-600/40 text-white shadow-lg hover:shadow-xl'
               }`}
           >
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 h-full">
               {!isConnecting && !isWalletConnected && (
                 <img src="/phantom.png" alt="Phantom" className="w-5 h-5" />
               )}
@@ -505,11 +505,13 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
               }
             </div>
           </button>
-          {isWalletConnected && walletAddress && (
-            <div className="mt-2 text-xs text-white/60 break-all text-center">
-              Connected: {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
-            </div>
-          )}
+          <div className="mt-2 h-4 flex items-center justify-center">
+            {isWalletConnected && walletAddress && (
+              <div className="text-xs text-white/60 break-all text-center">
+                Connected: {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
