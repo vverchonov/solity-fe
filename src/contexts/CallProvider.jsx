@@ -1,11 +1,17 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { Web } from 'sip.js';
 import axios from 'axios';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { useWallet } from './WalletProvider';
+import { LAMPORTS_PER_SOL, Connection, PublicKey } from '@solana/web3.js';
 
 const DISPLAY_NAME = 'solity';
 const BACKEND_URL = 'https://api.sipcallers.com';
+
+// Initialize Solana connection
+const connection = new Connection(
+    import.meta.env.VITE_RPC_URL || "https://eleonore-edy6fd-fast-mainnet.helius-rpc.com/",
+    'confirmed'
+);
 
 const CallContext = createContext(undefined);
 
@@ -18,8 +24,7 @@ export const useCall = () => {
 };
 
 export const CallProvider = ({ children }) => {
-    const { publicKey, connect, disconnect: walletDisconnect, connected } = useWallet();
-    const { connection } = useConnection();
+    const { walletAddress, connectWallet, disconnectWallet, isWalletConnected, walletProvider } = useWallet();
 
     const [callConfig, setCallConfig] = useState({
         username: '',
@@ -329,18 +334,22 @@ export const CallProvider = ({ children }) => {
     };
 
     // Wallet functions
-    const connectWallet = async () => {
+    const handleConnectWallet = async () => {
         try {
-            await connect();
-            addLog('Wallet connected');
+            const result = await connectWallet();
+            if (result.success) {
+                addLog('Wallet connected');
+            } else {
+                addLog(`Wallet connection failed: ${result.error}`);
+            }
         } catch (error) {
             addLog(`Wallet connection failed: ${error}`);
         }
     };
 
-    const disconnectWallet = async () => {
+    const handleDisconnectWallet = async () => {
         try {
-            await walletDisconnect();
+            await disconnectWallet();
             addLog('Wallet disconnected');
             setWalletBalance(0);
         } catch (error) {
@@ -349,9 +358,10 @@ export const CallProvider = ({ children }) => {
     };
 
     const refreshWalletBalance = useCallback(async () => {
-        if (!publicKey || !connection) return;
+        if (!walletAddress) return;
 
         try {
+            const publicKey = new PublicKey(walletAddress);
             const balance = await connection.getBalance(publicKey);
             const solBalance = balance / LAMPORTS_PER_SOL;
             setWalletBalance(solBalance);
@@ -359,16 +369,16 @@ export const CallProvider = ({ children }) => {
         } catch (error) {
             addLog(`Failed to fetch wallet balance: ${error}`);
         }
-    }, [publicKey, connection]);
+    }, [walletAddress]);
 
     // Update wallet balance when connected
     useEffect(() => {
-        if (connected && publicKey) {
+        if (isWalletConnected && walletAddress) {
             refreshWalletBalance();
         } else {
             setWalletBalance(0);
         }
-    }, [connected, publicKey, connection, refreshWalletBalance]);
+    }, [isWalletConnected, walletAddress, refreshWalletBalance]);
 
     useEffect(() => {
         return () => {
@@ -393,11 +403,11 @@ export const CallProvider = ({ children }) => {
         sendDTMF,
         addLog,
         // Wallet functionality
-        walletAddress: publicKey?.toString() || null,
+        walletAddress: walletAddress || null,
         walletBalance,
-        isWalletConnected: connected,
-        connectWallet,
-        disconnectWallet,
+        isWalletConnected,
+        connectWallet: handleConnectWallet,
+        disconnectWallet: handleDisconnectWallet,
         refreshWalletBalance
     };
 

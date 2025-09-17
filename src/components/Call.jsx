@@ -7,8 +7,12 @@ import { useTele } from '../contexts/TeleProvider'
 import { useI18n } from '../contexts/I18nProvider'
 import apiClient from '../lib/axios'
 
+// Phone validation constants
+const PHONE_REGEX = /^[1-9]\d{1,14}$/
+
 function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) {
   const [phoneNumber, setPhoneNumber] = useState('')
+  const [phoneNumberError, setPhoneNumberError] = useState(null)
   const [callerID, setCallerID] = useState('+17349303030')
   const [editableCallerID, setEditableCallerID] = useState('+17349303030')
   const [callerIDError, setCallerIDError] = useState(null)
@@ -99,15 +103,32 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
       return
     }
 
+    // Validation function for phone numbers using schema validation
+    const validatePhoneNumber = (phoneStr, setError) => {
+      // Extract only digits
+      const digitsOnly = phoneStr.replace(/[^\d]/g, '')
+
+      // Check length (7-15 digits)
+      if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+        setError('Phone number must be 7-15 digits long')
+        return false
+      }
+
+      // Check regex pattern (starts with 1-9, followed by 1-14 digits)
+      if (!PHONE_REGEX.test(digitsOnly)) {
+        setError('Only digits are allowed')
+        return false
+      }
+
+      setError(null)
+      return true
+    }
+
     const validateCallerID = (newCallerID) => {
       setIsUpdatingCallerID(true)
-      setCallerIDError(null)
 
-      // Validate format: 7-15 characters, digits only (removing + and spaces)
-      const digitsOnly = newCallerID.replace(/[^\d]/g, '')
-      if (digitsOnly.length < 7 || digitsOnly.length > 15) {
-        setCallerIDError(t('call.callerIDError'))
-      } else {
+      const isValid = validatePhoneNumber(newCallerID, setCallerIDError)
+      if (isValid) {
         // Update local caller ID state for display
         setCallerID(newCallerID)
       }
@@ -172,7 +193,9 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
   }
 
   const handleNumberClick = (num) => {
-    setPhoneNumber(prev => prev + num)
+    const newPhoneNumber = phoneNumber + num
+    setPhoneNumber(newPhoneNumber)
+    validatePhoneNumber(newPhoneNumber, setPhoneNumberError)
   }
 
 
@@ -323,14 +346,19 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
             <div className="mb-6">
               <label className="text-white/70 text-sm block mb-3">{t('call.callerID')}</label>
               <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
-                  value={editableCallerID}
-                  onChange={(e) => setEditableCallerID(e.target.value)}
-                  placeholder={t('call.callerIDPlaceholder')}
-                  disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
-                  className={`flex-1 bg-white/5 border ${callerIDError ? 'border-red-400' : 'border-white/10'} rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 min-h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
+                <div className={`flex-1 relative bg-white/5 border ${callerIDError ? 'border-red-400' : 'border-white/10'} rounded-xl overflow-hidden ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50' : ''}`}>
+                  <div className="absolute left-0 top-0 h-full flex items-center justify-center w-8 text-white/60 pointer-events-none">
+                    +
+                  </div>
+                  <input
+                    type="text"
+                    value={editableCallerID}
+                    onChange={(e) => setEditableCallerID(e.target.value)}
+                    placeholder={t('call.callerIDPlaceholder')}
+                    disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
+                    className={`w-full bg-transparent border-none pl-8 pr-4 py-3 text-white placeholder-white/40 focus:outline-none min-h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'cursor-not-allowed' : ''}`}
+                  />
+                </div>
                 <button
                   onClick={randomizeCallerID}
                   disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
@@ -355,20 +383,28 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
             <div className="mb-6">
               <label className="text-white/70 text-sm block mb-3">{t('call.phoneNumber')}</label>
               <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder={t('call.phoneNumberPlaceholder')}
-                  disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'}
-                  className={`flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 ${isInCall || callState.callStatus === 'calling' || callStatus === 'preparing' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
+                <div className={`flex-1 relative bg-white/5 border ${phoneNumberError ? 'border-red-400' : 'border-white/10'} rounded-xl overflow-hidden ${isInCall || callState.callStatus === 'calling' || callStatus === 'preparing' ? 'opacity-50' : ''}`}>
+                  <div className="absolute left-0 top-0 h-full flex items-center justify-center w-8 text-white/60 pointer-events-none">
+                    +
+                  </div>
+                  <input
+                    type="text"
+                    value={phoneNumber}
+                    onChange={(e) => {
+                      setPhoneNumber(e.target.value)
+                      validatePhoneNumber(e.target.value, setPhoneNumberError)
+                    }}
+                    placeholder={t('call.phoneNumberPlaceholder')}
+                    disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'}
+                    className={`w-full bg-transparent border-none pl-8 pr-4 py-3 text-white placeholder-white/40 focus:outline-none ${isInCall || callState.callStatus === 'calling' || callStatus === 'preparing' ? 'cursor-not-allowed' : ''}`}
+                  />
+                </div>
                 <button
                   onClick={(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') ? handleEndCall : handleStartCall}
-                  disabled={callStatus === 'ended' || (!(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') && !phoneNumber.trim())}
+                  disabled={callStatus === 'ended' || (!(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') && (!phoneNumber.trim() || phoneNumberError || callerIDError))}
                   className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] border ${(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing')
                     ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-600/30 hover:border-red-600/50'
-                    : callStatus === 'ended' || !phoneNumber.trim()
+                    : callStatus === 'ended' || !phoneNumber.trim() || phoneNumberError || callerIDError
                       ? 'bg-gray-600/20 text-gray-500 border-gray-600/30 cursor-not-allowed'
                       : 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-600/30 hover:border-green-600/50'
                     }`}
@@ -376,6 +412,13 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                   {(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') ? t('call.endCall') : t('call.startCall')}
                 </button>
               </div>
+
+              {/* Phone number error display */}
+              {phoneNumberError && (
+                <div className="mt-2">
+                  <span className="text-red-400 text-xs">{phoneNumberError}</span>
+                </div>
+              )}
 
               {/* Check Rate Button */}
               <div className="mt-3 flex items-center gap-3">
