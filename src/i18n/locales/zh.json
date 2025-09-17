@@ -1,0 +1,279 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "close": "关闭",
+    "confirm": "确认",
+    "delete": "删除",
+    "edit": "编辑",
+    "error": "错误",
+    "success": "成功",
+    "warning": "警告",
+    "online": "在线",
+    "offline": "离线",
+    "comingSoon": "即将推出"
+  },
+  "navigation": {
+    "dashboard": "仪表板",
+    "call": "通话",
+    "balance": "余额",
+    "about": "关于",
+    "esim": "电子卡",
+    "support": "支持",
+    "settings": "设置",
+    "logout": "退出登录",
+    "language": "语言",
+    "module": "模块"
+  },
+  "call": {
+    "callerID": "主叫号码",
+    "phoneNumber": "接收方（电话）",
+    "startCall": "通话",
+    "endCall": "结束通话",
+    "randomize": "随机化",
+    "enterCallerID": "输入您的主叫号码（电话号码）",
+    "phoneNumberPlaceholder": "例如：+86 138 0013 8000",
+    "callerIDPlaceholder": "例如：+86 138 0013 8000",
+    "validatingCallerID": "验证主叫号码中...",
+    "callerIDError": "主叫号码必须是7-15位数字",
+    "callDuration": "通话时长",
+    "mute": "静音",
+    "unmute": "取消静音",
+    "enableSound": "启用声音",
+    "disableSound": "禁用声音",
+    "logs": "日志",
+    "clear": "清除",
+    "noLogs": "无日志可显示"
+  },
+  "status": {
+    "idle": "空闲",
+    "connecting": "连接中...",
+    "preparing": "准备通话中...",
+    "ringing": "响铃中...",
+    "inCall": "通话中",
+    "callEnded": "通话结束"
+  },
+  "account": {
+    "balance": "余额",
+    "topUp": "充值",
+    "accountInactive": "账户未激活",
+    "accountInactiveMessage": "请充值您的余额以激活账户并开始通话。",
+    "username": "用户"
+  },
+  "server": {
+    "solityNet": "SolityNET",
+    "serverStatus": "服务器状态"
+  },
+  "about": {
+    "aboutSolity": "关于 Solity",
+    "aboutDescription": "Solity是基于Solana构建的链上移动服务提供商。用户使用SOL充值账户，资金透明地结算到Solity金库。我们的旗舰产品SolityNET允许您拨打全球低延迟语音通话，具有灵活的主叫身份选项。接下来，我们将推出一系列创新移动产品，摒弃传统企业限制，使连接更加开放、可编程和用户可控。",
+    "solityNet": "SolityNET",
+    "solityNetDescription": "SolityNET是去中心化全球电话的综合解决方案。发布时，通话将在美国和加拿大提供。我们可以接入80多个国家，但为了避免网络过载，我们将逐步扩展覆盖范围——逐日添加地区。",
+    "scaling": "扩展",
+    "scalingDescription": "服务器计划和我们的总体扩展路线图。",
+    "lastUpdated": "最后更新于 2025年9月13日",
+    "environment": "环境：SolityNET"
+  },
+  "modal": {
+    "inCallClickToShow": "通话中 - 点击显示通话模态框",
+    "minimize": "最小化"
+  },
+  "support": {
+    "telegramDescription": "加入我们的社区聊天，获得快速支持和更新",
+    "discordDescription": "与其他用户联系并获得技术帮助",
+    "twitterDescription": "关注我们获取最新新闻和公告",
+    "joinTelegram": "加入Telegram",
+    "joinDiscord": "加入Discord",
+    "joinTwitter": "加入X（推特）",
+    "attachSessionLogs": "附加会话日志",
+    "sessionLogsDescription": "如果您联系支持，请包含您的会话日志以帮助我们更快解决问题。",
+    "copySessionLogs": "复制会话日志",
+    "noLogsAvailable": "无可用日志 - 会话刚开始",
+    "logssCopied": "会话日志已复制到剪贴板",
+    "responseTime": "我们通常在24小时内回复",
+    "supportAvailability": "支持在多个时区提供"
+  },
+  "scaling": {
+    "upcomingUpdates": "即将到来的服务器更新",
+    "updateDescription": "编辑文件底部的updatesData中的JSON以保持此列表更新。",
+    "scalingRoadmap": "扩展路线图",
+    "status": {
+      "done": "完成",
+      "inProgress": "进行中",
+      "planned": "计划中"
+    },
+    "categories": {
+      "telephony": "电话",
+      "performance": "性能",
+      "technology": "技术",
+      "ai": "人工智能"
+    },
+    "updates": {
+      "solityNetCall": {
+        "title": "SolityNET通话",
+        "description": "我们正在向公众推出SolityNET通话功能。从想法到上线产品只用了三个月——这是我们成为领先的加密原生移动服务提供商的第一步。",
+        "details": ["公开发布完成", "3个月开发", "加密原生移动"]
+      },
+      "coverageIncrease": {
+        "title": "SolityNET覆盖范围增加",
+        "description": "计划每日覆盖扩展。40多个国家排队推出。我们将在X上发布逐日更新。",
+        "details": ["40多个国家排队", "每日扩展", "X更新"]
+      },
+      "solityNetApi": {
+        "title": "SolityNET API",
+        "description": "开放SolityNET API带来完全的集成灵活性。连接您自己的系统——或连接AI助手，可以代您拨打电话，从订购披萨到安排商务会议。",
+        "details": ["完全集成灵活性", "AI助手支持", "业务自动化"]
+      },
+      "solityNetSms": {
+        "title": "SolityNET短信",
+        "description": "去中心化出站短信完全可行且正在积极开发中。与通话一样，我们专注于发送功能；我们不支持入站短信接收，以避免个人信息的潜在暴露。",
+        "details": ["仅出站短信", "注重隐私", "去中心化"]
+      },
+      "aiAssistant": {
+        "title": "Solity AI助手",
+        "description": "AI助手的测试发布计划在eSIM之前，因为这是核心移动功能。它可以替代语音邮件，作为您的守门员筛选来电，并处理简单任务，如\"预订餐桌\"或\"订披萨\"。",
+        "details": ["语音邮件替代", "来电筛选", "任务自动化"]
+      },
+      "esimUs": {
+        "title": "Solity eSIM美国",
+        "description": "美国将是我们的第一个eSIM市场，提供具有唯一/自定义分机号码的直接电话服务。全球覆盖是我们路线图上的关键目标。",
+        "details": ["美国首个市场", "自定义分机", "全球覆盖目标"]
+      }
+    },
+    "phases": {
+      "phase1": {
+        "title": "阶段1 | 基础",
+        "subtitle": "现在 → 100个并发通话",
+        "features": ["稳定的核心拨号器 + SOL计费", "限速器v2", "基本仪表板(P95)"]
+      },
+      "phase2": {
+        "title": "阶段2 | 扩展",
+        "subtitle": "100 → 1,000个并发通话",
+        "features": ["自动扩展工作器(HPA)", "多区域入口 + 故障转移", "后台号码声誉检查"]
+      },
+      "phase3": {
+        "title": "阶段3 | 全球",
+        "subtitle": "多区域 + 路由策略",
+        "features": ["按延迟/成本智能路由", "客户流量隔离", "灾难恢复演练(季度)"]
+      },
+      "phase4": {
+        "title": "阶段4 | 企业",
+        "subtitle": "安全性和合规性提升",
+        "features": ["KMS密钥管理 + 轮换", "SAML SSO / SCIM", "细粒度组织控制"]
+      }
+    },
+    "eta": "预计时间"
+  },
+  "balance": {
+    "title": "余额",
+    "onChainSol": "链上 • SOL",
+    "accountActive": "账户活跃 — 准备通话",
+    "lowBalance": "余额不足 — 请在通话前充值。",
+    "refreshBalance": "刷新余额",
+    "quickAddBalance": "快速充值余额",
+    "customAmount": "自定义金额",
+    "enterSolAmount": "输入SOL金额",
+    "preparing": "准备中...",
+    "invoiceActive": "发票活跃",
+    "pendingInvoice": "待处理发票",
+    "add": "添加",
+    "invoice": "发票",
+    "expires": "到期",
+    "cancel": "取消",
+    "payInvoice": "支付发票",
+    "paymentProcessing": "支付处理中",
+    "connectPhantomWallet": "连接Phantom钱包",
+    "disconnectWallet": "断开钱包",
+    "connecting": "连接中...",
+    "connected": "已连接",
+    "paymentSubmitted": "支付已提交！",
+    "paymentSubmittedDesc": "您的支付已成功提交到Solana网络。",
+    "processingTime": "处理可能需要10分钟。请耐心等待余额更新。",
+    "problemsContact": "如果支付出现任何问题，请",
+    "visitThisPage": "访问此页面",
+    "andContactUs": "并联系我们。",
+    "gotIt": "明白了",
+    "topUp": "充值",
+    "invoices": "发票",
+    "journal": "日志",
+    "allInvoices": "所有发票",
+    "searchInvoices": "搜索发票...",
+    "noInvoicesFound": "未找到发票",
+    "createFirstInvoice": "通过上面添加余额来创建您的第一张发票。",
+    "amount": "金额",
+    "status": "状态",
+    "created": "创建时间",
+    "actions": "操作",
+    "pay": "支付",
+    "pending": "待处理",
+    "processing": "处理中",
+    "completed": "已完成",
+    "cancelled": "已取消",
+    "failed": "失败",
+    "loadingInvoices": "加载发票中...",
+    "errorLoadingInvoices": "加载发票错误",
+    "recentInvoices": "最近发票",
+    "recentActivity": "最近活动",
+    "currentRates": "当前费率",
+    "searchRates": "按方向、代码或路由搜索...",
+    "noRatesFound": "未找到匹配搜索的费率。",
+    "noRatesAvailable": "无可用费率。",
+    "loadingRates": "加载费率中...",
+    "errorLoadingRates": "加载费率失败",
+    "active": "活跃",
+    "inactive": "未活跃",
+    "direction": "方向",
+    "codes": "代码",
+    "cost": "费用",
+    "details": "详情",
+    "noJournalEntries": "未找到日志条目。",
+    "noDetailsAvailable": "无可用详情",
+    "showingRates": "显示 {count} 个，共 {total} 个费率",
+    "filteredFrom": "从 {total} 个总数中筛选",
+    "invoiceId": "发票ID",
+    "paidAt": "支付时间",
+    "paymentProcessingMessage": "您的 {amount} 付款正在处理中。处理完成前（最多10分钟）充值按钮将被禁用。"
+  },
+  "login": {
+    "loading": "加载中...",
+    "solityMobile": "Solity Mobile",
+    "solanaEcosystem": "Solana 生态系统",
+    "description": "基于Solana生态系统的链上电信公司，提供全球服务。任何号码之间的私人通话。",
+    "onChain": "链上",
+    "transparentFees": "SOL透明费用",
+    "private": "私密",
+    "noKyc": "无KYC，无通话记录",
+    "decentralised": "去中心化",
+    "anyNumbers": "可使用任何号码",
+    "companyRegistration": "公司注册号：",
+    "servicesOnline": "服务在线",
+    "someServicesOffline": "部分服务离线",
+    "offline": "离线",
+    "signIn": "登录",
+    "createAccount": "创建账户",
+    "login": "登录",
+    "signUp": "注册",
+    "username": "用户名",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "enterUsername": "输入您的用户名",
+    "enterPassword": "输入您的密码",
+    "confirmYourPassword": "确认您的密码",
+    "pleaseWait": "请稍候...",
+    "forgotPassword": "忘记密码？",
+    "contactSupport": "请联系支持",
+    "fillAllFields": "请填写所有必填字段",
+    "usernameTooShort": "用户名必须至少3个字符",
+    "usernameTooLong": "用户名不能超过30个字符",
+    "passwordTooShort": "密码必须至少12个字符",
+    "passwordNeedsUppercase": "密码必须包含至少一个大写字母",
+    "passwordNeedsLowercase": "密码必须包含至少一个小写字母",
+    "passwordNeedsDigit": "密码必须包含至少一个数字",
+    "passwordNeedsSpecial": "密码必须包含至少一个特殊字符",
+    "passwordsDoNotMatch": "密码不匹配",
+    "loginSuccessful": "登录成功！",
+    "accountCreated": "账户创建成功！",
+    "authenticationFailed": "认证失败"
+  }
+}

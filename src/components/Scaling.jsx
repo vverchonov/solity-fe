@@ -1,61 +1,52 @@
+import { useI18n } from '../contexts/I18nProvider'
+
 function Scaling() {
+  const { t } = useI18n()
   const serverUpdates = [
     {
-      title: "SolityNET Call",
-      category: "Telephony",
-      status: "Done",
-      description: "We're rolling out the SolityNET calling feature to the public. It took just three months to go from idea to live product - our first step toward becoming the leading crypto-native mobility provider.",
-      details: ["Public launch complete", "3 months development", "Crypto-native mobility"],
+      titleKey: "solityNetCall",
+      category: "telephony",
+      status: "done",
       impact: 5,
       eta: "2026-02-01",
       overdue: ""
     },
     {
-      title: "SolityNET Coverage Increase",
-      category: "Performance",
-      status: "In progress",
-      description: "Daily coverage expansions are planned. 40+ countries are queued for rollout. We'll post day-by-day updates on X.",
-      details: ["40+ countries queued", "Daily expansions", "X updates"],
+      titleKey: "coverageIncrease",
+      category: "performance",
+      status: "inProgress",
       impact: 4,
       eta: "2026-03-15",
       overdue: ""
     },
     {
-      title: "SolityNET API",
-      category: "Technology",
-      status: "In progress",
-      description: "Opening up the SolityNET API brings full integration flexibility. Hook up your own systems - or connect an AI assistant that can place calls on your behalf, from ordering pizza to scheduling business meetings.",
-      details: ["Full integration flexibility", "AI assistant support", "Business automation"],
+      titleKey: "solityNetApi",
+      category: "technology",
+      status: "inProgress",
       impact: 5,
       eta: "2026-04-01",
       overdue: ""
     },
     {
-      title: "SolityNET SMS",
-      category: "Telephony",
-      status: "Planned",
-      description: "Decentralized outbound SMS is fully feasible and in active development. As with calling, we're focusing on sending only; we won't support inbound SMS reception to avoid potential exposure of personal information.",
-      details: ["Outbound SMS only", "Privacy focused", "Decentralized"],
+      titleKey: "solityNetSms",
+      category: "telephony",
+      status: "planned",
       impact: 4,
       eta: "2026-05-15",
       overdue: ""
     },
     {
-      title: "Solity AI Assistant",
-      category: "AI",
-      status: "Planned",
-      description: "A test launch of the AI assistant is planned before eSIM, since it's a core mobility feature. It can replace voicemail, screen incoming calls as your gatekeeper, and handle simple tasks like \"book a table\" or \"order pizza.\"",
-      details: ["Voicemail replacement", "Call screening", "Task automation"],
+      titleKey: "aiAssistant",
+      category: "ai",
+      status: "planned",
       impact: 5,
       eta: "2026-06-01",
       overdue: ""
     },
     {
-      title: "Solity eSIM US",
-      category: "Telephony",
-      status: "Planned",
-      description: "The United States will be our first eSIM market, offering direct telephony with unique/custom extension numbers. Global coverage is a key goal on our roadmap.",
-      details: ["US first market", "Custom extensions", "Global coverage goal"],
+      titleKey: "esimUs",
+      category: "telephony",
+      status: "planned",
       impact: 5,
       eta: "2026-07-01",
       overdue: ""
@@ -64,44 +55,20 @@ function Scaling() {
 
   const roadmapPhases = [
     {
-      title: "Phase 1 | Foundation",
-      subtitle: "Now → 100 concurrent calls",
-      progress: 80,
-      features: [
-        "Stable core dialer + billing in SOL",
-        "Rate limiter v2",
-        "Basic dashboards (P95)"
-      ]
+      phaseKey: "phase1",
+      progress: 80
     },
     {
-      title: "Phase 2 | Scale-out",
-      subtitle: "100 → 1,000 concurrent calls",
-      progress: 40,
-      features: [
-        "Autoscaling workers (HPA)",
-        "Multi-region ingress + failover",
-        "Background number reputation checks"
-      ]
+      phaseKey: "phase2",
+      progress: 40
     },
     {
-      title: "Phase 3 | Global",
-      subtitle: "Multi-region + routing policies",
-      progress: 10,
-      features: [
-        "Smart routing by latency/cost",
-        "Customer traffic isolation",
-        "Disaster recovery drills (quarterly)"
-      ]
+      phaseKey: "phase3",
+      progress: 10
     },
     {
-      title: "Phase 4 | Enterprise",
-      subtitle: "Security & compliance uplift",
-      progress: 5,
-      features: [
-        "KMS key management + rotations",
-        "SAML SSO / SCIM",
-        "Fine-grained org controls"
-      ]
+      phaseKey: "phase4",
+      progress: 5
     }
   ]
 
@@ -115,15 +82,23 @@ function Scaling() {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'Done':
+      case 'done':
         return 'bg-green-600/20 text-green-300 border-green-600/30'
-      case 'In progress':
+      case 'inProgress':
         return 'bg-yellow-600/20 text-yellow-300 border-yellow-600/30'
-      case 'Planned':
+      case 'planned':
         return 'bg-blue-600/20 text-blue-300 border-blue-600/30'
       default:
         return 'bg-gray-600/20 text-gray-300 border-gray-600/30'
     }
+  }
+
+  const getStatusText = (status) => {
+    return t(`scaling.status.${status}`)
+  }
+
+  const getCategoryText = (category) => {
+    return t(`scaling.categories.${category}`)
   }
 
   return (
@@ -137,12 +112,12 @@ function Scaling() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <h3 className="text-xl font-bold text-white">
-            Upcoming server updates
+            {t('scaling.upcomingUpdates')}
           </h3>
         </div>
 
         <p className="text-white/60 text-sm mb-6">
-          Edit the JSON in updatesData (near the bottom of this file) to keep this list fresh.
+          {t('scaling.updateDescription')}
         </p>
 
         {/* 6 Update Cards Grid - Responsive: 1 column on mobile, 2 on tablet, 3 on desktop */}
@@ -155,27 +130,27 @@ function Scaling() {
                 <div className="mb-3">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                     <h4 className="text-lg font-semibold text-white">
-                      {update.title}
+                      {t(`scaling.updates.${update.titleKey}.title`)}
                     </h4>
                     <span className={`px-2 py-1 rounded-full text-xs border w-fit text-center ${getStatusStyle(update.status)}`}>
-                      {update.status}
+                      {getStatusText(update.status)}
                     </span>
                   </div>
                   <div className="mb-2">
                     <span className="text-white/60 text-sm">
-                      {update.category}
+                      {getCategoryText(update.category)}
                     </span>
                   </div>
                 </div>
 
                 {/* Description */}
                 <p className="text-white/70 text-sm mb-3 leading-relaxed">
-                  {update.description}
+                  {t(`scaling.updates.${update.titleKey}.description`)}
                 </p>
 
                 {/* Details List */}
                 <ul className="space-y-1 mb-4">
-                  {update.details.map((detail, detailIndex) => (
+                  {t(`scaling.updates.${update.titleKey}.details`, { returnObjects: true }).map((detail, detailIndex) => (
                     <li key={detailIndex} className="flex items-start gap-2">
                       <span className="text-white/60 text-sm mt-0.5">•</span>
                       <span className="text-white/60 text-sm leading-relaxed">
@@ -189,7 +164,7 @@ function Scaling() {
               {/* Footer with ETA - Always at bottom */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 text-sm mt-auto">
                 <div className="flex items-center gap-2">
-                  <span className="text-white/60">ETA:</span>
+                  <span className="text-white/60">{t('scaling.eta')}:</span>
                   <div className="flex items-center gap-1">
                     <span className="bg-white/10 border border-white/20 text-white/80 px-2 py-1 rounded-full text-xs">
                       {update.eta}
@@ -213,7 +188,7 @@ function Scaling() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
           <h3 className="text-xl font-bold text-white">
-            Scaling roadmap
+            {t('scaling.scalingRoadmap')}
           </h3>
         </div>
 
@@ -225,10 +200,10 @@ function Scaling() {
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
                 <div className="flex-1">
                   <h4 className="text-lg font-semibold text-white mb-1">
-                    {phase.title}
+                    {t(`scaling.phases.${phase.phaseKey}.title`)}
                   </h4>
                   <p className="text-white/60 text-sm">
-                    {phase.subtitle}
+                    {t(`scaling.phases.${phase.phaseKey}.subtitle`)}
                   </p>
                 </div>
                 <span className="text-white/80 text-sm font-medium bg-white/10 px-2 py-1 rounded-full w-fit">
@@ -246,7 +221,7 @@ function Scaling() {
 
               {/* Features List */}
               <ul className="space-y-2">
-                {phase.features.map((feature, featureIndex) => (
+                {t(`scaling.phases.${phase.phaseKey}.features`, { returnObjects: true }).map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start gap-2">
                     <span className="text-white/60 text-sm mt-0.5">•</span>
                     <span className="text-white/70 text-sm leading-relaxed">

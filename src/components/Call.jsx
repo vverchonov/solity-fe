@@ -4,6 +4,7 @@ import { useCall } from '../contexts/CallProvider'
 import { useUser } from '../contexts/UserContext'
 import { useLogs } from '../contexts/LogsProvider'
 import { useTele } from '../contexts/TeleProvider'
+import { useI18n } from '../contexts/I18nProvider'
 import apiClient from '../lib/axios'
 
 function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) {
@@ -36,6 +37,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
   // Use UserProvider
   const { user, isUserInactive } = useUser()
+  const { t } = useI18n()
 
 
   // Derived state from CallProvider
@@ -101,7 +103,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
       // Validate format: 7-15 characters, digits only (removing + and spaces)
       const digitsOnly = newCallerID.replace(/[^\d]/g, '')
       if (digitsOnly.length < 7 || digitsOnly.length > 15) {
-        setCallerIDError('Caller ID must be 7-15 digits')
+        setCallerIDError(t('call.callerIDError'))
       } else {
         // Update local caller ID state for display
         setCallerID(newCallerID)
@@ -142,18 +144,18 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
     switch (status) {
       case 'preparing':
-        return { text: 'Preparing call...', className: 'bg-blue-500/20 border border-blue-400/30 text-blue-100 px-3 py-1 rounded-full text-sm' }
+        return { text: t('status.preparing'), className: 'bg-blue-500/20 border border-blue-400/30 text-blue-100 px-3 py-1 rounded-full text-sm' }
       case 'ringing':
       case 'calling':
-        return { text: 'Ringing...', className: 'bg-yellow-500/20 border border-yellow-400/30 text-yellow-100 px-3 py-1 rounded-full text-sm' }
+        return { text: t('status.ringing'), className: 'bg-yellow-500/20 border border-yellow-400/30 text-yellow-100 px-3 py-1 rounded-full text-sm' }
       case 'in-call':
-        return { text: 'In Call', className: 'bg-green-500/20 border border-green-400/30 text-green-100 px-3 py-1 rounded-full text-sm' }
+        return { text: t('status.inCall'), className: 'bg-green-500/20 border border-green-400/30 text-green-100 px-3 py-1 rounded-full text-sm' }
       case 'ended':
-        return { text: 'Call Ended', className: 'bg-red-500/20 border border-red-400/30 text-red-100 px-3 py-1 rounded-full text-sm' }
+        return { text: t('status.callEnded'), className: 'bg-red-500/20 border border-red-400/30 text-red-100 px-3 py-1 rounded-full text-sm' }
       case 'connecting':
-        return { text: 'Connecting...', className: 'bg-blue-500/20 border border-blue-400/30 text-blue-100 px-3 py-1 rounded-full text-sm' }
+        return { text: t('status.connecting'), className: 'bg-blue-500/20 border border-blue-400/30 text-blue-100 px-3 py-1 rounded-full text-sm' }
       default:
-        return { text: 'Idle', className: 'chip' }
+        return { text: t('status.idle'), className: 'chip' }
     }
   }
 
@@ -294,20 +296,20 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
               <span className={getStatusPill().className}>{getStatusPill().text}</span>
               {isInCall && (
                 <span className="text-white/70 text-sm">
-                  Call duration: {formatCallDuration(callDuration)}
+                  {t('call.callDuration')}: {formatCallDuration(callDuration)}
                 </span>
               )}
             </div>
 
             {/* Caller ID */}
             <div className="mb-6">
-              <label className="text-white/70 text-sm block mb-3">Caller ID</label>
+              <label className="text-white/70 text-sm block mb-3">{t('call.callerID')}</label>
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   value={editableCallerID}
                   onChange={(e) => setEditableCallerID(e.target.value)}
-                  placeholder="e.g. +1 555 0123"
+                  placeholder={t('call.callerIDPlaceholder')}
                   disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
                   className={`flex-1 bg-white/5 border ${callerIDError ? 'border-red-400' : 'border-white/10'} rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 min-h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
@@ -316,30 +318,30 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                   disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
                   className={`bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-xl text-sm transition-all whitespace-nowrap sm:w-32 h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  Randomize
+                  {t('call.randomize')}
                 </button>
               </div>
               {/* Status indicators */}
               <div className="text-gray-400 text-xs mt-2">
                 {isUpdatingCallerID ? (
-                  <span className="text-blue-400">Validating caller ID...</span>
+                  <span className="text-blue-400">{t('call.validatingCallerID')}</span>
                 ) : callerIDError ? (
                   <span className="text-red-400">{callerIDError}</span>
                 ) : (
-                  <span>Enter your caller ID(phone number)</span>
+                  <span>{t('call.enterCallerID')}</span>
                 )}
               </div>
             </div>
 
             {/* Phone Input */}
             <div className="mb-6">
-              <label className="text-white/70 text-sm block mb-3">To (phone)</label>
+              <label className="text-white/70 text-sm block mb-3">{t('call.phoneNumber')}</label>
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="e.g. +44 20 7946 0958"
+                  placeholder={t('call.phoneNumberPlaceholder')}
                   disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'}
                   className={`flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 ${isInCall || callState.callStatus === 'calling' || callStatus === 'preparing' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
@@ -353,7 +355,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                       : 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-600/30 hover:border-green-600/50'
                     }`}
                 >
-                  {(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') ? 'End Call' : 'Call'}
+                  {(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') ? t('call.endCall') : t('call.startCall')}
                 </button>
               </div>
             </div>
@@ -368,7 +370,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                     : 'bg-white/10 hover:bg-white/15 text-white border border-white/10'
                     }`}
                 >
-                  {isMuted ? 'Unmute' : 'Mute'}
+                  {isMuted ? t('call.unmute') : t('call.mute')}
                 </button>
 
                 <button
@@ -378,7 +380,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                     : 'bg-white/10 hover:bg-white/15 text-white border border-white/10'
                     }`}
                 >
-                  {soundDisabled ? 'Enable Sound' : 'Disable Sound'}
+                  {soundDisabled ? t('call.enableSound') : t('call.disableSound')}
                 </button>
               </div>
             )}
@@ -405,9 +407,9 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
         {isUserInactive() && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-none z-10">
             <div className="text-center px-4">
-              <h3 className="text-xl font-semibold text-white mb-2">Account Inactive</h3>
+              <h3 className="text-xl font-semibold text-white mb-2">{t('account.accountInactive')}</h3>
               <p className="text-white/70 text-base">
-                Please top up your balance to activate your account and start making calls.
+                {t('account.accountInactiveMessage')}
               </p>
             </div>
           </div>
@@ -423,19 +425,19 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
       {/* Logs Card - Bottom (spans full width) */}
       <div className="lg:col-span-12 card p-4 h-fit">
         <div className="flex justify-between items-center mb-3">
-          <h3 className="text-lg text-white/70">Logs</h3>
+          <h3 className="text-lg text-white/70">{t('call.logs')}</h3>
           <button
             onClick={handleClearLogs}
             className="text-white/60 hover:text-white text-sm transition-all"
           >
-            Clear
+            {t('call.clear')}
           </button>
         </div>
         <div className="bg-black/20 rounded-xl p-3 h-48 overflow-y-auto">
           <div className="space-y-1 text-sm font-mono">
             {logs.length === 0 ? (
               <div className="text-white/40 text-center py-8">
-                No logs to display
+                {t('call.noLogs')}
               </div>
             ) : (
               logs.map((log) => (

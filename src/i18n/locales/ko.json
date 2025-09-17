@@ -1,0 +1,279 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "save": "저장",
+    "cancel": "취소",
+    "close": "닫기",
+    "confirm": "확인",
+    "delete": "삭제",
+    "edit": "편집",
+    "error": "오류",
+    "success": "성공",
+    "warning": "경고",
+    "online": "온라인",
+    "offline": "오프라인",
+    "comingSoon": "곧 출시"
+  },
+  "navigation": {
+    "dashboard": "대시보드",
+    "call": "통화",
+    "balance": "잔액",
+    "about": "소개",
+    "esim": "이심",
+    "support": "지원",
+    "settings": "설정",
+    "logout": "로그아웃",
+    "language": "언어",
+    "module": "모듈"
+  },
+  "call": {
+    "callerID": "발신자 번호",
+    "phoneNumber": "수신처 (전화번호)",
+    "startCall": "통화",
+    "endCall": "통화 종료",
+    "randomize": "무작위",
+    "enterCallerID": "발신자 번호(전화번호)를 입력하세요",
+    "phoneNumberPlaceholder": "예: +82 10 1234 5678",
+    "callerIDPlaceholder": "예: +82 10 1234 5678",
+    "validatingCallerID": "발신자 번호 확인 중...",
+    "callerIDError": "발신자 번호는 7-15자리 숫자여야 합니다",
+    "callDuration": "통화 시간",
+    "mute": "음소거",
+    "unmute": "음소거 해제",
+    "enableSound": "소리 켜기",
+    "disableSound": "소리 끄기",
+    "logs": "로그",
+    "clear": "지우기",
+    "noLogs": "표시할 로그가 없습니다"
+  },
+  "status": {
+    "idle": "대기",
+    "connecting": "연결 중...",
+    "preparing": "통화 준비 중...",
+    "ringing": "발신 중...",
+    "inCall": "통화 중",
+    "callEnded": "통화 종료"
+  },
+  "account": {
+    "balance": "잔액",
+    "topUp": "충전",
+    "accountInactive": "계정 비활성화",
+    "accountInactiveMessage": "계정을 활성화하고 통화를 시작하려면 잔액을 충전해 주세요.",
+    "username": "사용자"
+  },
+  "server": {
+    "solityNet": "SolityNET",
+    "serverStatus": "서버 상태"
+  },
+  "about": {
+    "aboutSolity": "Solity 소개",
+    "aboutDescription": "Solity는 솔라나 기반의 온체인 모빌리티 서비스 제공업체입니다. 사용자는 SOL로 계정에 자금을 충전하며, 이는 Solity 국고에 투명하게 정산됩니다. 우리의 플래그십 제품인 SolityNET을 통해 유연한 발신자 신원 옵션으로 전 세계 저지연 음성 통화를 할 수 있습니다. 다음으로, 우리는 기존 기업의 제약을 거부하고 연결을 더욱 개방적이고 프로그래밍 가능하며 사용자가 제어할 수 있도록 하는 혁신적인 모빌리티 제품군을 출시할 예정입니다.",
+    "solityNet": "SolityNET",
+    "solityNetDescription": "SolityNET은 글로벌 전화를 탈중앙화하는 종합적인 솔루션입니다. 출시 시 미국과 캐나다에서 통화가 가능합니다. 80개 이상의 국가를 연결할 수 있지만, 네트워크 과부하를 피하기 위해 점진적으로 커버리지를 확장할 예정입니다 - 매일 지역을 추가해 나갈 것입니다.",
+    "scaling": "확장",
+    "scalingDescription": "서버 계획과 전반적인 확장 로드맵입니다.",
+    "lastUpdated": "최종 업데이트: 2025년 9월 13일",
+    "environment": "환경: SolityNET"
+  },
+  "modal": {
+    "inCallClickToShow": "통화 중 - 클릭하여 통화 모달 표시",
+    "minimize": "최소화"
+  },
+  "support": {
+    "telegramDescription": "빠른 지원과 업데이트를 위해 커뮤니티 채팅에 참여하세요",
+    "discordDescription": "다른 사용자들과 연결하고 기술적 도움을 받으세요",
+    "twitterDescription": "최신 뉴스와 공지사항을 위해 팔로우하세요",
+    "joinTelegram": "텔레그램 참여",
+    "joinDiscord": "디스코드 참여",
+    "joinTwitter": "X (트위터) 참여",
+    "attachSessionLogs": "세션 로그 첨부",
+    "sessionLogsDescription": "지원팀에 연락할 때는 문제를 더 빠르게 해결하기 위해 세션 로그를 포함해 주세요.",
+    "copySessionLogs": "세션 로그 복사",
+    "noLogsAvailable": "사용 가능한 로그 없음 - 세션이 막 시작됨",
+    "logssCopied": "세션 로그가 클립보드에 복사됨",
+    "responseTime": "일반적으로 24시간 이내에 응답합니다",
+    "supportAvailability": "여러 시간대에서 지원 가능"
+  },
+  "scaling": {
+    "upcomingUpdates": "예정된 서버 업데이트",
+    "updateDescription": "이 목록을 최신 상태로 유지하려면 파일 하단의 updatesData에서 JSON을 편집하세요.",
+    "scalingRoadmap": "확장 로드맵",
+    "status": {
+      "done": "완료",
+      "inProgress": "진행 중",
+      "planned": "계획됨"
+    },
+    "categories": {
+      "telephony": "전화",
+      "performance": "성능",
+      "technology": "기술",
+      "ai": "인공지능"
+    },
+    "updates": {
+      "solityNetCall": {
+        "title": "SolityNET 통화",
+        "description": "SolityNET 통화 기능을 대중에게 출시하고 있습니다. 아이디어에서 실제 제품까지 단 3개월이 걸렸습니다 - 선도적인 암호화폐 네이티브 모빌리티 제공업체가 되기 위한 첫 번째 단계입니다.",
+        "details": ["공개 출시 완료", "3개월 개발", "암호화폐 네이티브 모빌리티"]
+      },
+      "coverageIncrease": {
+        "title": "SolityNET 커버리지 확대",
+        "description": "일일 커버리지 확장이 계획되어 있습니다. 40개 이상의 국가가 출시 대기 중입니다. X에서 일일 업데이트를 게시할 예정입니다.",
+        "details": ["40개 이상 국가 대기", "일일 확장", "X 업데이트"]
+      },
+      "solityNetApi": {
+        "title": "SolityNET API",
+        "description": "SolityNET API 개방으로 완전한 통합 유연성을 제공합니다. 자신의 시스템을 연결하거나 - 피자 주문부터 비즈니스 회의 일정까지 대신 전화를 걸 수 있는 AI 어시스턴트를 연결하세요.",
+        "details": ["완전한 통합 유연성", "AI 어시스턴트 지원", "비즈니스 자동화"]
+      },
+      "solityNetSms": {
+        "title": "SolityNET SMS",
+        "description": "탈중앙화된 아웃바운드 SMS는 완전히 실현 가능하며 활발하게 개발 중입니다. 통화와 마찬가지로 발신에만 중점을 둡니다. 개인정보 노출 가능성을 피하기 위해 인바운드 SMS 수신은 지원하지 않습니다.",
+        "details": ["아웃바운드 SMS만", "개인정보 중심", "탈중앙화"]
+      },
+      "aiAssistant": {
+        "title": "Solity AI 어시스턴트",
+        "description": "핵심 모빌리티 기능이므로 eSIM 이전에 AI 어시스턴트의 테스트 출시가 계획되어 있습니다. 음성메일을 대체하고, 게이트키퍼로서 수신 전화를 스크리닝하며, \\\"테이블 예약\\\" 또는 \\\"피자 주문\\\"과 같은 간단한 작업을 처리할 수 있습니다.",
+        "details": ["음성메일 대체", "전화 스크리닝", "작업 자동화"]
+      },
+      "esimUs": {
+        "title": "Solity eSIM 미국",
+        "description": "미국이 우리의 첫 번째 eSIM 시장이 될 것이며, 고유/맞춤 내선 번호로 직접 전화 서비스를 제공합니다. 글로벌 커버리지는 로드맵의 핵심 목표입니다.",
+        "details": ["미국 첫 시장", "맞춤 내선", "글로벌 커버리지 목표"]
+      }
+    },
+    "phases": {
+      "phase1": {
+        "title": "1단계 | 기반",
+        "subtitle": "현재 → 100개 동시 통화",
+        "features": ["안정적인 코어 다이얼러 + SOL 빌링", "속도 제한기 v2", "기본 대시보드(P95)"]
+      },
+      "phase2": {
+        "title": "2단계 | 확장",
+        "subtitle": "100 → 1,000개 동시 통화",
+        "features": ["자동 확장 워커(HPA)", "다중 지역 인그레스 + 페일오버", "백그라운드 번호 평판 확인"]
+      },
+      "phase3": {
+        "title": "3단계 | 글로벌",
+        "subtitle": "다중 지역 + 라우팅 정책",
+        "features": ["지연시간/비용 기반 스마트 라우팅", "고객 트래픽 격리", "재해 복구 훈련(분기별)"]
+      },
+      "phase4": {
+        "title": "4단계 | 엔터프라이즈",
+        "subtitle": "보안 및 컴플라이언스 강화",
+        "features": ["KMS 키 관리 + 로테이션", "SAML SSO / SCIM", "세밀한 조직 제어"]
+      }
+    },
+    "eta": "예정 시간"
+  },
+  "balance": {
+    "title": "잔액",
+    "onChainSol": "온체인 • SOL",
+    "accountActive": "계정 활성 — 통화 준비 완료",
+    "lowBalance": "잔액 부족 — 통화 전에 충전해 주세요.",
+    "refreshBalance": "잔액 새로고침",
+    "quickAddBalance": "빠른 잔액 추가",
+    "customAmount": "사용자 정의 금액",
+    "enterSolAmount": "SOL 금액 입력",
+    "preparing": "준비 중...",
+    "invoiceActive": "인보이스 활성",
+    "pendingInvoice": "보류 중인 인보이스",
+    "add": "추가",
+    "invoice": "인보이스",
+    "expires": "만료",
+    "cancel": "취소",
+    "payInvoice": "인보이스 결제",
+    "paymentProcessing": "결제 처리 중",
+    "connectPhantomWallet": "팬텀 지갑 연결",
+    "disconnectWallet": "지갑 연결 해제",
+    "connecting": "연결 중...",
+    "connected": "연결됨",
+    "paymentSubmitted": "결제가 제출되었습니다!",
+    "paymentSubmittedDesc": "결제가 솔라나 네트워크에 성공적으로 제출되었습니다.",
+    "processingTime": "처리까지 최대 10분이 소요될 수 있습니다. 잔액이 업데이트될 때까지 인내심을 갖고 기다려 주세요.",
+    "problemsContact": "결제에 문제가 발생하면",
+    "visitThisPage": "이 페이지를 방문하여",
+    "andContactUs": "저희에게 연락해 주세요.",
+    "gotIt": "알겠습니다",
+    "topUp": "충전",
+    "invoices": "인보이스",
+    "journal": "저널",
+    "allInvoices": "모든 인보이스",
+    "searchInvoices": "인보이스 검색...",
+    "noInvoicesFound": "인보이스를 찾을 수 없습니다",
+    "createFirstInvoice": "위에서 잔액을 추가하여 첫 번째 인보이스를 생성하세요.",
+    "amount": "금액",
+    "status": "상태",
+    "created": "생성됨",
+    "actions": "작업",
+    "pay": "결제",
+    "pending": "보류 중",
+    "processing": "처리 중",
+    "completed": "완료",
+    "cancelled": "취소됨",
+    "failed": "실패",
+    "loadingInvoices": "인보이스 로딩 중...",
+    "errorLoadingInvoices": "인보이스 로딩 오류",
+    "recentInvoices": "최근 인보이스",
+    "recentActivity": "최근 활동",
+    "currentRates": "현재 요금",
+    "searchRates": "방향, 코드 또는 경로로 검색...",
+    "noRatesFound": "검색과 일치하는 요금을 찾을 수 없습니다.",
+    "noRatesAvailable": "사용 가능한 요금이 없습니다.",
+    "loadingRates": "요금 로딩 중...",
+    "errorLoadingRates": "요금 로딩 실패",
+    "active": "활성",
+    "inactive": "비활성",
+    "direction": "방향",
+    "codes": "코드",
+    "cost": "비용",
+    "details": "세부사항",
+    "noJournalEntries": "저널 항목을 찾을 수 없습니다.",
+    "noDetailsAvailable": "사용 가능한 세부사항 없음",
+    "showingRates": "{total}개 중 {count}개 요금 표시",
+    "filteredFrom": "전체 {total}개에서 필터링됨",
+    "invoiceId": "인보이스 ID",
+    "paidAt": "결제 시간",
+    "paymentProcessingMessage": "귀하의 {amount} 결제가 처리 중입니다. 처리 완료까지(최대 10분) 충전 버튼이 비활성화됩니다."
+  },
+  "login": {
+    "loading": "로딩 중...",
+    "solityMobile": "Solity Mobile",
+    "solanaEcosystem": "솔라나 생태계",
+    "description": "솔라나 생태계 기반의 온체인 통신 회사로 전 세계 서비스를 제공합니다. 어떤 번호에서든 어떤 번호로든 비공개 통화가 가능합니다.",
+    "onChain": "온체인",
+    "transparentFees": "SOL 투명 수수료",
+    "private": "비공개",
+    "noKyc": "KYC 없음, 통화 기록 없음",
+    "decentralised": "탈중앙화",
+    "anyNumbers": "모든 번호 사용 가능",
+    "companyRegistration": "회사 등록 번호:",
+    "servicesOnline": "서비스 온라인",
+    "someServicesOffline": "일부 서비스 오프라인",
+    "offline": "오프라인",
+    "signIn": "로그인",
+    "createAccount": "계정 생성",
+    "login": "로그인",
+    "signUp": "회원가입",
+    "username": "사용자명",
+    "password": "비밀번호",
+    "confirmPassword": "비밀번호 확인",
+    "enterUsername": "사용자명을 입력하세요",
+    "enterPassword": "비밀번호를 입력하세요",
+    "confirmYourPassword": "비밀번호를 확인하세요",
+    "pleaseWait": "잠시 기다려주세요...",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "contactSupport": "지원팀에 문의해주세요",
+    "fillAllFields": "모든 필수 항목을 입력해주세요",
+    "usernameTooShort": "사용자명은 최소 3자 이상이어야 합니다",
+    "usernameTooLong": "사용자명은 30자 이하여야 합니다",
+    "passwordTooShort": "비밀번호는 최소 12자 이상이어야 합니다",
+    "passwordNeedsUppercase": "비밀번호에는 대문자가 최소 1개 포함되어야 합니다",
+    "passwordNeedsLowercase": "비밀번호에는 소문자가 최소 1개 포함되어야 합니다",
+    "passwordNeedsDigit": "비밀번호에는 숫자가 최소 1개 포함되어야 합니다",
+    "passwordNeedsSpecial": "비밀번호에는 특수문자가 최소 1개 포함되어야 합니다",
+    "passwordsDoNotMatch": "비밀번호가 일치하지 않습니다",
+    "loginSuccessful": "로그인 성공!",
+    "accountCreated": "계정이 성공적으로 생성되었습니다!",
+    "authenticationFailed": "인증 실패"
+  }
+}

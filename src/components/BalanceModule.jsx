@@ -6,6 +6,7 @@ import { useBalance } from '../contexts/BalanceProvider'
 import { useInvoices } from '../contexts/InvoicesProvider'
 import { useLogs } from '../contexts/LogsProvider'
 import { useUser } from '../contexts/UserContext'
+import { useI18n } from '../contexts/I18nProvider'
 import { paymentsAPI } from '../services/payments'
 import { solanaService } from '../services/solana'
 import { authAPI } from '../services/auth'
@@ -22,6 +23,7 @@ function BalanceModule({ onNavigateToSupport }) {
   const [journalError, setJournalError] = useState(null)
   const navigate = useNavigate()
   const { user, clearUser } = useUser()
+  const { t } = useI18n()
 
   // Use rates from the /current endpoint via RatesProvider
   const { rates: apiRates, isLoading: ratesLoading, error: ratesError } = useRates()
@@ -510,9 +512,9 @@ function BalanceModule({ onNavigateToSupport }) {
         {/* Balance Card */}
         <div className="card p-6 flex-shrink-0">
           <div className="flex justify-between items-start mb-6">
-            <h2 className="text-2xl text-white/70">Balance</h2>
+            <h2 className="text-2xl text-white/70">{t('balance.title')}</h2>
             <div className="bg-white/10 px-4 py-2 rounded-full">
-              <span className="text-white/70 text-sm">on-chain • SOL</span>
+              <span className="text-white/70 text-sm">{t('balance.onChainSol')}</span>
             </div>
           </div>
 
@@ -532,7 +534,7 @@ function BalanceModule({ onNavigateToSupport }) {
                       ? 'text-white/40 cursor-not-allowed'
                       : 'text-white/60 hover:text-white hover:bg-white/5'
                       }`}
-                    title="Refresh balance"
+                    title={t('balance.refreshBalance')}
                   >
                     <svg
                       className={`w-5 h-5 ${isRefreshingBalance ? 'animate-spin' : ''}`}
@@ -546,8 +548,8 @@ function BalanceModule({ onNavigateToSupport }) {
                 </div>
                 <p className={`text-sm mt-1 ${isUserActive() ? 'text-green-400' : 'text-yellow-400'}`}>
                   {isUserActive()
-                    ? 'Account active — ready for calls'
-                    : 'Low balance — please top up before a call.'
+                    ? t('balance.accountActive')
+                    : t('balance.lowBalance')
                   }
                 </p>
 
@@ -555,14 +557,14 @@ function BalanceModule({ onNavigateToSupport }) {
                 {firstPendingInvoice && (
                   <div className="mt-3">
                     <div className="text-xs text-white/60 text-center mb-2">
-                      Pending invoice: {formatInvoiceAmount(firstPendingInvoice.lamports)} • Expires {formatDate(firstPendingInvoice.expiresAt)}
+                      {t('balance.pendingInvoice')}: {formatInvoiceAmount(firstPendingInvoice.lamports)} • {t('balance.expires')} {formatDate(firstPendingInvoice.expiresAt)}
                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleCancelInvoice(firstPendingInvoice.id)}
                         className="flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-600/30 hover:border-red-600/50"
                       >
-                        Cancel
+                        {t('balance.cancel')}
                       </button>
                       <button
                         onClick={() => handlePayInvoice(firstPendingInvoice.id)}
@@ -572,7 +574,7 @@ function BalanceModule({ onNavigateToSupport }) {
                           : 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
                           }`}
                       >
-                        Pay Invoice
+                        {t('balance.payInvoice')}
                       </button>
                     </div>
                   </div>
@@ -583,11 +585,10 @@ function BalanceModule({ onNavigateToSupport }) {
                   <div className="mt-3 mb-3 p-3 bg-blue-600/20 border border-blue-600/30 rounded-xl">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-                      <span className="text-blue-400 text-sm font-medium">Payment Processing</span>
+                      <span className="text-blue-400 text-sm font-medium">{t('balance.paymentProcessing')}</span>
                     </div>
                     <p className="text-white/70 text-xs">
-                      Your {formatInvoiceAmount(latestProcessingInvoice.lamports)} payment is being processed.
-                      Top-up buttons are disabled until processing completes (up to 10 minutes).
+                      {t('balance.paymentProcessingMessage', { amount: formatInvoiceAmount(latestProcessingInvoice.lamports) })}
                     </p>
                   </div>
                 )}
@@ -609,16 +610,16 @@ function BalanceModule({ onNavigateToSupport }) {
                         <img src="/phantom.png" alt="Phantom" className="w-5 h-5" />
                       )}
                       {isConnecting
-                        ? 'Connecting...'
+                        ? t('balance.connecting')
                         : isWalletConnected
-                          ? 'Disconnect Wallet'
-                          : 'Connect Phantom Wallet'
+                          ? t('balance.disconnectWallet')
+                          : t('balance.connectPhantomWallet')
                       }
                     </div>
                   </button>
                   {isWalletConnected && walletAddress && (
                     <div className="mt-1 text-xs text-white/60 break-all text-center">
-                      Connected: {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
+                      {t('balance.connected')}: {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
                     </div>
                   )}
                 </div>
@@ -629,7 +630,7 @@ function BalanceModule({ onNavigateToSupport }) {
             <div className="space-y-3">
               {/* Quick Add Balance Buttons */}
               <div className="space-y-3 mb-4">
-                <h3 className="text-white/70 text-sm">Quick Add Balance</h3>
+                <h3 className="text-white/70 text-sm">{t('balance.quickAddBalance')}</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {quickAmounts.map((amount) => (
                     <button
@@ -651,7 +652,7 @@ function BalanceModule({ onNavigateToSupport }) {
 
               {/* Custom Amount */}
               <div className="mb-4">
-                <h3 className="text-white/70 text-sm mb-2">Custom Amount</h3>
+                <h3 className="text-white/70 text-sm mb-2">{t('balance.customAmount')}</h3>
                 <div className="flex gap-2">
                   <input
                     type="number"
@@ -677,7 +678,7 @@ function BalanceModule({ onNavigateToSupport }) {
                       // Block everything else
                       e.preventDefault();
                     }}
-                    placeholder="Enter SOL amount"
+                    placeholder={t('balance.enterSolAmount')}
                     disabled={!isWalletConnected || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice}
                     className={`flex-1 border rounded-xl px-3 py-2 text-sm focus:outline-none transition-all ${isWalletConnected && !isTopUpLoading && !hasActiveInvoice() && !firstPendingInvoice && !latestProcessingInvoice
                       ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:border-blue-400'
@@ -695,7 +696,7 @@ function BalanceModule({ onNavigateToSupport }) {
                       : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       }`}
                   >
-                    {isTopUpLoading ? 'Preparing...' : hasActiveInvoice() ? 'Invoice Active' : firstPendingInvoice ? 'Pending Invoice' : latestProcessingInvoice ? 'Payment Processing' : 'Add'}
+                    {isTopUpLoading ? t('balance.preparing') : hasActiveInvoice() ? t('balance.invoiceActive') : firstPendingInvoice ? t('balance.pendingInvoice') : latestProcessingInvoice ? t('balance.paymentProcessing') : t('balance.add')}
                   </button>
                 </div>
               </div>
@@ -710,7 +711,7 @@ function BalanceModule({ onNavigateToSupport }) {
               <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                 <div className="w-3 h-3 bg-white/40 rounded-full"></div>
               </div>
-              <h3 className="text-xl font-semibold text-white">Recent Activity</h3>
+              <h3 className="text-xl font-semibold text-white">{t('balance.recentActivity')}</h3>
             </div>
           </div>
 
@@ -723,7 +724,7 @@ function BalanceModule({ onNavigateToSupport }) {
                 : 'text-white/70 hover:text-white hover:bg-white/5'
                 }`}
             >
-              Invoices ({displayInvoices.length})
+              {t('balance.invoices')} ({displayInvoices.length})
             </button>
             <button
               onClick={() => setActiveTab('journal')}
@@ -732,7 +733,7 @@ function BalanceModule({ onNavigateToSupport }) {
                 : 'text-white/70 hover:text-white hover:bg-white/5'
                 }`}
             >
-              Journal ({displayJournal.length})
+              {t('balance.journal')} ({displayJournal.length})
             </button>
           </div>
 
@@ -758,10 +759,10 @@ function BalanceModule({ onNavigateToSupport }) {
                   <div className="min-w-[700px] w-full">
                     {/* Invoices Table Header */}
                     <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs" style={{ gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(120px, 1fr) minmax(60px, 0.6fr) minmax(120px, 1fr) minmax(120px, 1fr)' }}>
-                      <div className="text-white/60 font-medium">Invoice ID</div>
+                      <div className="text-white/60 font-medium">{t('balance.invoiceId')}</div>
                       <div className="text-white/60 font-medium">Amount</div>
                       <div className="text-white/60 font-medium">Status</div>
-                      <div className="text-white/60 font-medium">Paid At</div>
+                      <div className="text-white/60 font-medium">{t('balance.paidAt')}</div>
                       <div className="text-white/60 font-medium">Expires</div>
                     </div>
 
@@ -769,7 +770,7 @@ function BalanceModule({ onNavigateToSupport }) {
                     <div className="space-y-2 h-48 overflow-y-auto">
                       {displayInvoices.length === 0 ? (
                         <div className="text-center py-8 text-white/60">
-                          No invoices found.
+                          {t('balance.noInvoicesFound')}
                         </div>
                       ) : (
                         displayInvoices.map((invoice) => (
@@ -824,14 +825,14 @@ function BalanceModule({ onNavigateToSupport }) {
                       <div className="text-white/60 font-medium">Status</div>
                       <div className="text-white/60 font-medium">Amount</div>
                       <div className="text-white/60 font-medium">Date</div>
-                      <div className="text-white/60 font-medium">Details</div>
+                      <div className="text-white/60 font-medium">{t('balance.details')}</div>
                     </div>
 
                     {/* Journal Table Rows */}
                     <div className="space-y-2 h-48 overflow-y-auto">
                       {displayJournal.length === 0 ? (
                         <div className="text-center py-8 text-white/60">
-                          No journal entries found.
+                          {t('balance.noJournalEntries')}
                         </div>
                       ) : (
                         displayJournal.map((entry) => (
@@ -861,8 +862,8 @@ function BalanceModule({ onNavigateToSupport }) {
                                   {entry.meta?.direction || 'Unknown'} - {entry.meta?.status || 'Unknown'}
                                 </div>
                               ) : (
-                                <div className="truncate" title={entry.reference || 'No details available'}>
-                                  {entry.reference ? entry.reference.substring(0, 20) + '...' : '-'}
+                                <div className="truncate" title={entry.reference || t('balance.noDetailsAvailable')}>
+                                  {entry.reference ? entry.reference.substring(0, 20) + '...' : t('balance.noDetailsAvailable')}
                                 </div>
                               )}
                             </div>
@@ -885,14 +886,14 @@ function BalanceModule({ onNavigateToSupport }) {
               <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                 <div className="w-3 h-3 bg-white/40 rounded-full"></div>
               </div>
-              <h3 className="text-xl font-semibold text-white">Current Rates</h3>
+              <h3 className="text-xl font-semibold text-white">{t('balance.currentRates')}</h3>
             </div>
 
             {/* Search Field */}
             <div className="w-64">
               <input
                 type="text"
-                placeholder="Search by direction, codes, or route..."
+                placeholder={t('balance.searchRates')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
@@ -903,12 +904,12 @@ function BalanceModule({ onNavigateToSupport }) {
           {ratesLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-              <span className="ml-3 text-white/70">Loading rates...</span>
+              <span className="ml-3 text-white/70">{t('balance.loadingRates')}</span>
             </div>
           ) : ratesError ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <div className="text-red-400 text-sm mb-2">Failed to load rates</div>
+                <div className="text-red-400 text-sm mb-2">{t('balance.errorLoadingRates')}</div>
                 <div className="text-white/60 text-xs">{ratesError}</div>
               </div>
             </div>
@@ -916,17 +917,17 @@ function BalanceModule({ onNavigateToSupport }) {
             <div className="flex flex-col min-h-0 flex-1">
               {/* Table Header */}
               <div className="hidden md:grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs items-center flex-shrink-0" style={{ gridTemplateColumns: '60px minmax(120px, 1fr) minmax(200px, 3fr) 120px' }}>
-                <div className="text-white/60 font-medium text-left">Active</div>
-                <div className="text-white/60 font-medium">Direction</div>
-                <div className="text-white/60 font-medium">Codes</div>
-                <div className="text-white/60 font-medium text-right">Cost</div>
+                <div className="text-white/60 font-medium text-left">{t('balance.active')}</div>
+                <div className="text-white/60 font-medium">{t('balance.direction')}</div>
+                <div className="text-white/60 font-medium">{t('balance.codes')}</div>
+                <div className="text-white/60 font-medium text-right">{t('balance.cost')}</div>
               </div>
 
               {/* Table Rows */}
               <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
                 {displayRates.length === 0 ? (
                   <div className="text-center py-8 text-white/60">
-                    {searchQuery ? 'No rates found matching your search.' : 'No rates available.'}
+                    {searchQuery ? t('balance.noRatesFound') : t('balance.noRatesAvailable')}
                   </div>
                 ) : (
                   displayRates.map((rate) => (
@@ -957,7 +958,7 @@ function BalanceModule({ onNavigateToSupport }) {
                           <div className="flex items-center gap-2 justify-center">
                             <div className={`w-2 h-2 rounded-full ${rate.active ? 'bg-green-400' : 'bg-red-400'}`}></div>
                             <span className="text-white/60 text-xs">
-                              {rate.active ? 'Active' : 'Inactive'}
+                              {rate.active ? t('balance.active') : t('balance.inactive')}
                             </span>
                           </div>
                           <div className="text-white font-mono self-center">
@@ -965,11 +966,11 @@ function BalanceModule({ onNavigateToSupport }) {
                           </div>
                         </div>
                         <div className="text-white self-center">
-                          <span className="text-white/60">Direction: </span>
+                          <span className="text-white/60">{t('balance.direction')}: </span>
                           {rate.direction || '-'}
                         </div>
                         <div className="text-white/70 self-center">
-                          <span className="text-white/60">Codes: </span>
+                          <span className="text-white/60">{t('balance.codes')}: </span>
                           <span className="font-mono break-words">
                             {rate.formattedCodes}
                           </span>
@@ -983,8 +984,8 @@ function BalanceModule({ onNavigateToSupport }) {
               {/* Results Info */}
               <div className="mt-4 pt-4 border-t border-white/10 flex-shrink-0">
                 <div className="text-white/50 text-sm">
-                  Showing {displayRates.length} of {filteredRates.length} rates
-                  {searchQuery && ` (filtered from ${rates.length} total)`}
+                  {t('balance.showingRates', { count: displayRates.length, total: filteredRates.length })}
+                  {searchQuery && ` (${t('balance.filteredFrom', { total: rates.length })})`}
                 </div>
               </div>
             </div>
@@ -1004,16 +1005,15 @@ function BalanceModule({ onNavigateToSupport }) {
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">Payment Submitted!</h3>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">{t('balance.paymentSubmitted')}</h3>
               <p className="text-white/80 text-base mb-4">
-                Your payment has been successfully submitted to the Solana network.
+                {t('balance.paymentSubmittedDesc')}
               </p>
               <p className="text-white/70 text-sm mb-4">
-                It may take up to <span className="text-purple-300 font-semibold">10 minutes</span> to process.
-                Please wait patiently while your balance is updated.
+                {t('balance.processingTime')}
               </p>
               <p className="text-white/60 text-sm mb-8">
-                If you experience any problems with the payment, please{' '}
+                {t('balance.problemsContact')}{' '}
                 <button
                   onClick={() => {
                     setShowProcessingModal(false)
@@ -1021,15 +1021,15 @@ function BalanceModule({ onNavigateToSupport }) {
                   }}
                   className="text-blue-400 hover:text-blue-300 underline transition-colors"
                 >
-                  visit this page
+                  {t('balance.visitThisPage')}
                 </button>
-                {' '}and contact us.
+                {' '}{t('balance.andContactUs')}
               </p>
               <button
                 onClick={() => setShowProcessingModal(false)}
                 className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-xl"
               >
-                Got it
+                {t('balance.gotIt')}
               </button>
             </div>
           </div>

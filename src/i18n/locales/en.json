@@ -1,0 +1,279 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "online": "Online",
+    "offline": "Offline",
+    "comingSoon": "Coming soon"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "call": "Call",
+    "balance": "Balance",
+    "about": "About",
+    "esim": "E-SIM",
+    "support": "Support",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "language": "Language",
+    "module": "module"
+  },
+  "call": {
+    "callerID": "Caller ID",
+    "phoneNumber": "To (phone)",
+    "startCall": "Call",
+    "endCall": "End Call",
+    "randomize": "Randomize",
+    "enterCallerID": "Enter your caller ID(phone number)",
+    "phoneNumberPlaceholder": "e.g. +44 20 7946 0958",
+    "callerIDPlaceholder": "e.g. +1 555 0123",
+    "validatingCallerID": "Validating caller ID...",
+    "callerIDError": "Caller ID must be 7-15 digits",
+    "callDuration": "Call duration",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "enableSound": "Enable Sound",
+    "disableSound": "Disable Sound",
+    "logs": "Logs",
+    "clear": "Clear",
+    "noLogs": "No logs to display"
+  },
+  "status": {
+    "idle": "Idle",
+    "connecting": "Connecting...",
+    "preparing": "Preparing call...",
+    "ringing": "Ringing...",
+    "inCall": "In Call",
+    "callEnded": "Call Ended"
+  },
+  "account": {
+    "balance": "Balance",
+    "topUp": "Top Up",
+    "accountInactive": "Account Inactive",
+    "accountInactiveMessage": "Please top up your balance to activate your account and start making calls.",
+    "username": "User"
+  },
+  "server": {
+    "solityNet": "SolityNET",
+    "serverStatus": "Server Status"
+  },
+  "about": {
+    "aboutSolity": "About Solity",
+    "aboutDescription": "Solity is an on-chain mobility service provider built on Solana. Users fund account in SOL, which settle transparently to the Solity Treasury. Our flagship product, SolityNET, lets you place global, low-latency voice calls with flexible caller identity options. Next, we're rolling out a suite of innovative mobility products that reject the usual corporate limitations, making connectivity more open, programmable, and user-controlled.",
+    "solityNet": "SolityNET",
+    "solityNetDescription": "SolityNET is a comprehensive solution to decentralize global telephony. At launch, calling will be available in the US and Canada. We can onboard 80+ countries, but to avoid overloading the network we'll expand coverage gradually - adding regions day by day.",
+    "scaling": "Scaling",
+    "scalingDescription": "What's planned for the server and our general scaling map.",
+    "lastUpdated": "Last updated 9/13/2025",
+    "environment": "Environment: SolityNET"
+  },
+  "modal": {
+    "inCallClickToShow": "In call - Click to show call modal",
+    "minimize": "Minimize"
+  },
+  "support": {
+    "telegramDescription": "Join our community chat for quick support and updates",
+    "discordDescription": "Connect with other users and get technical help",
+    "twitterDescription": "Follow us for the latest news and announcements",
+    "joinTelegram": "Join Telegram",
+    "joinDiscord": "Join Discord",
+    "joinTwitter": "Join X (Twitter)",
+    "attachSessionLogs": "Attach session logs",
+    "sessionLogsDescription": "If you contact support, include your session logs to help us resolve issues faster.",
+    "copySessionLogs": "Copy session logs",
+    "noLogsAvailable": "No logs available - session just started",
+    "logssCopied": "Session logs copied to clipboard",
+    "responseTime": "We typically respond within 24 hours",
+    "supportAvailability": "Support available in multiple timezones"
+  },
+  "scaling": {
+    "upcomingUpdates": "Upcoming server updates",
+    "updateDescription": "Edit the JSON in updatesData (near the bottom of this file) to keep this list fresh.",
+    "scalingRoadmap": "Scaling roadmap",
+    "status": {
+      "done": "Done",
+      "inProgress": "In progress",
+      "planned": "Planned"
+    },
+    "categories": {
+      "telephony": "Telephony",
+      "performance": "Performance",
+      "technology": "Technology",
+      "ai": "AI"
+    },
+    "updates": {
+      "solityNetCall": {
+        "title": "SolityNET Call",
+        "description": "We're rolling out the SolityNET calling feature to the public. It took just three months to go from idea to live product - our first step toward becoming the leading crypto-native mobility provider.",
+        "details": ["Public launch complete", "3 months development", "Crypto-native mobility"]
+      },
+      "coverageIncrease": {
+        "title": "SolityNET Coverage Increase",
+        "description": "Daily coverage expansions are planned. 40+ countries are queued for rollout. We'll post day-by-day updates on X.",
+        "details": ["40+ countries queued", "Daily expansions", "X updates"]
+      },
+      "solityNetApi": {
+        "title": "SolityNET API",
+        "description": "Opening up the SolityNET API brings full integration flexibility. Hook up your own systems - or connect an AI assistant that can place calls on your behalf, from ordering pizza to scheduling business meetings.",
+        "details": ["Full integration flexibility", "AI assistant support", "Business automation"]
+      },
+      "solityNetSms": {
+        "title": "SolityNET SMS",
+        "description": "Decentralized outbound SMS is fully feasible and in active development. As with calling, we're focusing on sending only; we won't support inbound SMS reception to avoid potential exposure of personal information.",
+        "details": ["Outbound SMS only", "Privacy focused", "Decentralized"]
+      },
+      "aiAssistant": {
+        "title": "Solity AI Assistant",
+        "description": "A test launch of the AI assistant is planned before eSIM, since it's a core mobility feature. It can replace voicemail, screen incoming calls as your gatekeeper, and handle simple tasks like \\\"book a table\\\" or \\\"order pizza.\\\"",
+        "details": ["Voicemail replacement", "Call screening", "Task automation"]
+      },
+      "esimUs": {
+        "title": "Solity eSIM US",
+        "description": "The United States will be our first eSIM market, offering direct telephony with unique/custom extension numbers. Global coverage is a key goal on our roadmap.",
+        "details": ["US first market", "Custom extensions", "Global coverage goal"]
+      }
+    },
+    "phases": {
+      "phase1": {
+        "title": "Phase 1 | Foundation",
+        "subtitle": "Now → 100 concurrent calls",
+        "features": ["Stable core dialer + billing in SOL", "Rate limiter v2", "Basic dashboards (P95)"]
+      },
+      "phase2": {
+        "title": "Phase 2 | Scale-out",
+        "subtitle": "100 → 1,000 concurrent calls",
+        "features": ["Autoscaling workers (HPA)", "Multi-region ingress + failover", "Background number reputation checks"]
+      },
+      "phase3": {
+        "title": "Phase 3 | Global",
+        "subtitle": "Multi-region + routing policies",
+        "features": ["Smart routing by latency/cost", "Customer traffic isolation", "Disaster recovery drills (quarterly)"]
+      },
+      "phase4": {
+        "title": "Phase 4 | Enterprise",
+        "subtitle": "Security & compliance uplift",
+        "features": ["KMS key management + rotations", "SAML SSO / SCIM", "Fine-grained org controls"]
+      }
+    },
+    "eta": "ETA"
+  },
+  "balance": {
+    "title": "Balance",
+    "onChainSol": "on-chain • SOL",
+    "accountActive": "Account active — ready for calls",
+    "lowBalance": "Low balance — please top up before a call.",
+    "refreshBalance": "Refresh balance",
+    "quickAddBalance": "Quick Add Balance",
+    "customAmount": "Custom Amount",
+    "enterSolAmount": "Enter SOL amount",
+    "preparing": "Preparing...",
+    "invoiceActive": "Invoice Active",
+    "pendingInvoice": "Pending Invoice",
+    "add": "Add",
+    "invoice": "Invoice",
+    "expires": "Expires",
+    "cancel": "Cancel",
+    "payInvoice": "Pay Invoice",
+    "paymentProcessing": "Payment Processing",
+    "connectPhantomWallet": "Connect Phantom Wallet",
+    "disconnectWallet": "Disconnect Wallet",
+    "connecting": "Connecting...",
+    "connected": "Connected",
+    "paymentSubmitted": "Payment Submitted!",
+    "paymentSubmittedDesc": "Your payment has been successfully submitted to the Solana network.",
+    "processingTime": "It may take up to 10 minutes to process. Please wait patiently while your balance is updated.",
+    "problemsContact": "If you experience any problems with the payment, please",
+    "visitThisPage": "visit this page",
+    "andContactUs": "and contact us.",
+    "gotIt": "Got it",
+    "topUp": "Top Up",
+    "invoices": "Invoices",
+    "journal": "Journal",
+    "allInvoices": "All Invoices",
+    "searchInvoices": "Search invoices...",
+    "noInvoicesFound": "No invoices found",
+    "createFirstInvoice": "Create your first invoice by adding balance above.",
+    "amount": "Amount",
+    "status": "Status",
+    "created": "Created",
+    "actions": "Actions",
+    "pay": "Pay",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "failed": "Failed",
+    "loadingInvoices": "Loading invoices...",
+    "errorLoadingInvoices": "Error loading invoices",
+    "recentInvoices": "Recent Invoices",
+    "recentActivity": "Recent Activity",
+    "currentRates": "Current Rates",
+    "searchRates": "Search by direction, codes, or route...",
+    "noRatesFound": "No rates found matching your search.",
+    "noRatesAvailable": "No rates available.",
+    "loadingRates": "Loading rates...",
+    "errorLoadingRates": "Failed to load rates",
+    "active": "Active",
+    "inactive": "Inactive",
+    "direction": "Direction",
+    "codes": "Codes",
+    "cost": "Cost",
+    "details": "Details",
+    "noJournalEntries": "No journal entries found.",
+    "noDetailsAvailable": "No details available",
+    "showingRates": "Showing {count} of {total} rates",
+    "filteredFrom": "filtered from {total} total",
+    "invoiceId": "Invoice ID",
+    "paidAt": "Paid At",
+    "paymentProcessingMessage": "Your {amount} payment is being processed. Top-up buttons are disabled until processing completes (up to 10 minutes)."
+  },
+  "login": {
+    "loading": "Loading...",
+    "solityMobile": "Solity Mobile",
+    "solanaEcosystem": "Solana Ecosystem",
+    "description": "Onchain telecommunication company providing worldwide service. Solana ecosystem based. Private calls any number to any number.",
+    "onChain": "on-chain",
+    "transparentFees": "Transparent fees in SOL",
+    "private": "private",
+    "noKyc": "No KYC, no call history",
+    "decentralised": "decentralised",
+    "anyNumbers": "Any numbers to use",
+    "companyRegistration": "Company Registration Number:",
+    "servicesOnline": "Services Online",
+    "someServicesOffline": "Some Services Offline",
+    "offline": "Offline",
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "enterUsername": "Enter your username",
+    "enterPassword": "Enter your password",
+    "confirmYourPassword": "Confirm your password",
+    "pleaseWait": "Please wait...",
+    "forgotPassword": "Forgot Password?",
+    "contactSupport": "Please contact Support",
+    "fillAllFields": "Please fill in all required fields",
+    "usernameTooShort": "Username must be at least 3 characters long",
+    "usernameTooLong": "Username must be no more than 30 characters long",
+    "passwordTooShort": "Password must be at least 12 characters long",
+    "passwordNeedsUppercase": "Password must contain at least one uppercase letter",
+    "passwordNeedsLowercase": "Password must contain at least one lowercase letter",
+    "passwordNeedsDigit": "Password must contain at least one digit",
+    "passwordNeedsSpecial": "Password must contain at least one special character",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "loginSuccessful": "Login successful!",
+    "accountCreated": "Account created successfully!",
+    "authenticationFailed": "Authentication failed"
+  }
+}

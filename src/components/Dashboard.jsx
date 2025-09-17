@@ -5,9 +5,11 @@ import Support from './Support'
 import BalanceModule from './BalanceModule'
 import Scaling from './Scaling'
 import { CallModal } from './CallModal'
+import LanguageToggle from './LanguageToggle'
 import { useHealth } from '../contexts/HealthProvider'
 import { useUser } from '../contexts/UserContext'
 import { useCall } from '../contexts/CallProvider'
+import { useI18n } from '../contexts/I18nProvider'
 import { authAPI } from '../services/auth'
 
 function Dashboard() {
@@ -25,8 +27,15 @@ function Dashboard() {
   const { health, isServerHealthy, getUnhealthyServices } = useHealth()
   const { user, clearUser } = useUser()
   const { callState, hangupCall, toggleMute, sendDTMF } = useCall()
+  const { t } = useI18n()
 
-  const menuItems = ['Call', 'Balance', 'About', 'E-SIM', 'Support']
+  const menuItems = [
+    { key: 'Call', label: t('navigation.call') },
+    { key: 'Balance', label: t('navigation.balance') },
+    { key: 'About', label: t('navigation.about') },
+    { key: 'E-SIM', label: t('navigation.esim') },
+    { key: 'Support', label: t('navigation.support') }
+  ]
 
   // Derived state for call
   const isInCall = callState.callStatus === 'in-call'
@@ -196,35 +205,35 @@ function Dashboard() {
           <div className="h-full space-y-6">
             {/* About Cards */}
             <div className="card p-6">
-              <h2 className="text-2xl font-bold text-white mb-6">About Solity</h2>
+              <h2 className="text-2xl font-bold text-white mb-6">{t('about.aboutSolity')}</h2>
               <div>
                 <p className="text-white/80 text-base leading-relaxed">
-                  Solity is an on-chain mobility service provider built on Solana. Users fund account in SOL, which settle transparently to the Solity Treasury. Our flagship product, SolityNET, lets you place global, low-latency voice calls with flexible caller identity options. Next, we're rolling out a suite of innovative mobility products that reject the usual corporate limitations, making connectivity more open, programmable, and user-controlled.
+                  {t('about.aboutDescription')}
                 </p>
               </div>
             </div>
 
             <div className="card p-6">
-              <h3 className="text-xl font-bold text-white mb-4">SolityNET</h3>
+              <h3 className="text-xl font-bold text-white mb-4">{t('about.solityNet')}</h3>
               <p className="text-white/80 text-base leading-relaxed">
-                SolityNET is a comprehensive solution to decentralize global telephony. At launch, calling will be available in the US and Canada. We can onboard 80+ countries, but to avoid overloading the network we'll expand coverage gradually - adding regions day by day.
+                {t('about.solityNetDescription')}
               </p>
             </div>
 
             {/* Scaling Content */}
             <div className="card p-6">
               <h2 className="text-2xl font-bold text-white mb-3">
-                Scaling
+                {t('about.scaling')}
               </h2>
               <p className="text-white/70 text-base mb-6">
-                What's planned for the server and our general scaling map.
+                {t('about.scalingDescription')}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="bg-white/10 border border-white/20 text-white/80 px-4 py-2 rounded-full text-sm w-fit">
-                  Last updated 9/13/2025
+                  {t('about.lastUpdated')}
                 </div>
                 <div className="bg-white/10 border border-white/20 text-white/80 px-4 py-2 rounded-full text-sm w-fit">
-                  Environment: SolityNET
+                  {t('about.environment')}
                 </div>
               </div>
             </div>
@@ -242,7 +251,7 @@ function Dashboard() {
                 {activeModule}
               </h1>
               <p className="text-lg text-white/70">
-                {activeModule} module - Coming soon
+{activeModule} {t('navigation.module')} - {t('common.comingSoon')}
               </p>
             </div>
           </div>
@@ -289,7 +298,7 @@ function Dashboard() {
                 {/* Spacer */}
                 <div className="flex-1"></div>
 
-                {/* Username, Status & Logout - Always Visible */}
+                {/* Username, Language Toggle, Status & Logout - Always Visible */}
                 <div className="flex items-center gap-3">
                   {/* Username */}
                   <div className="flex items-center gap-2">
@@ -299,7 +308,7 @@ function Dashboard() {
                       </svg>
                     </div>
                     <span className="text-white/80 text-[0.5rem] text-center font-medium">
-                      {user?.username || 'User'}
+                      {user?.username || t('account.username')}
                     </span>
                     {/* In Call Indicator - Compact */}
                     {(callStatus === 'in-call' || callStatus === 'ringing') && (
@@ -315,8 +324,11 @@ function Dashboard() {
                     )}
                   </div>
 
+                  {/* Language Toggle - Compact */}
+                  <LanguageToggle compact={true} />
+
                   {/* Compact Server Status */}
-                  <div className="flex items-center gap-2 relative group" title={`Solity NET: ${isServerHealthy() ? 'Online' : 'Offline'}`}>
+                  <div className="flex items-center gap-2 relative group" title={`${t('server.solityNet')}: ${isServerHealthy() ? t('common.online') : t('common.offline')}`}>
                     <div className="flex items-end gap-0.5">
                       <div className={`w-0.5 h-1.5 rounded-sm ${health.api ? 'bg-green-400' : 'bg-red-400'}`}></div>
                       <div className={`w-0.5 h-2 rounded-sm ${health.db ? 'bg-green-400' : 'bg-red-400'}`}></div>
@@ -348,30 +360,30 @@ function Dashboard() {
                 <div className="border-t border-white/10 pt-3">
                   <div className="grid grid-cols-2 gap-2">
                     {menuItems.map((item) => (
-                      <div key={item} className={`relative ${item === 'E-SIM' ? 'group' : ''}`}>
+                      <div key={item.key} className={`relative ${item.key === 'E-SIM' ? 'group' : ''}`}>
                         <button
-                          onClick={item === 'E-SIM' ? undefined : () => {
-                            setActiveModule(item)
+                          onClick={item.key === 'E-SIM' ? undefined : () => {
+                            setActiveModule(item.key)
                             setIsMobileMenuOpen(false)
                           }}
-                          disabled={item === 'E-SIM'}
-                          className={`w-full text-center px-3 py-3 rounded-lg font-medium transition-all duration-200 text-sm ${item === 'E-SIM'
+                          disabled={item.key === 'E-SIM'}
+                          className={`w-full text-center px-3 py-3 rounded-lg font-medium transition-all duration-200 text-sm ${item.key === 'E-SIM'
                             ? 'opacity-50 cursor-not-allowed text-white/50'
-                            : activeModule === item
+                            : activeModule === item.key
                               ? 'bg-white/10 border border-white/20 text-white'
                               : 'hover:bg-white/5 text-white/70'
                             }`}
                         >
-                          {item}
-                          {item === 'E-SIM' && (
+                          {item.label}
+                          {item.key === 'E-SIM' && (
                             <svg className="w-3 h-3 text-white/40 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                           )}
                         </button>
-                        {item === 'E-SIM' && (
+                        {item.key === 'E-SIM' && (
                           <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                            Coming soon
+                            {t('common.comingSoon')}
                           </div>
                         )}
                       </div>
@@ -395,27 +407,27 @@ function Dashboard() {
               <div className="card p-2">
                 <div className="flex flex-col gap-3">
                   {menuItems.map((item) => (
-                    <div key={item} className={`relative ${item === 'E-SIM' ? 'group' : ''}`}>
+                    <div key={item.key} className={`relative ${item.key === 'E-SIM' ? 'group' : ''}`}>
                       <button
-                        onClick={item === 'E-SIM' ? undefined : () => setActiveModule(item)}
-                        disabled={item === 'E-SIM'}
-                        className={`w-full text-left px-4 py-3 rounded-xl ring-1 ring-white/10 font-medium transition-all duration-200 flex items-center justify-between ${item === 'E-SIM'
+                        onClick={item.key === 'E-SIM' ? undefined : () => setActiveModule(item.key)}
+                        disabled={item.key === 'E-SIM'}
+                        className={`w-full text-left px-4 py-3 rounded-xl ring-1 ring-white/10 font-medium transition-all duration-200 flex items-center justify-between ${item.key === 'E-SIM'
                           ? 'opacity-50 cursor-not-allowed text-white/50'
-                          : activeModule === item
+                          : activeModule === item.key
                             ? 'bg-white/10 border border-white/20 text-white'
                             : 'hover:bg-white/5 text-white/70'
                           }`}
                       >
-                        <span>{item}</span>
-                        {item === 'E-SIM' && (
+                        <span>{item.label}</span>
+                        {item.key === 'E-SIM' && (
                           <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                           </svg>
                         )}
                       </button>
-                      {item === 'E-SIM' && (
+                      {item.key === 'E-SIM' && (
                         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                          Coming soon
+                          {t('common.comingSoon')}
                         </div>
                       )}
                     </div>
@@ -426,9 +438,9 @@ function Dashboard() {
               {/* Server Status Card */}
               <div className="card px-4 py-2 flex flex-col gap-2">
                 <div className="w-full flex items-baseline justify-start gap-1 px-3 py-3 relative group">
-                  <span className="text-white/70 text-sm">SolityNET:</span>
+                  <span className="text-white/70 text-sm">{t('server.solityNet')}:</span>
                   <span className={`text-sm font-medium ${isServerHealthy() ? 'text-green-300' : 'text-red-300'}`}>
-                    {isServerHealthy() ? 'Online' : 'Offline'}
+                    {isServerHealthy() ? t('common.online') : t('common.offline')}
                   </span>
                   <div className="flex items-end gap-0.5">
                     <div className={`w-0.5 h-1.5 rounded-sm ${health.api ? 'bg-green-400' : 'bg-red-400'}`}></div>
@@ -454,7 +466,7 @@ function Dashboard() {
                         </svg>
                       </div>
                       <div className="text-white/80 text-sm font-medium">
-                        {user?.username || 'User'}
+                        {user?.username || t('account.username')}
                       </div>
                     </div>
                     {/* In Call Indicator - Expanded */}
@@ -472,6 +484,9 @@ function Dashboard() {
                   </div>
                 </div>
 
+                {/* Language Toggle - Styled like logout button */}
+                <LanguageToggle />
+
                 {/* Logout Button */}
                 <button
                   onClick={handleLogout}
@@ -482,7 +497,7 @@ function Dashboard() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                   </div>
-                  <span>Log Out</span>
+                  <span>{t('navigation.logout')}</span>
                 </button>
               </div>
             </div>

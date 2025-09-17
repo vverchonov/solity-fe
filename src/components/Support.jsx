@@ -1,11 +1,13 @@
 import { useLogs } from '../contexts/LogsProvider'
+import { useI18n } from '../contexts/I18nProvider'
 
 function Support() {
   const { logs } = useLogs()
+  const { t } = useI18n()
 
   const handleCopyLogs = () => {
     if (logs.length === 0) {
-      const noLogsMessage = 'No logs available - session just started'
+      const noLogsMessage = t('support.noLogsAvailable')
       navigator.clipboard.writeText(noLogsMessage)
       console.log('No logs message copied to clipboard')
       return
@@ -28,25 +30,25 @@ function Support() {
     {
       icon: '✓',
       name: 'Telegram',
-      description: 'Join our community chat for quick support and updates',
+      description: t('support.telegramDescription'),
       handle: '@Solityapp_Bot',
-      buttonText: 'Join Telegram',
+      buttonText: t('support.joinTelegram'),
       url: 'https://t.me/Solityapp_Bot'
     },
     {
       icon: '#',
       name: 'Discord',
-      description: 'Connect with other users and get technical help',
+      description: t('support.discordDescription'),
       handle: 'discord.gg/EHz8Yjy2',
-      buttonText: 'Join Discord',
+      buttonText: t('support.joinDiscord'),
       url: 'https://discord.gg/EHz8Yjy2'
     },
     {
       icon: 'X',
       name: 'X (Twitter)',
-      description: 'Follow us for the latest news and announcements',
+      description: t('support.twitterDescription'),
       handle: '@solity_sol',
-      buttonText: 'Join X (Twitter)',
+      buttonText: t('support.joinTwitter'),
       url: 'https://x.com/solity_sol'
     }
   ]
@@ -56,7 +58,7 @@ function Support() {
       {/* Social Links - Responsive Layout */}
       <div className="flex flex-col lg:flex-row gap-6">
         {socialLinks.map((link) => (
-          <div key={link.name} className="card p-6">
+          <div key={link.name} className="card p-6 lg:flex-1">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
                 {link.name === 'Telegram' ? (
@@ -102,16 +104,16 @@ function Support() {
       <div className="card p-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
           <div className="flex-1">
-            <h3 className="text-xl font-semibold text-white mb-2">Attach session logs</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">{t('support.attachSessionLogs')}</h3>
             <p className="text-white/60 text-sm">
-              If you contact support, include your session logs to help us resolve issues faster.
+              {t('support.sessionLogsDescription')}
             </p>
           </div>
           <button
             onClick={handleCopyLogs}
             className="bg-white hover:bg-gray-100 text-gray-900 px-8 py-3 rounded-xl font-semibold transition-all whitespace-nowrap min-h-[48px] touch-manipulation w-full sm:w-auto"
           >
-            Copy session logs
+{t('support.copySessionLogs')}
           </button>
         </div>
       </div>
@@ -119,8 +121,8 @@ function Support() {
       {/* Response Time Info */}
       <div className="card p-6 text-center">
         <div className="text-white/60 space-y-1">
-          <p className="text-lg">We typically respond within 24 hours</p>
-          <p className="text-sm">Support available in multiple timezones</p>
+          <p className="text-lg">{t('support.responseTime')}</p>
+          <p className="text-sm">{t('support.supportAvailability')}</p>
         </div>
       </div>
     </div>

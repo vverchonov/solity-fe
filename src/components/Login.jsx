@@ -4,6 +4,8 @@ import { authAPI } from '../services/auth'
 import { useToastContext } from '../contexts/ToastContext'
 import { useUser } from '../contexts/UserContext'
 import { useHealth } from '../contexts/HealthProvider'
+import { useI18n } from '../contexts/I18nProvider'
+import LanguageToggle from './LanguageToggle'
 
 function Login() {
   const [isLogin, setIsLogin] = useState(true)
@@ -17,6 +19,7 @@ function Login() {
   const { addToast } = useToastContext()
   const { updateUser, user, isLoading, shouldRedirectToDashboard, clearRedirectFlag } = useUser()
   const { health, isServerHealthy, getUnhealthyServices } = useHealth()
+  const { t } = useI18n()
 
   // Redirect if already authenticated or after successful refresh
   useEffect(() => {
@@ -34,7 +37,7 @@ function Login() {
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-black flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white/70">Loading...</p>
+          <p className="text-white/70">{t('login.loading')}</p>
         </div>
       </div>
     )
@@ -49,33 +52,33 @@ function Login() {
 
   const validatePassword = (password, isSignup = false) => {
     if (password.length < 12) {
-      return 'Password must be at least 12 characters long'
+      return t('login.passwordTooShort')
     }
-    
+
     if (isSignup) {
       if (!/[A-Z]/.test(password)) {
-        return 'Password must contain at least one uppercase letter'
+        return t('login.passwordNeedsUppercase')
       }
       if (!/[a-z]/.test(password)) {
-        return 'Password must contain at least one lowercase letter'
+        return t('login.passwordNeedsLowercase')
       }
       if (!/[0-9]/.test(password)) {
-        return 'Password must contain at least one digit'
+        return t('login.passwordNeedsDigit')
       }
       if (!/[^A-Za-z0-9]/.test(password)) {
-        return 'Password must contain at least one special character'
+        return t('login.passwordNeedsSpecial')
       }
     }
-    
+
     return null
   }
 
   const validateUsername = (username) => {
     if (username.length < 3) {
-      return 'Username must be at least 3 characters long'
+      return t('login.usernameTooShort')
     }
     if (username.length > 30) {
-      return 'Username must be no more than 30 characters long'
+      return t('login.usernameTooLong')
     }
     return null
   }
@@ -87,7 +90,7 @@ function Login() {
     console.log('Form submitted:', { isLogin, formData })
 
     if (!formData.username || !formData.password) {
-      addToast('Please fill in all required fields', 'error')
+      addToast(t('login.fillAllFields'), 'error')
       return
     }
 
@@ -106,7 +109,7 @@ function Login() {
     }
 
     if (!isLogin && formData.password !== formData.confirmPassword) {
-      addToast('Passwords do not match', 'error')
+      addToast(t('login.passwordsDoNotMatch'), 'error')
       return
     }
 
@@ -129,14 +132,14 @@ function Login() {
         // Store user data in context
         console.log('Current user:', result.data.user)
         updateUser(result.data.user)
-        addToast(isLogin ? 'Login successful!' : 'Account created successfully!', 'success')
+        addToast(isLogin ? t('login.loginSuccessful') : t('login.accountCreated'), 'success')
         navigate('/dashboard')
       } else {
-        addToast(result.error || 'Authentication failed', 'error')
+        addToast(result.error || t('login.authenticationFailed'), 'error')
       }
     } catch (error) {
       console.error('Authentication error:', error)
-      addToast(error.message || 'Authentication failed', 'error')
+      addToast(error.message || t('login.authenticationFailed'), 'error')
     } finally {
       setLoading(false)
     }
@@ -151,8 +154,9 @@ function Login() {
       {/* Navbar */}
       <nav className="relative w-full px-4 py-4 lg:p-6">
         <div className="w-full max-w-7xl mx-auto">
-          <div className="flex items-center">
+          <div className="flex items-center justify-between">
             <img src="/logo.png" alt="Logo" className="h-8 sm:h-10 lg:h-12 w-auto" />
+            <LanguageToggle />
           </div>
         </div>
       </nav>
@@ -166,13 +170,13 @@ function Login() {
             <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
               <div className="w-full text-center lg:text-left">
                 <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white mb-3 lg:mb-4 break-words">
-                  Solity Mobile
+                  {t('login.solityMobile')}
                 </h1>
                 <h2 className="text-lg sm:text-xl lg:text-3xl text-blue-300 mb-4 lg:mb-6 break-words">
-                  Solana Ecosystem
+                  {t('login.solanaEcosystem')}
                 </h2>
                 <p className="text-white/70 text-sm sm:text-base lg:text-lg leading-relaxed">
-                  Onchain telecommunication company providing worldwide service. Solana ecosystem based. Private calls any number to any number.
+                  {t('login.description')}
                 </p>
               </div>
 
@@ -180,31 +184,31 @@ function Login() {
                 <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
                   <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-blue-300 font-semibold text-sm lg:text-base">on-chain</span>
-                    <p className="text-white/60 text-xs lg:text-sm">Transparent fees in SOL</p>
+                    <span className="text-blue-300 font-semibold text-sm lg:text-base">{t('login.onChain')}</span>
+                    <p className="text-white/60 text-xs lg:text-sm">{t('login.transparentFees')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
                   <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-green-300 font-semibold text-sm lg:text-base">private</span>
-                    <p className="text-white/60 text-xs lg:text-sm">No KYC, no call history</p>
+                    <span className="text-green-300 font-semibold text-sm lg:text-base">{t('login.private')}</span>
+                    <p className="text-white/60 text-xs lg:text-sm">{t('login.noKyc')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
                   <div className="w-2 h-2 bg-purple-400 rounded-full flex-shrink-0"></div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-purple-300 font-semibold text-sm lg:text-base">decentralised</span>
-                    <p className="text-white/60 text-xs lg:text-sm">Any numbers to use</p>
+                    <span className="text-purple-300 font-semibold text-sm lg:text-base">{t('login.decentralised')}</span>
+                    <p className="text-white/60 text-xs lg:text-sm">{t('login.anyNumbers')}</p>
                   </div>
                 </div>
               </div>
 
               <div className="pt-6 lg:pt-8 border-t border-white/10">
                 <div className="space-y-2 flex flex-col items-center lg:items-start">
-                  <p className="text-white/50 text-xs lg:text-sm">Company Registration Number:</p>
+                  <p className="text-white/50 text-xs lg:text-sm">{t('login.companyRegistration')}</p>
                   <p className="text-white font-mono text-sm lg:text-lg">CA</p>
                   <div className="flex items-center gap-2 mt-3 lg:mt-4">
                     <div className="flex items-end gap-0.5">
@@ -215,11 +219,11 @@ function Login() {
                     </div>
                     <div className="flex flex-col relative group">
                       <span className={`text-xs font-medium ${isServerHealthy() ? 'text-green-300' : 'text-red-300'}`}>
-                        {isServerHealthy() ? 'Services Online' : 'Some Services Offline'}
+                        {isServerHealthy() ? t('login.servicesOnline') : t('login.someServicesOffline')}
                       </span>
                       {!isServerHealthy() && (
                         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                          Offline: {getUnhealthyServices().join(', ')}
+                          {t('login.offline')}: {getUnhealthyServices().join(', ')}
                         </div>
                       )}
                     </div>
@@ -234,7 +238,7 @@ function Login() {
             <div className="space-y-6 lg:space-y-8 w-full">
               <div className="text-center w-full">
                 <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-6 lg:mb-8">
-                  {isLogin ? 'Sign In' : 'Create Account'}
+                  {isLogin ? t('login.signIn') : t('login.createAccount')}
                 </h3>
               </div>
 
@@ -247,7 +251,7 @@ function Login() {
                     : 'text-white/60 hover:text-white'
                     }`}
                 >
-                  Login
+                  {t('login.login')}
                 </button>
                 <button
                   onClick={() => setIsLogin(false)}
@@ -256,7 +260,7 @@ function Login() {
                     : 'text-white/60 hover:text-white'
                     }`}
                 >
-                  Sign Up
+                  {t('login.signUp')}
                 </button>
               </div>
 
@@ -264,7 +268,7 @@ function Login() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="username" className="block text-white/70 text-sm font-medium mb-2">
-                    Username
+                    {t('login.username')}
                   </label>
                   <input
                     type="text"
@@ -273,14 +277,14 @@ function Login() {
                     value={formData.username}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
-                    placeholder="Enter your username"
+                    placeholder={t('login.enterUsername')}
                     required
                   />
                 </div>
 
                 <div>
                   <label htmlFor="password" className="block text-white/70 text-sm font-medium mb-2">
-                    Password
+                    {t('login.password')}
                   </label>
                   <input
                     type="password"
@@ -289,7 +293,7 @@ function Login() {
                     value={formData.password}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
-                    placeholder="Enter your password"
+                    placeholder={t('login.enterPassword')}
                     required
                   />
                 </div>
@@ -297,7 +301,7 @@ function Login() {
                 {!isLogin && (
                   <div>
                     <label htmlFor="confirmPassword" className="block text-white/70 text-sm font-medium mb-2">
-                      Confirm Password
+                      {t('login.confirmPassword')}
                     </label>
                     <input
                       type="password"
@@ -306,7 +310,7 @@ function Login() {
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
-                      placeholder="Confirm your password"
+                      placeholder={t('login.confirmYourPassword')}
                       required
                     />
                   </div>
@@ -320,7 +324,7 @@ function Login() {
                     : 'bg-white hover:bg-gray-100 text-gray-900'
                     }`}
                 >
-                  {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+                  {loading ? t('login.pleaseWait') : (isLogin ? t('login.signIn') : t('login.createAccount'))}
                 </button>
               </form>
 
@@ -328,10 +332,10 @@ function Login() {
               {isLogin && (
                 <div className="text-center">
                   <button
-                    onClick={() => addToast('Please contact Support', 'info')}
+                    onClick={() => addToast(t('login.contactSupport'), 'info')}
                     className="text-sm mt-2 text-white/70 hover:text-white"
                   >
-                    Forgot Password?
+                    {t('login.forgotPassword')}
                   </button>
                 </div>
               )}

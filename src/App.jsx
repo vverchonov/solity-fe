@@ -12,39 +12,42 @@ import { BalanceProvider } from './contexts/BalanceProvider'
 import { InvoicesProvider } from './contexts/InvoicesProvider'
 import { LogsProvider } from './contexts/LogsProvider'
 import { TeleProvider } from './contexts/TeleProvider'
+import { I18nProvider } from './contexts/I18nProvider'
 
 function App() {
   return (
-    <HealthProvider>
-      <ToastProvider>
-        <LogsProvider>
-          <WalletProvider>
-            <UserProvider>
-              <TeleProvider>
-                <InvoicesProvider>
-                  <BalanceProvider>
-                    <CallProvider>
-                      <Router>
-                      <Routes>
-                        <Route path="/" element={<Login />} />
-                        <Route path="/dashboard" element={
-                          <ProtectedRoute>
-                            <RatesProvider>
-                              <Dashboard />
-                            </RatesProvider>
-                          </ProtectedRoute>
-                        } />
-                        </Routes>
-                      </Router>
-                    </CallProvider>
-                  </BalanceProvider>
-                </InvoicesProvider>
-              </TeleProvider>
-            </UserProvider>
-          </WalletProvider>
-        </LogsProvider>
-      </ToastProvider>
-    </HealthProvider>
+    <I18nProvider>
+      <HealthProvider>
+        <ToastProvider>
+          <LogsProvider>
+            <WalletProvider>
+              <UserProvider>
+                <TeleProvider>
+                  <InvoicesProvider>
+                    <BalanceProvider>
+                      <CallProvider>
+                        <Router>
+                        <Routes>
+                          <Route path="/" element={<Login />} />
+                          <Route path="/dashboard" element={
+                            <ProtectedRoute>
+                              <RatesProvider>
+                                <Dashboard />
+                              </RatesProvider>
+                            </ProtectedRoute>
+                          } />
+                          </Routes>
+                        </Router>
+                      </CallProvider>
+                    </BalanceProvider>
+                  </InvoicesProvider>
+                </TeleProvider>
+              </UserProvider>
+            </WalletProvider>
+          </LogsProvider>
+        </ToastProvider>
+      </HealthProvider>
+    </I18nProvider>
   )
 }
 
