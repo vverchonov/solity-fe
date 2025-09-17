@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authAPI } from '../services/auth'
 import { useToastContext } from '../contexts/ToastContext'
 import { useUser } from '../contexts/UserContext'
 import { useHealth } from '../contexts/HealthProvider'
 import { useI18n } from '../contexts/I18nProvider'
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
+import ReCAPTCHA from 'react-google-recaptcha'
 import LanguageToggle from './LanguageToggle'
 
 function Login() {
@@ -21,7 +21,8 @@ function Login() {
   const { updateUser, user, isLoading, shouldRedirectToDashboard, clearRedirectFlag } = useUser()
   const { health, isServerHealthy, getUnhealthyServices } = useHealth()
   const { t } = useI18n()
-  const { executeRecaptcha } = useGoogleReCaptcha()
+  const recaptchaRef = useRef(null)
+  const [recaptchaToken, setRecaptchaToken] = useState(null)
 
   // Redirect if already authenticated or after successful refresh
   useEffect(() => {
@@ -44,6 +45,22 @@ function Login() {
       </div>
     )
   }
+
+  const handleRecaptchaChange = (token) => {
+    setRecaptchaToken(token)
+  }
+
+  const handleRecaptchaExpired = () => {
+    setRecaptchaToken(null)
+  }
+
+  // Reset reCAPTCHA when switching between login/register
+  useEffect(() => {
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset()
+      setRecaptchaToken(null)
+    }
+  }, [isLogin])
 
   const handleInputChange = (e) => {
     setFormData({
@@ -115,20 +132,16 @@ function Login() {
       return
     }
 
+    // Check reCAPTCHA
+    if (!recaptchaToken) {
+      addToast(t('login.recaptchaRequired'), 'error')
+      return
+    }
+
     setLoading(true)
     console.log('Starting authentication request...')
 
     try {
-      // Execute reCAPTCHA
-      if (!executeRecaptcha) {
-        addToast(t('login.recaptchaUnavailable'), 'error')
-        setLoading(false)
-        return
-      }
-
-      const recaptchaToken = await executeRecaptcha(isLogin ? 'login' : 'register')
-      console.log('reCAPTCHA token generated:', recaptchaToken ? 'Success' : 'Failed')
-
       let result
       if (isLogin) {
         console.log('Making login request...')
@@ -328,10 +341,21 @@ function Login() {
                   </div>
                 )}
 
+                {/* reCAPTCHA */}
+                <div className="flex justify-center">
+                  <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                    onChange={handleRecaptchaChange}
+                    onExpired={handleRecaptchaExpired}
+                    theme="dark"
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  disabled={loading}
-                  className={`w-full py-3 px-6 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl ${loading
+                  disabled={loading || !recaptchaToken}
+                  className={`w-full py-3 px-6 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl ${loading || !recaptchaToken
                     ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                     : 'bg-white hover:bg-gray-100 text-gray-900'
                     }`}

@@ -13,46 +13,41 @@ import { InvoicesProvider } from './contexts/InvoicesProvider'
 import { LogsProvider } from './contexts/LogsProvider'
 import { TeleProvider } from './contexts/TeleProvider'
 import { I18nProvider } from './contexts/I18nProvider'
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 
 function App() {
-  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
-
   return (
-    <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
-      <I18nProvider>
-        <HealthProvider>
-          <ToastProvider>
-            <LogsProvider>
-              <WalletProvider>
-                <UserProvider>
-                  <TeleProvider>
-                    <InvoicesProvider>
-                      <BalanceProvider>
-                        <CallProvider>
-                          <Router>
-                          <Routes>
-                            <Route path="/" element={<Login />} />
-                            <Route path="/dashboard" element={
-                              <ProtectedRoute>
-                                <RatesProvider>
-                                  <Dashboard />
-                                </RatesProvider>
-                              </ProtectedRoute>
-                            } />
-                            </Routes>
-                          </Router>
-                        </CallProvider>
-                      </BalanceProvider>
-                    </InvoicesProvider>
-                  </TeleProvider>
-                </UserProvider>
-              </WalletProvider>
-            </LogsProvider>
-          </ToastProvider>
-        </HealthProvider>
-      </I18nProvider>
-    </GoogleReCaptchaProvider>
+    <I18nProvider>
+      <HealthProvider>
+        <ToastProvider>
+          <LogsProvider>
+            <WalletProvider>
+              <UserProvider>
+                <TeleProvider>
+                  <InvoicesProvider>
+                    <BalanceProvider>
+                      <CallProvider>
+                        <Router>
+                        <Routes>
+                          <Route path="/" element={<Login />} />
+                          <Route path="/dashboard" element={
+                            <ProtectedRoute>
+                              <RatesProvider>
+                                <Dashboard />
+                              </RatesProvider>
+                            </ProtectedRoute>
+                          } />
+                          </Routes>
+                        </Router>
+                      </CallProvider>
+                    </BalanceProvider>
+                  </InvoicesProvider>
+                </TeleProvider>
+              </UserProvider>
+            </WalletProvider>
+          </LogsProvider>
+        </ToastProvider>
+      </HealthProvider>
+    </I18nProvider>
   )
 }
 

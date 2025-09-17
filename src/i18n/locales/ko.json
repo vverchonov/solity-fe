@@ -288,6 +288,7 @@
     "accountCreated": "계정이 성공적으로 생성되었습니다!",
     "authenticationFailed": "인증 실패",
     "recaptchaUnavailable": "reCAPTCHA를 사용할 수 없습니다. 다시 시도해 주세요.",
-    "recaptchaFailed": "reCAPTCHA 인증에 실패했습니다. 다시 시도해 주세요."
+    "recaptchaFailed": "reCAPTCHA 인증에 실패했습니다. 다시 시도해 주세요.",
+    "recaptchaRequired": "reCAPTCHA 인증을 완료해 주세요."
   }
 }
