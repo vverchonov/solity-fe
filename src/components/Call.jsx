@@ -395,7 +395,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                   {isCheckingRate ? (
                     '...'
                   ) : rateInfo && rateInfo.rates && rateInfo.rates.length > 0 && rateInfo.rates[0].displaycost !== undefined ? (
-                    `${rateInfo.rates[0].displaycost} ${rateInfo.rates[0].displaycurrency || 'SOL'}/min | ${rateInfo.rates[0].direction}`
+                    `${rateInfo.rates[0].displaycost} ${rateInfo.rates[0].displaycurrency || 'SOL'}/min | ${rateInfo.rates[0].direction} | ${rateInfo.rates[0].active ? 'Active' : 'Inactive'}`
                   ) : rateError ? (
                     '~'
                   ) : (
