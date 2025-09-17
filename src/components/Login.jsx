@@ -18,6 +18,8 @@ function Login() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordRequirements, setPasswordRequirements] = useState([])
+  const [confirmPasswordError, setConfirmPasswordError] = useState('')
   const navigate = useNavigate()
   const { addToast } = useToastContext()
   const { updateUser, user, isLoading, shouldRedirectToDashboard, clearRedirectFlag } = useUser()
@@ -43,6 +45,9 @@ function Login() {
       recaptchaRef.current.reset()
       setRecaptchaToken(null)
     }
+    // Clear validation errors when switching modes
+    setPasswordRequirements([])
+    setConfirmPasswordError('')
   }, [isLogin])
 
   // Show loading screen while checking authentication
@@ -74,10 +79,30 @@ function Login() {
   }
 
   const handleInputChange = (e) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     })
+
+    // Real-time validation for password fields during registration
+    if (!isLogin) {
+      if (name === 'password') {
+        const requirements = getPasswordRequirements(value)
+        setPasswordRequirements(requirements)
+      }
+
+      if (name === 'confirmPassword' || (name === 'password' && formData.confirmPassword)) {
+        const passwordToCheck = name === 'password' ? value : formData.password
+        const confirmToCheck = name === 'confirmPassword' ? value : formData.confirmPassword
+
+        if (confirmToCheck && passwordToCheck !== confirmToCheck) {
+          setConfirmPasswordError(t('login.passwordsDoNotMatch'))
+        } else {
+          setConfirmPasswordError('')
+        }
+      }
+    }
   }
 
   const validatePassword = (password, isSignup = false) => {
@@ -101,6 +126,36 @@ function Login() {
     }
 
     return null
+  }
+
+  const getPasswordRequirements = (password) => {
+    return [
+      {
+        text: t('login.passwordTooShort'),
+        met: password.length >= 12,
+        key: 'length'
+      },
+      {
+        text: t('login.passwordNeedsUppercase'),
+        met: /[A-Z]/.test(password),
+        key: 'uppercase'
+      },
+      {
+        text: t('login.passwordNeedsLowercase'),
+        met: /[a-z]/.test(password),
+        key: 'lowercase'
+      },
+      {
+        text: t('login.passwordNeedsDigit'),
+        met: /[0-9]/.test(password),
+        key: 'digit'
+      },
+      {
+        text: t('login.passwordNeedsSpecial'),
+        met: /[^A-Za-z0-9]/.test(password),
+        key: 'special'
+      }
+    ]
   }
 
   const validateUsername = (username) => {
@@ -329,7 +384,7 @@ function Login() {
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
+                      className={`w-full px-4 py-3 pr-12 bg-white/5 border ${passwordRequirements.some(req => !req.met) && !isLogin ? 'border-red-400/50' : 'border-white/10'} rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all`}
                       placeholder={t('login.enterPassword')}
                       required
                     />
@@ -350,6 +405,26 @@ function Login() {
                       )}
                     </button>
                   </div>
+                  {!isLogin && (
+                    <div className="mt-2 space-y-1">
+                      {getPasswordRequirements(formData.password).map((requirement) => (
+                        <div key={requirement.key} className={`text-xs flex items-center gap-1 transition-colors ${
+                          requirement.met ? 'text-green-400' : 'text-red-400'
+                        }`}>
+                          {requirement.met ? (
+                            <svg className="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          )}
+                          {requirement.text.replace('Password must ', '').replace('must ', '')}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {!isLogin && (
@@ -364,7 +439,7 @@ function Login() {
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all"
+                        className={`w-full px-4 py-3 pr-12 bg-white/5 border ${confirmPasswordError ? 'border-red-400/50' : 'border-white/10'} rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all`}
                         placeholder={t('login.confirmYourPassword')}
                         required
                       />
@@ -385,6 +460,16 @@ function Login() {
                         )}
                       </button>
                     </div>
+                    {confirmPasswordError && (
+                      <div className="mt-2">
+                        <div className="text-red-400 text-xs flex items-center gap-1">
+                          <svg className="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          {confirmPasswordError}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -401,8 +486,8 @@ function Login() {
 
                 <button
                   type="submit"
-                  disabled={loading || !recaptchaToken}
-                  className={`w-full py-3 px-6 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl ${loading || !recaptchaToken
+                  disabled={loading || !recaptchaToken || (!isLogin && (passwordRequirements.some(req => !req.met) || confirmPasswordError))}
+                  className={`w-full py-3 px-6 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl ${loading || !recaptchaToken || (!isLogin && (passwordRequirements.some(req => !req.met) || confirmPasswordError))
                     ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                     : 'bg-white hover:bg-gray-100 text-gray-900'
                     }`}
