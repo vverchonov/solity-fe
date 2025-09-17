@@ -286,6 +286,8 @@
     "passwordsDoNotMatch": "密码不匹配",
     "loginSuccessful": "登录成功！",
     "accountCreated": "账户创建成功！",
-    "authenticationFailed": "认证失败"
+    "authenticationFailed": "认证失败",
+    "recaptchaUnavailable": "reCAPTCHA不可用。请重试。",
+    "recaptchaFailed": "reCAPTCHA验证失败。请重试。"
   }
 }

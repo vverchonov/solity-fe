@@ -286,6 +286,8 @@
     "passwordsDoNotMatch": "Passwords do not match",
     "loginSuccessful": "Login successful!",
     "accountCreated": "Account created successfully!",
-    "authenticationFailed": "Authentication failed"
+    "authenticationFailed": "Authentication failed",
+    "recaptchaUnavailable": "reCAPTCHA not available. Please try again.",
+    "recaptchaFailed": "reCAPTCHA verification failed. Please try again."
   }
 }

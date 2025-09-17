@@ -5,6 +5,7 @@ import { useToastContext } from '../contexts/ToastContext'
 import { useUser } from '../contexts/UserContext'
 import { useHealth } from '../contexts/HealthProvider'
 import { useI18n } from '../contexts/I18nProvider'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import LanguageToggle from './LanguageToggle'
 
 function Login() {
@@ -20,6 +21,7 @@ function Login() {
   const { updateUser, user, isLoading, shouldRedirectToDashboard, clearRedirectFlag } = useUser()
   const { health, isServerHealthy, getUnhealthyServices } = useHealth()
   const { t } = useI18n()
+  const { executeRecaptcha } = useGoogleReCaptcha()
 
   // Redirect if already authenticated or after successful refresh
   useEffect(() => {
@@ -117,13 +119,23 @@ function Login() {
     console.log('Starting authentication request...')
 
     try {
+      // Execute reCAPTCHA
+      if (!executeRecaptcha) {
+        addToast(t('login.recaptchaUnavailable'), 'error')
+        setLoading(false)
+        return
+      }
+
+      const recaptchaToken = await executeRecaptcha(isLogin ? 'login' : 'register')
+      console.log('reCAPTCHA token generated:', recaptchaToken ? 'Success' : 'Failed')
+
       let result
       if (isLogin) {
         console.log('Making login request...')
-        result = await authAPI.login(formData.username, formData.password)
+        result = await authAPI.login(formData.username, formData.password, recaptchaToken)
       } else {
         console.log('Making register request...')
-        result = await authAPI.register(formData.username, formData.password)
+        result = await authAPI.register(formData.username, formData.password, recaptchaToken)
       }
 
       console.log('Authentication result:', result)

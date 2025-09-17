@@ -47,11 +47,12 @@ export const tokenUtils = {
 // Authentication API functions
 export const authAPI = {
   // Login with username and password
-  login: async (username, password) => {
+  login: async (username, password, recaptchaToken) => {
     try {
       const response = await apiClient.post('/auth/login', {
         username,
-        password
+        password,
+        recaptchaToken
       })
 
       const { accessToken, id, status, userRole, username: responseUsername, accessTokenExpiry } = response.data
@@ -88,11 +89,12 @@ export const authAPI = {
   },
 
   // Create new account
-  register: async (username, password) => {
+  register: async (username, password, recaptchaToken) => {
     try {
       const response = await apiClient.post('/auth/signup', {
         username,
-        password
+        password,
+        recaptchaToken
       })
 
       const { accessToken, id, status, userRole, username: responseUsername, accessTokenExpiry } = response.data
