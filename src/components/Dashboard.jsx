@@ -435,11 +435,6 @@ function Dashboard() {
                     </div>
                   )}
                 </div>
-                {!isServerHealthy() && (
-                  <div className="px-3 mb-3 text-xs text-red-400">
-                    Issues: {getUnhealthyServices().join(', ')}
-                  </div>
-                )}
 
 
                 {/* Username Section */}
