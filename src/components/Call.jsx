@@ -153,7 +153,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
       case 'connecting':
         return { text: 'Connecting...', className: 'bg-blue-500/20 border border-blue-400/30 text-blue-100 px-3 py-1 rounded-full text-sm' }
       default:
-        return { text: callState.isRegistered ? 'Ready' : 'Connecting...', className: 'chip' }
+        return { text: 'Idle', className: 'chip' }
     }
   }
 

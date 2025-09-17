@@ -414,7 +414,7 @@ function BalanceModule({ onNavigateToSupport }) {
   // Helper functions for journal display
   const formatJournalAmount = (lamports) => {
     const amount = Math.abs(lamports / 1e9)
-    return amount.toFixed(4) + ' SOL'
+    return amount.toFixed(6) + ' SOL'
   }
 
   const getJournalTypeColor = (kind) => {
@@ -753,46 +753,50 @@ function BalanceModule({ onNavigateToSupport }) {
               </div>
             ) : (
               <>
-                {/* Invoices Table Header */}
-                <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs w-full" style={{ gridTemplateColumns: 'minmax(120px, 25%) minmax(120px, 20%) minmax(80px, 15%) minmax(120px, 20%) minmax(120px, 20%)' }}>
-                  <div className="text-white/60 font-medium">Invoice ID</div>
-                  <div className="text-white/60 font-medium">Amount</div>
-                  <div className="text-white/60 font-medium">Status</div>
-                  <div className="text-white/60 font-medium">Paid At</div>
-                  <div className="text-white/60 font-medium">Expires</div>
-                </div>
-
-                {/* Invoices Table Rows */}
-                <div className="space-y-2 h-48 overflow-y-auto">
-                  {displayInvoices.length === 0 ? (
-                    <div className="text-center py-8 text-white/60">
-                      No invoices found.
+                {/* Invoices Table with Shared Horizontal Scroll */}
+                <div className="overflow-x-auto">
+                  <div className="min-w-[700px] w-full">
+                    {/* Invoices Table Header */}
+                    <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs" style={{ gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(120px, 1fr) minmax(60px, 0.6fr) minmax(120px, 1fr) minmax(120px, 1fr)' }}>
+                      <div className="text-white/60 font-medium">Invoice ID</div>
+                      <div className="text-white/60 font-medium">Amount</div>
+                      <div className="text-white/60 font-medium">Status</div>
+                      <div className="text-white/60 font-medium">Paid At</div>
+                      <div className="text-white/60 font-medium">Expires</div>
                     </div>
-                  ) : (
-                    displayInvoices.map((invoice) => (
-                      <div key={invoice.id} className="grid gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs w-full" style={{ gridTemplateColumns: 'minmax(120px, 25%) minmax(120px, 20%) minmax(80px, 15%) minmax(120px, 20%) minmax(120px, 20%)' }}>
-                        <div className="text-white/70 font-mono">
-                          <div className="truncate" title={invoice.id}>
-                            {invoice.id ? invoice.id.substring(0, 12) + '...' : '-'}
-                          </div>
-                        </div>
-                        <div className="text-white font-mono">
-                          {formatInvoiceAmount(invoice.lamports)}
-                        </div>
-                        <div className={`font-medium ${getStatusColor(invoice.status)}`}>
-                          {formatInvoiceStatus(invoice.status)}
-                        </div>
-                        <div className="text-white/70">
-                          {formatDate(invoice.paidAt)}
-                        </div>
-                        <div className="text-white/70">
-                          {formatDate(invoice.expiresAt)}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
 
+                    {/* Invoices Table Rows */}
+                    <div className="space-y-2 h-48 overflow-y-auto">
+                      {displayInvoices.length === 0 ? (
+                        <div className="text-center py-8 text-white/60">
+                          No invoices found.
+                        </div>
+                      ) : (
+                        displayInvoices.map((invoice) => (
+                          <div key={invoice.id} className="grid gap-3 py-2 px-2 hover:bg-white/5 rounded-lg transition-colors text-xs" style={{ gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(120px, 1fr) minmax(60px, 0.6fr) minmax(120px, 1fr) minmax(120px, 1fr)' }}>
+                            <div className="text-white/70 font-mono">
+                              <div className="truncate" title={invoice.id}>
+                                {invoice.id ? invoice.id : '-'}
+                              </div>
+                            </div>
+                            <div className="text-white font-mono">
+                              {formatInvoiceAmount(invoice.lamports)}
+                            </div>
+                            <div className={`font-medium ${getStatusColor(invoice.status)}`}>
+                              {formatInvoiceStatus(invoice.status)}
+                            </div>
+                            <div className="text-white/70">
+                              {formatDate(invoice.paidAt)}
+                            </div>
+                            <div className="text-white/70">
+                              {formatDate(invoice.expiresAt)}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
 
               </>
             )
@@ -812,38 +816,62 @@ function BalanceModule({ onNavigateToSupport }) {
               </div>
             ) : (
               <>
-                {/* Journal Table Header */}
-                <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs w-full" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-                  <div className="text-white/60 font-medium">Type</div>
-                  <div className="text-white/60 font-medium">Amount</div>
-                  <div className="text-white/60 font-medium">Reference</div>
-                </div>
-
-                {/* Journal Table Rows */}
-                <div className="space-y-2 h-48 overflow-y-auto">
-                  {displayJournal.length === 0 ? (
-                    <div className="text-center py-8 text-white/60">
-                      No journal entries found.
+                {/* Journal Table with Shared Horizontal Scroll */}
+                <div className="overflow-x-auto">
+                  <div className="min-w-[700px] w-full">
+                    {/* Journal Table Header */}
+                    <div className="grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs" style={{ gridTemplateColumns: 'minmax(50px, 1fr) minmax(50px, 1fr) minmax(50px, 1fr) minmax(200px, 1fr)' }}>
+                      <div className="text-white/60 font-medium">Status</div>
+                      <div className="text-white/60 font-medium">Amount</div>
+                      <div className="text-white/60 font-medium">Date</div>
+                      <div className="text-white/60 font-medium">Details</div>
                     </div>
-                  ) : (
-                    displayJournal.map((entry) => (
-                      <div key={entry.id} className="grid gap-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-xs w-full" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-                        <div className={`font-medium ${getJournalTypeColor(entry.kind)}`}>
-                          {formatJournalKind(entry.kind)}
-                        </div>
-                        <div className={`font-mono ${entry.lamports < 0 ? 'text-red-400' : 'text-green-400'}`}>
-                          {entry.lamports < 0 ? '-' : '+'}{formatJournalAmount(entry.lamports)}
-                        </div>
-                        <div className="text-white/70 font-mono">
-                          <div className="truncate" title={entry.reference}>
-                            {entry.reference ? entry.reference.substring(0, 20) + '...' : '-'}
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
 
+                    {/* Journal Table Rows */}
+                    <div className="space-y-2 h-48 overflow-y-auto">
+                      {displayJournal.length === 0 ? (
+                        <div className="text-center py-8 text-white/60">
+                          No journal entries found.
+                        </div>
+                      ) : (
+                        displayJournal.map((entry) => (
+                          <div key={entry.id} className="grid gap-3 py-2 px-2 hover:bg-white/5 rounded-lg transition-colors text-xs" style={{ gridTemplateColumns: 'minmax(50px, 1fr) minmax(50px, 1fr) minmax(50px, 1fr) minmax(200px, 1fr)' }}>
+                            <div className={`font-medium ${getJournalTypeColor(entry.kind)}`}>
+                              {formatJournalKind(entry.kind)}
+                            </div>
+                            <div className={`font-mono ${entry.lamports === 0 ? 'text-white/70' : entry.lamports < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                              {entry.lamports === 0 ? formatJournalAmount(entry.lamports) : (entry.lamports < 0 ? '-' : '+') + formatJournalAmount(entry.lamports)}
+                            </div>
+                            <div className="text-white/70 text-xs">
+                              {formatDate(entry.createdAt)}
+                            </div>
+                            <div className="text-white/70 font-mono">
+                              {entry.kind === 'deposit' && entry.reference ? (
+                                <a
+                                  href={`https://solscan.io/tx/${entry.reference}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-400 hover:text-blue-300 underline transition-colors truncate block"
+                                  title={`View transaction on Solscan: ${entry.reference}`}
+                                >
+                                  {entry.reference.substring(0, 20) + '...'}
+                                </a>
+                              ) : (entry.kind === 'call' || entry.kind === 'sms') ? (
+                                <div className="truncate" title={`${entry.meta?.direction || 'Unknown'} - ${entry.meta?.status || 'Unknown'}`}>
+                                  {entry.meta?.direction || 'Unknown'} - {entry.meta?.status || 'Unknown'}
+                                </div>
+                              ) : (
+                                <div className="truncate" title={entry.reference || 'No details available'}>
+                                  {entry.reference ? entry.reference.substring(0, 20) + '...' : '-'}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
 
               </>
             )
@@ -887,8 +915,8 @@ function BalanceModule({ onNavigateToSupport }) {
           ) : (
             <div className="flex flex-col min-h-0 flex-1">
               {/* Table Header */}
-              <div className="hidden md:grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs items-center flex-shrink-0" style={{ gridTemplateColumns: '60px minmax(120px, 1fr) minmax(150px, 1fr) 120px' }}>
-                <div className="text-white/60 font-medium text-center">Active</div>
+              <div className="hidden md:grid gap-3 pb-4 border-b border-white/10 mb-4 text-xs items-center flex-shrink-0" style={{ gridTemplateColumns: '60px minmax(120px, 1fr) minmax(200px, 3fr) 120px' }}>
+                <div className="text-white/60 font-medium text-left">Active</div>
                 <div className="text-white/60 font-medium">Direction</div>
                 <div className="text-white/60 font-medium">Codes</div>
                 <div className="text-white/60 font-medium text-right">Cost</div>
@@ -904,21 +932,21 @@ function BalanceModule({ onNavigateToSupport }) {
                   displayRates.map((rate) => (
                     <div key={rate.uniqueKey} className="hover:bg-white/5 rounded-lg transition-colors">
                       {/* Desktop Layout */}
-                      <div className="hidden md:grid gap-3 py-2 text-xs items-start" style={{ gridTemplateColumns: '60px minmax(120px, 1fr) minmax(150px, 1fr) 120px' }}>
-                        <div className="flex items-center justify-center pt-1">
+                      <div className="hidden md:grid gap-3 py-2 px-2 text-xs items-start justify-center" style={{ gridTemplateColumns: '60px minmax(120px, 1fr) minmax(200px, 3fr) 120px' }}>
+                        <div className="flex items-center justify-start self-center">
                           <div className={`w-2 h-2 rounded-full ${rate.active ? 'bg-green-400' : 'bg-red-400'}`}></div>
                         </div>
-                        <div className="text-white flex items-start">
+                        <div className="text-white flex items-start self-center">
                           <div className="break-words min-w-0" title={rate.direction}>
                             {rate.direction || '-'}
                           </div>
                         </div>
-                        <div className="text-white/70 font-mono flex items-start min-w-0">
-                          <div className="break-all text-xs leading-relaxed">
+                        <div className="text-white/70 font-mono flex items-start self-center min-w-0">
+                          <div className="break-words text-xs leading-relaxed">
                             {rate.formattedCodes}
                           </div>
                         </div>
-                        <div className="text-white font-mono text-right flex items-start justify-end pt-1">
+                        <div className="text-white font-mono text-right flex items-start justify-end self-center">
                           <span>{rate.displaycost || '0'} {rate.displaycurrency || ''}</span>
                         </div>
                       </div>
@@ -926,21 +954,21 @@ function BalanceModule({ onNavigateToSupport }) {
                       {/* Mobile Layout */}
                       <div className="md:hidden p-3 space-y-2 text-xs">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 justify-center">
                             <div className={`w-2 h-2 rounded-full ${rate.active ? 'bg-green-400' : 'bg-red-400'}`}></div>
                             <span className="text-white/60 text-xs">
                               {rate.active ? 'Active' : 'Inactive'}
                             </span>
                           </div>
-                          <div className="text-white font-mono">
+                          <div className="text-white font-mono self-center">
                             {rate.displaycost || '0'} {rate.displaycurrency || ''}
                           </div>
                         </div>
-                        <div className="text-white">
+                        <div className="text-white self-center">
                           <span className="text-white/60">Direction: </span>
                           {rate.direction || '-'}
                         </div>
-                        <div className="text-white/70">
+                        <div className="text-white/70 self-center">
                           <span className="text-white/60">Codes: </span>
                           <span className="font-mono break-words">
                             {rate.formattedCodes}
