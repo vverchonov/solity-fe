@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 
 export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, soundDisabled, callStatus, onEndCall, onMute, onSoundToggle, onDTMF, onMinimize }) {
   const [showNumpad, setShowNumpad] = useState(false)
+
   const [position, setPosition] = useState({ x: window.innerWidth / 2 - 160, y: window.innerHeight / 2 - 300 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
@@ -62,7 +63,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
   }
 
   return (
-    <div 
+    <div
       ref={modalRef}
       className="fixed z-50 w-80 h-[600px] bg-gray-900/40 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden cursor-move"
       style={{ left: position.x, top: position.y }}
@@ -84,14 +85,14 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
           </svg>
         </button>
-        
+
         <div className="mt-8">
           <div className="text-sm text-white/60 mb-2">
             {callStatus === 'ringing' ? 'Ringing...' :
-             callStatus === 'calling' ? 'Calling...' :
-             callStatus === 'in-call' ? 'In Call' :
-             callStatus === 'connecting' ? 'Connecting...' :
-             'In Call'}
+              callStatus === 'calling' ? 'Calling...' :
+                callStatus === 'in-call' ? 'In Call' :
+                  callStatus === 'connecting' ? 'Connecting...' :
+                    'In Call'}
           </div>
           <div className="text-2xl font-medium text-white mb-2">{phoneNumber}</div>
           <div className="text-lg text-white/70">
@@ -158,11 +159,10 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
         <div className="flex justify-center items-center gap-8 mb-6">
           {/* Mute Button */}
           <button
-            className={`h-14 w-14 rounded-full border transition-all ${
-              isMuted 
-                ? 'bg-red-500 hover:bg-red-600 border-red-400 text-white' 
-                : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
-            }`}
+            className={`h-14 w-14 rounded-full border transition-all ${isMuted
+              ? 'bg-red-500 hover:bg-red-600 border-red-400 text-white'
+              : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
+              }`}
             onClick={onMute}
           >
             {isMuted ? (
@@ -179,11 +179,10 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
           {/* Speaker Button */}
           <button
-            className={`h-14 w-14 rounded-full border transition-all ${
-              soundDisabled 
-                ? 'bg-blue-500 hover:bg-blue-600 border-blue-400 text-white' 
-                : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
-            }`}
+            className={`h-14 w-14 rounded-full border transition-all ${soundDisabled
+              ? 'bg-blue-500 hover:bg-blue-600 border-blue-400 text-white'
+              : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
+              }`}
             onClick={onSoundToggle}
           >
             {soundDisabled ? (
@@ -200,11 +199,10 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
           {/* Numpad */}
           <button
-            className={`h-14 w-14 rounded-full border transition-all ${
-              showNumpad 
-                ? 'bg-blue-500 hover:bg-blue-600 border-blue-400 text-white' 
-                : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
-            }`}
+            className={`h-14 w-14 rounded-full border transition-all ${showNumpad
+              ? 'bg-blue-500 hover:bg-blue-600 border-blue-400 text-white'
+              : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
+              }`}
             onClick={toggleNumpad}
           >
             <svg className="h-6 w-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
