@@ -780,7 +780,7 @@ function BalanceModule({ onNavigateToSupport }) {
                               {formatJournalKind(entry.kind)}
                             </div>
                             <div className={`font-mono ${entry.lamports === 0 ? 'text-white/70' : entry.lamports < 0 ? 'text-red-400' : 'text-green-400'}`}>
-                              {entry.lamports === 0 ? formatJournalAmount(entry.lamports) : (entry.lamports < 0 ? '-' : '+') + formatJournalAmount(entry.lamports)}
+                              {entry.lamports === 0 ? ' ' + formatJournalAmount(entry.lamports) : (entry.lamports < 0 ? '-' : '+') + formatJournalAmount(entry.lamports)}
                             </div>
                             <div className="text-white/70 text-xs">
                               {formatDate(entry.createdAt)}
