@@ -22,7 +22,7 @@ export const InvoicesProvider = ({ children }) => {
   const [currentOffset, setCurrentOffset] = useState(0)
 
   // Fetch invoices from API
-  const fetchInvoices = useCallback(async (offset = 0, limit = 20, reset = false) => {
+  const fetchInvoices = useCallback(async (offset = 0, limit = 100, reset = false) => {
     if (!user) {
       return
     }
@@ -31,7 +31,7 @@ export const InvoicesProvider = ({ children }) => {
     setError(null)
 
     try {
-      const result = await paymentsAPI.getInvoices(offset, limit)
+      const result = await paymentsAPI.getInvoices(offset, 100)
 
       if (result.success) {
 
