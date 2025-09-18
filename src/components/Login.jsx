@@ -26,7 +26,7 @@ function Login() {
   const { health, isServerHealthy, getUnhealthyServices } = useHealth()
   const { t } = useI18n()
   const recaptchaRef = useRef(null)
-  const [recaptchaToken, setRecaptchaToken] = useState(true)
+  const [recaptchaToken, setRecaptchaToken] = useState(false)
 
   // Redirect if already authenticated or after successful refresh
   useEffect(() => {
