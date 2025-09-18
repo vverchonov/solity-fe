@@ -81,7 +81,7 @@ export const LogsProvider = ({ children }) => {
       createdAt: new Date()
     }
 
-    setLogs(prevLogs => [logEntry, ...prevLogs].slice(0, MAX_LOGS)) // Keep last 300 logs
+    setLogs(prevLogs => [...prevLogs, logEntry].slice(0, MAX_LOGS)) // Keep last 300 logs
 
     // Also log to browser console with appropriate method
     const consoleMessage = `${logEntry.timestamp} ${message}`
