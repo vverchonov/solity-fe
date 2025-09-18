@@ -49,7 +49,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
   // Derived state from CallProvider
   const isInCall = callState.callStatus === 'in-call'
-  const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing' || callStatus === 'preparing'
+  const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing' || callStatus === 'preparing' || callStatus === 'creating-call' || callStatus === 'pending'
   const isMuted = callState.isMuted
 
   // Sync with CallProvider state changes
@@ -240,7 +240,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
   const handleStartCall = async () => {
     if (phoneNumber.trim()) {
-      setCallStatus('preparing')
+      setCallStatus('creating-call') // Show "creating call" status during API requests
       setCallStartTime(Date.now())
 
       try {
@@ -272,11 +272,14 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
         const freshCredentials = credentialsResponse.data
 
-
+        // All API requests successful, now show pending status
+        setCallStatus('pending') // Change to pending when API requests are done
 
         // Step 3: Make call with fresh credentials
-        setCallStatus('ringing') // Now actually start ringing
         await makeCall(phoneNumber, freshCredentials.callerID || callerID, freshCredentials)
+
+        // After makeCall is initiated, set to ringing
+        setCallStatus('ringing')
       } catch (error) {
         setCallStatus('ready')
       }
@@ -346,7 +349,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
             <div className="mb-6">
               <label className="text-white/70 text-sm block mb-3">{t('call.callerID')}</label>
               <div className="flex flex-col sm:flex-row gap-3">
-                <div className={`flex-1 relative bg-white/5 border ${callerIDError ? 'border-red-400' : 'border-white/10'} rounded-xl overflow-hidden ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50' : ''}`}>
+                <div className={`flex-1 relative bg-white/5 border ${callerIDError ? 'border-red-400' : 'border-white/10'} rounded-xl overflow-hidden ${isCallActive || callStatus === 'ended' ? 'opacity-50' : ''}`}>
                   <div className="absolute left-0 top-0 h-full flex items-center justify-center w-8 text-white/60 pointer-events-none">
                     +
                   </div>
@@ -359,14 +362,14 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                       setEditableCallerID(sanitized)
                     }}
                     placeholder={t('call.callerIDPlaceholder')}
-                    disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
-                    className={`w-full bg-transparent border-none pl-8 pr-4 py-3 text-white placeholder-white/40 focus:outline-none min-h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'cursor-not-allowed' : ''}`}
+                    disabled={isCallActive || callStatus === 'ended'}
+                    className={`w-full bg-transparent border-none pl-8 pr-4 py-3 text-white placeholder-white/40 focus:outline-none min-h-[50px] ${isCallActive || callStatus === 'ended' ? 'cursor-not-allowed' : ''}`}
                   />
                 </div>
                 <button
                   onClick={randomizeCallerID}
-                  disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
-                  className={`bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-xl text-sm transition-all whitespace-nowrap sm:w-32 h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isCallActive || callStatus === 'ended'}
+                  className={`bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-xl text-sm transition-all whitespace-nowrap sm:w-32 h-[50px] ${isCallActive || callStatus === 'ended' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {t('call.randomize')}
                 </button>
@@ -387,7 +390,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
             <div className="mb-6">
               <label className="text-white/70 text-sm block mb-3">{t('call.phoneNumber')}</label>
               <div className="flex flex-col sm:flex-row gap-3">
-                <div className={`flex-1 relative bg-white/5 border ${phoneNumberError ? 'border-red-400' : 'border-white/10'} rounded-xl overflow-hidden ${isInCall || callState.callStatus === 'calling' || callStatus === 'preparing' ? 'opacity-50' : ''}`}>
+                <div className={`flex-1 relative bg-white/5 border ${phoneNumberError ? 'border-red-400' : 'border-white/10'} rounded-xl overflow-hidden ${isCallActive ? 'opacity-50' : ''}`}>
                   <div className="absolute left-0 top-0 h-full flex items-center justify-center w-8 text-white/60 pointer-events-none">
                     +
                   </div>
@@ -401,21 +404,21 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                       validatePhoneNumber(sanitized, setPhoneNumberError)
                     }}
                     placeholder={t('call.phoneNumberPlaceholder')}
-                    disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'}
-                    className={`w-full bg-transparent border-none pl-8 pr-4 py-3 text-white placeholder-white/40 focus:outline-none ${isInCall || callState.callStatus === 'calling' || callStatus === 'preparing' ? 'cursor-not-allowed' : ''}`}
+                    disabled={isCallActive}
+                    className={`w-full bg-transparent border-none pl-8 pr-4 py-3 text-white placeholder-white/40 focus:outline-none ${isCallActive ? 'cursor-not-allowed' : ''}`}
                   />
                 </div>
                 <button
-                  onClick={(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') ? handleEndCall : handleStartCall}
-                  disabled={callStatus === 'ended' || (!(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') && (!phoneNumber.trim() || phoneNumberError || callerIDError))}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] border ${(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing')
+                  onClick={isCallActive ? handleEndCall : handleStartCall}
+                  disabled={callStatus === 'ended' || (!isCallActive && (!phoneNumber.trim() || phoneNumberError || callerIDError))}
+                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] border ${isCallActive
                     ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-600/30 hover:border-red-600/50'
                     : callStatus === 'ended' || !phoneNumber.trim() || phoneNumberError || callerIDError
                       ? 'bg-gray-600/20 text-gray-500 border-gray-600/30 cursor-not-allowed'
                       : 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-600/30 hover:border-green-600/50'
                     }`}
                 >
-                  {(isInCall || callState.callStatus === 'calling' || callStatus === 'preparing') ? t('call.endCall') : t('call.startCall')}
+                  {isCallActive ? t('call.endCall') : t('call.startCall')}
                 </button>
               </div>
 
@@ -430,8 +433,8 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
               <div className="mt-3 flex items-center gap-3">
                 <button
                   onClick={handleCheckRate}
-                  disabled={isCheckingRate || !phoneNumber.trim() || isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'}
-                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${isCheckingRate || !phoneNumber.trim() || isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'
+                  disabled={isCheckingRate || !phoneNumber.trim() || isCallActive}
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${isCheckingRate || !phoneNumber.trim() || isCallActive
                     ? 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
                     : 'bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-600/30 hover:border-blue-600/50'
                     }`}

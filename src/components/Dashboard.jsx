@@ -39,7 +39,7 @@ function Dashboard() {
 
   // Derived state for call
   const isInCall = callState.callStatus === 'in-call'
-  const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing' || callStatus === 'preparing'
+  const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing' || callStatus === 'preparing' || callStatus === 'creating-call' || callStatus === 'pending'
   const isMuted = callState.isMuted
 
   // Call duration effect

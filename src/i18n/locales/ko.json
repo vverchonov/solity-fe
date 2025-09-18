@@ -61,6 +61,8 @@
   "status": {
     "idle": "대기",
     "connecting": "연결 중...",
+    "creatingCall": "통화 생성 중...",
+    "pending": "대기 중...",
     "preparing": "통화 준비 중...",
     "ringing": "발신 중...",
     "inCall": "통화 중",

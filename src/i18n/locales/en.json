@@ -61,6 +61,8 @@
   "status": {
     "idle": "Idle",
     "connecting": "Connecting...",
+    "creatingCall": "Creating call...",
+    "pending": "Pending...",
     "preparing": "Preparing call...",
     "ringing": "Ringing...",
     "inCall": "In Call",
