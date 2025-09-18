@@ -41,10 +41,10 @@ function Login() {
 
   // Reset reCAPTCHA when switching between login/register
   useEffect(() => {
-    // if (recaptchaRef.current) {
-    //   recaptchaRef.current.reset()
-    //   setRecaptchaToken(null)
-    // }
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset()
+      setRecaptchaToken(null)
+    }
     // Clear validation errors when switching modes
     setPasswordRequirements([])
     setConfirmPasswordError('')
@@ -470,7 +470,7 @@ function Login() {
                 )}
 
                 {/* reCAPTCHA */}
-                {/* <div className="flex justify-center">
+                <div className="flex justify-center">
                   <ReCAPTCHA
                     ref={recaptchaRef}
                     sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
@@ -478,11 +478,11 @@ function Login() {
                     onExpired={handleRecaptchaExpired}
                     theme="dark"
                   />
-                </div> */}
+                </div>
 
                 <button
                   type="submit"
-                  // disabled={loading || !recaptchaToken || (!isLogin && (passwordRequirements.some(req => !req.met) || confirmPasswordError))}
+                  disabled={loading || !recaptchaToken || (!isLogin && (passwordRequirements.some(req => !req.met) || confirmPasswordError))}
                   className={`w-full py-3 px-6 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl ${loading || !recaptchaToken || (!isLogin && (passwordRequirements.some(req => !req.met) || confirmPasswordError))
                     ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                     : 'bg-white hover:bg-gray-100 text-gray-900'
