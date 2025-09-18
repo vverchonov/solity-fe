@@ -175,15 +175,15 @@ export const LogsProvider = ({ children }) => {
 
   const logCallSipConnection = (status, details = null) => {
     const statusMessages = {
-      connecting: 'Connecting to SIP server...',
-      connected: 'Connected to SIP server',
-      registered: 'SIP client registered',
-      failed: 'SIP connection failed',
-      disconnected: 'Disconnected from SIP server'
+      connecting: 'Connecting to Solity server...',
+      connected: 'Connected to Solity server',
+      registered: 'Solity client registered',
+      failed: 'Solity connection failed',
+      disconnected: 'Disconnected from Solity server'
     }
 
     const logType = status === 'failed' ? 'error' : status === 'connected' || status === 'registered' ? 'success' : 'info'
-    addLog(logType, statusMessages[status] || `SIP status: ${status}`, details)
+    addLog(logType, statusMessages[status] || `Solity status: ${status}`, details)
   }
 
   const logCallStateChange = (oldState, newState, phoneNumber = null) => {

@@ -3,6 +3,7 @@ import { useI18n } from '../contexts/I18nProvider'
 
 export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, soundDisabled, callStatus, onEndCall, onMute, onSoundToggle, onDTMF, onMinimize }) {
   const [showNumpad, setShowNumpad] = useState(false)
+  const [pressedNumbers, setPressedNumbers] = useState('')
   const { t } = useI18n()
 
   const [position, setPosition] = useState({ x: window.innerWidth / 2 - 160, y: window.innerHeight / 2 - 300 })
@@ -52,11 +53,19 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
     }
   }, [isDragging, dragStart])
 
+  // Clear pressed numbers when call ends
+  useEffect(() => {
+    if (callStatus === 'idle') {
+      setPressedNumbers('')
+    }
+  }, [callStatus])
+
   const toggleNumpad = () => {
     setShowNumpad(!showNumpad)
   }
 
   const handleDTMF = (digit) => {
+    setPressedNumbers(prev => prev + digit)
     if (onDTMF) onDTMF(digit)
   }
 
@@ -67,9 +76,8 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
   return (
     <div
       ref={modalRef}
-      className={`fixed z-50 w-80 bg-gray-900/40 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden cursor-move ${
-        showNumpad ? 'h-[700px] sm:h-[650px]' : 'h-[600px] sm:h-[550px]'
-      }`}
+      className={`fixed z-50 w-80 bg-gray-900/40 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden cursor-move flex flex-col ${showNumpad ? 'h-[700px] sm:h-[650px]' : 'h-[600px] sm:h-[550px]'
+        }`}
       style={{ left: position.x, top: position.y }}
       onMouseDown={handleMouseDown}
     >
@@ -112,28 +120,26 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
       {/* Avatar/Visual or Numpad */}
       {showNumpad ? (
-        <div className="px-6 py-4 pb-32">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-sm font-medium text-white/70">{t('call.numpad')}</h3>
-            <button
-              className="h-6 w-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-all"
-              onClick={toggleNumpad}
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="grid grid-cols-3 gap-3 max-w-44 mx-auto">
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map((digit) => (
-              <button
-                key={digit}
-                className="h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white text-lg font-medium transition-all"
-                onClick={() => handleDTMF(digit)}
-              >
-                {digit}
-              </button>
-            ))}
+        <div className="px-6 py-4 pb-4 flex justify-center flex-1">
+          <div className="flex flex-col items-center">
+            {/* Display pressed numbers */}
+            <div className="h-8 mb-4 flex items-center">
+              <div className="text-white/80 text-lg font-mono tracking-wider min-w-[120px] text-center">
+                {pressedNumbers || ''}
+              </div>
+            </div>
+            {/* Numpad */}
+            <div className="grid grid-cols-3 gap-3 max-w-44">
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map((digit) => (
+                <button
+                  key={digit}
+                  className="h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white text-lg font-medium transition-all"
+                  onClick={() => handleDTMF(digit)}
+                >
+                  {digit}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       ) : (

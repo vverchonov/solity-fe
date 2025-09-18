@@ -251,7 +251,7 @@ function Dashboard() {
                 {activeModule}
               </h1>
               <p className="text-lg text-white/70">
-{activeModule} {t('navigation.module')} - {t('common.comingSoon')}
+                {activeModule} {t('navigation.module')} - {t('common.comingSoon')}
               </p>
             </div>
           </div>

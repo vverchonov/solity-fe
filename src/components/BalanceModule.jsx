@@ -334,13 +334,21 @@ function BalanceModule({ onNavigateToSupport }) {
   // Check if we should disable top-up based on any pending or processing invoice
   const shouldDisableTopUp = useMemo(() => {
     const result = invoices.some(invoice => invoice.status === 'pending' || invoice.status === 'processing')
+    const allDisableConditions = {
+      isWalletConnected,
+      isTopUpLoading,
+      hasActiveInvoiceResult: hasActiveInvoice(),
+      shouldDisableTopUp: result,
+      finalDisabled: !isWalletConnected || isTopUpLoading || hasActiveInvoice() || result
+    }
     console.log('BalanceModule shouldDisableTopUp check:', {
       invoicesCount: invoices.length,
       invoiceStatuses: invoices.map(inv => ({ id: inv.id, status: inv.status })),
-      shouldDisable: result
+      shouldDisable: result,
+      allDisableConditions
     })
     return result
-  }, [invoices])
+  }, [invoices, isWalletConnected, isTopUpLoading, hasActiveInvoice])
 
   // Poll invoices every 15 seconds when first invoice is pending or processing
   useEffect(() => {
@@ -361,8 +369,6 @@ function BalanceModule({ onNavigateToSupport }) {
 
   // Get appropriate button text based on current state
   const getTopUpButtonText = () => {
-    if (isTopUpLoading) return t('balance.preparing')
-    if (hasActiveInvoice()) return t('balance.invoiceActive')
     if (shouldDisableTopUp) {
       const pendingInvoice = invoices.find(invoice => invoice.status === 'pending')
       const processingInvoice = invoices.find(invoice => invoice.status === 'processing')
@@ -621,8 +627,8 @@ function BalanceModule({ onNavigateToSupport }) {
                     <button
                       key={amount}
                       onClick={() => handleQuickTopUp(amount)}
-                      disabled={!isWalletConnected || isTopUpLoading || hasActiveInvoice() || shouldDisableTopUp}
-                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${!isWalletConnected || isTopUpLoading || hasActiveInvoice() || shouldDisableTopUp
+                      disabled={!isWalletConnected || shouldDisableTopUp}
+                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${!isWalletConnected || shouldDisableTopUp
                         ? 'bg-gray-600 text-gray-400 border-gray-600 cursor-not-allowed'
                         : topUpAmount === amount.toString()
                           ? 'bg-white text-gray-900 border-white'
@@ -664,8 +670,8 @@ function BalanceModule({ onNavigateToSupport }) {
                       e.preventDefault();
                     }}
                     placeholder={t('balance.enterSolAmount')}
-                    disabled={!isWalletConnected || isTopUpLoading || hasActiveInvoice() || shouldDisableTopUp}
-                    className={`flex-1 border rounded-xl px-3 py-2 text-sm focus:outline-none transition-all ${isWalletConnected && !isTopUpLoading && !hasActiveInvoice() && !shouldDisableTopUp
+                    disabled={!isWalletConnected || shouldDisableTopUp}
+                    className={`flex-1 border rounded-xl px-3 py-2 text-sm focus:outline-none transition-all ${isWalletConnected && !shouldDisableTopUp
                       ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:border-blue-400'
                       : 'bg-gray-600 border-gray-600 text-gray-400 placeholder-gray-500 cursor-not-allowed'
                       }`}
@@ -674,8 +680,8 @@ function BalanceModule({ onNavigateToSupport }) {
                     onClick={() => {
                       handleAddFunds()
                     }}
-                    disabled={!isWalletConnected || !topUpAmount || parseFloat(topUpAmount) <= 0 || isTopUpLoading || hasActiveInvoice() || shouldDisableTopUp}
-                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isWalletConnected && topUpAmount && parseFloat(topUpAmount) > 0 && !isTopUpLoading && !hasActiveInvoice() && !shouldDisableTopUp
+                    disabled={!isWalletConnected || !topUpAmount || parseFloat(topUpAmount) <= 0 || shouldDisableTopUp}
+                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isWalletConnected && topUpAmount && parseFloat(topUpAmount) > 0 && !shouldDisableTopUp
                       ? 'bg-white hover:bg-gray-100 text-gray-900'
                       : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       }`}
