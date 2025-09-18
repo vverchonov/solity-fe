@@ -71,6 +71,19 @@ export const CallProvider = ({ children }) => {
         }
     };
 
+    // Helper function to clean up WebSocket connection and reset state
+    const cleanupConnection = async () => {
+        if (simpleUserRef.current) {
+            try {
+                await simpleUserRef.current.disconnect();
+                addLog('WebSocket connection closed');
+            } catch (error) {
+                addLog(`WebSocket cleanup error: ${error}`);
+            }
+            simpleUserRef.current = null;
+        }
+    };
+
     const makeCall = async (targetNumber, callerID, credentials = null) => {
         if (!targetNumber || !callerID) {
             addLog('Cannot make call: no target number or caller ID provided');
@@ -124,6 +137,8 @@ export const CallProvider = ({ children }) => {
                             isMuted: false,
                             isOnHold: false
                         }));
+                        // Clean up WebSocket when call ends
+                        cleanupConnection();
                     },
                     onCallHold: (held) => {
                         addLog(held ? 'Call put on hold' : 'Call resumed from hold');
@@ -178,6 +193,8 @@ export const CallProvider = ({ children }) => {
         } catch (error) {
             addLog(`Call failed: ${error}`);
             setCallState(prev => ({ ...prev, callStatus: 'idle', remoteNumber: '' }));
+            // Clean up WebSocket connection on call failure
+            await cleanupConnection();
         }
     };
 
@@ -189,6 +206,8 @@ export const CallProvider = ({ children }) => {
             } catch (error) {
                 addLog(`Hangup error: ${error}`);
             }
+            // Clean up WebSocket connection after hangup
+            await cleanupConnection();
         }
     };
 
