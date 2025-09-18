@@ -58,7 +58,8 @@ function BalanceModule({ onNavigateToSupport }) {
     logTransactionRejected,
     logTransactionError,
     logInvoiceStatusUpdate,
-    logInvoiceCancel
+    logInvoiceCancel,
+    logBalanceRefresh
   } = useLogs()
 
   // Use actual rates from API or fallback to empty array
@@ -295,14 +296,17 @@ function BalanceModule({ onNavigateToSupport }) {
       if (result.success) {
         // The BalanceProvider will automatically update when we call refreshBalance
         refreshBalance()
+        logBalanceRefresh(true)
         // Also refresh invoices and journal
         await Promise.all([
           refreshInvoices(),
           fetchJournal()
         ])
       } else {
+        logBalanceRefresh(false, result.error)
       }
     } catch (error) {
+      logBalanceRefresh(false, error.message)
     } finally {
       setIsRefreshingBalance(false)
     }

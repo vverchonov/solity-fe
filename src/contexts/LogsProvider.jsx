@@ -1,6 +1,9 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 const LogsContext = createContext()
+
+const STORAGE_KEY = 'solity_user_logs'
+const MAX_LOGS = 300
 
 export const useLogs = () => {
   const context = useContext(LogsContext)
@@ -11,7 +14,54 @@ export const useLogs = () => {
 }
 
 export const LogsProvider = ({ children }) => {
-  const [logs, setLogs] = useState([])
+  // Initialize logs from localStorage
+  const [logs, setLogs] = useState(() => {
+    try {
+      const storedLogs = localStorage.getItem(STORAGE_KEY)
+      if (storedLogs) {
+        const parsed = JSON.parse(storedLogs)
+        // Validate the structure and convert dates
+        return parsed.map(log => ({
+          ...log,
+          createdAt: new Date(log.createdAt)
+        })).slice(0, MAX_LOGS) // Ensure we don't exceed limit
+      }
+    } catch (error) {
+      console.warn('Failed to load logs from localStorage:', error)
+    }
+    return []
+  })
+
+  // Save logs to localStorage whenever they change
+  const saveLogsToStorage = useCallback((logsToSave) => {
+    try {
+      const serializable = logsToSave.map(log => ({
+        ...log,
+        createdAt: log.createdAt.toISOString()
+      }))
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable))
+    } catch (error) {
+      console.warn('Failed to save logs to localStorage:', error)
+      // If localStorage is full, try to clear some space
+      try {
+        const reducedLogs = logsToSave.slice(0, Math.floor(MAX_LOGS * 0.7)) // Keep 70%
+        const serializable = reducedLogs.map(log => ({
+          ...log,
+          createdAt: log.createdAt.toISOString()
+        }))
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable))
+      } catch (fallbackError) {
+        console.error('Failed to save even reduced logs to localStorage:', fallbackError)
+      }
+    }
+  }, [])
+
+  // Update localStorage whenever logs change
+  useEffect(() => {
+    if (logs.length > 0) {
+      saveLogsToStorage(logs)
+    }
+  }, [logs, saveLogsToStorage])
 
   // Add a new log entry
   const addLog = (type, message, details = null) => {
@@ -31,7 +81,7 @@ export const LogsProvider = ({ children }) => {
       createdAt: new Date()
     }
 
-    setLogs(prevLogs => [logEntry, ...prevLogs].slice(0, 100)) // Keep last 100 logs
+    setLogs(prevLogs => [logEntry, ...prevLogs].slice(0, MAX_LOGS)) // Keep last 300 logs
 
     // Also log to browser console with appropriate method
     const consoleMessage = `${logEntry.timestamp} ${message}`
@@ -109,6 +159,82 @@ export const LogsProvider = ({ children }) => {
     }
   }
 
+  // Balance refresh logging
+  const logBalanceRefresh = (success, error = null) => {
+    if (success) {
+      addLog('success', 'Balance refreshed successfully')
+    } else {
+      addLog('error', 'Failed to refresh balance', { error })
+    }
+  }
+
+  // Call-related logging methods
+  const logCallInitiation = (phoneNumber, callerID) => {
+    addLog('info', `Initiating call to ${phoneNumber}`, { phoneNumber, callerID })
+  }
+
+  const logCallSipConnection = (status, details = null) => {
+    const statusMessages = {
+      connecting: 'Connecting to SIP server...',
+      connected: 'Connected to SIP server',
+      registered: 'SIP client registered',
+      failed: 'SIP connection failed',
+      disconnected: 'Disconnected from SIP server'
+    }
+
+    const logType = status === 'failed' ? 'error' : status === 'connected' || status === 'registered' ? 'success' : 'info'
+    addLog(logType, statusMessages[status] || `SIP status: ${status}`, details)
+  }
+
+  const logCallStateChange = (oldState, newState, phoneNumber = null) => {
+    const stateMessages = {
+      idle: 'Call ended',
+      calling: 'Placing call...',
+      ringing: 'Phone ringing',
+      'in-call': 'Call connected',
+      connecting: 'Connecting call...'
+    }
+
+    const message = `Call status: ${stateMessages[newState] || newState}`
+    const logType = newState === 'in-call' ? 'success' : newState === 'idle' ? 'info' : 'info'
+    addLog(logType, message, { oldState, newState, phoneNumber })
+  }
+
+  const logCallDuration = (phoneNumber, duration) => {
+    const minutes = Math.floor(duration / 60)
+    const seconds = duration % 60
+    const formattedDuration = `${minutes}m ${seconds}s`
+    addLog('info', `Call completed - Duration: ${formattedDuration}`, { phoneNumber, duration })
+  }
+
+  const logCallControl = (action, details = null) => {
+    const messages = {
+      mute: 'Call muted',
+      unmute: 'Call unmuted',
+      hold: 'Call put on hold',
+      unhold: 'Call resumed from hold',
+      dtmf: 'DTMF tone sent',
+      hangup: 'Call ended by user'
+    }
+
+    addLog('info', messages[action] || `Call control: ${action}`, details)
+  }
+
+  const logCallError = (error, context = null) => {
+    addLog('error', 'Call error occurred', { error, context })
+  }
+
+  // Enhanced error logging with context
+  const logError = (message, error, component = null, action = null) => {
+    addLog('error', message, {
+      error: error?.message || error,
+      component,
+      action,
+      stack: error?.stack,
+      timestamp: new Date().toISOString()
+    })
+  }
+
   // Clear all logs
   const clearLogs = () => {
     setLogs([])
@@ -135,9 +261,11 @@ export const LogsProvider = ({ children }) => {
     getLogsByType,
     getRecentLogs,
 
-    // Specific logging methods
+    // Wallet logging methods
     logPhantomConnection,
     logPhantomDisconnection,
+
+    // Invoice & Transaction logging methods
     logInvoicePrepare,
     logTransactionStart,
     logTransactionSigned,
@@ -146,8 +274,22 @@ export const LogsProvider = ({ children }) => {
     logTransactionRejected,
     logTransactionError,
     logInvoiceStatusUpdate,
+    logInvoiceCancel,
+
+    // Balance logging methods
     logBalanceUpdate,
-    logInvoiceCancel
+    logBalanceRefresh,
+
+    // Call logging methods
+    logCallInitiation,
+    logCallSipConnection,
+    logCallStateChange,
+    logCallDuration,
+    logCallControl,
+    logCallError,
+
+    // Enhanced error logging
+    logError
   }
 
   return (

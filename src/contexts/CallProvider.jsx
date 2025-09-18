@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { Web } from 'sip.js';
 import axios from 'axios';
 import { useWallet } from './WalletProvider';
+import { useLogs } from './LogsProvider';
 import { LAMPORTS_PER_SOL, Connection, PublicKey } from '@solana/web3.js';
 
 const DISPLAY_NAME = 'solity';
@@ -25,6 +26,15 @@ export const useCall = () => {
 
 export const CallProvider = ({ children }) => {
     const { walletAddress, connectWallet, disconnectWallet, isWalletConnected, walletProvider } = useWallet();
+    const {
+        logCallInitiation,
+        logCallSipConnection,
+        logCallStateChange,
+        logCallDuration,
+        logCallControl,
+        logCallError,
+        logError
+    } = useLogs();
 
     const [callConfig, setCallConfig] = useState({
         username: '',
@@ -86,14 +96,20 @@ export const CallProvider = ({ children }) => {
 
     const makeCall = async (targetNumber, callerID, credentials = null) => {
         if (!targetNumber || !callerID) {
-            addLog('Cannot make call: no target number or caller ID provided');
+            const errorMsg = 'Cannot make call: no target number or caller ID provided';
+            addLog(errorMsg);
+            logCallError(new Error(errorMsg), 'makeCall - validation');
             return;
         }
+
+        // Log call initiation
+        logCallInitiation(targetNumber, callerID);
 
         try {
             // If credentials are provided, create new SIP client with fresh credentials
             if (credentials) {
                 addLog('Setting up SIP client with fresh credentials...');
+                logCallSipConnection('connecting', { extension: credentials.extension, domain: credentials.domain });
 
                 // Console log SIP credentials for debugging
                 console.log('SIP Connection Credentials:');
@@ -122,14 +138,17 @@ export const CallProvider = ({ children }) => {
                 simpleUser.delegate = {
                     onCallReceived: () => {
                         addLog('Incoming call received');
+                        logCallStateChange('unknown', 'incoming', targetNumber);
                         setCallState(prev => ({ ...prev, callStatus: 'incoming' }));
                     },
                     onCallAnswered: () => {
                         addLog('Call answered');
+                        logCallStateChange('ringing', 'in-call', targetNumber);
                         setCallState(prev => ({ ...prev, callStatus: 'in-call' }));
                     },
                     onCallHangup: () => {
                         addLog('Call ended');
+                        logCallStateChange('in-call', 'idle', targetNumber);
                         setCallState(prev => ({
                             ...prev,
                             callStatus: 'idle',
@@ -141,23 +160,29 @@ export const CallProvider = ({ children }) => {
                         cleanupConnection();
                     },
                     onCallHold: (held) => {
+                        const action = held ? 'hold' : 'unhold';
                         addLog(held ? 'Call put on hold' : 'Call resumed from hold');
+                        logCallControl(action, { phoneNumber: targetNumber });
                         setCallState(prev => ({ ...prev, isOnHold: held }));
                     },
                     onRegistered: () => {
                         addLog('SIP client registered');
+                        logCallSipConnection('registered');
                         setCallState(prev => ({ ...prev, isRegistered: true }));
                     },
                     onUnregistered: () => {
                         addLog('SIP client unregistered');
+                        logCallSipConnection('disconnected');
                         setCallState(prev => ({ ...prev, isRegistered: false }));
                     },
                     onServerConnect: () => {
                         addLog('Connected to SIP server');
+                        logCallSipConnection('connected');
                         setCallState(prev => ({ ...prev, isConnected: true }));
                     },
                     onServerDisconnect: () => {
                         addLog('Disconnected from SIP server');
+                        logCallSipConnection('disconnected');
                         setCallState(prev => ({
                             ...prev,
                             isConnected: false,
@@ -185,6 +210,7 @@ export const CallProvider = ({ children }) => {
             }
 
             addLog(`Calling ${targetNumber} with caller ID ${callerID}...`);
+            logCallStateChange('connecting', 'calling', targetNumber);
             setCallState(prev => ({ ...prev, callStatus: 'calling', remoteNumber: targetNumber }));
 
             const target = `sip:${targetNumber}@${credentials?.domain || 'solityapp.net'}`;
@@ -192,6 +218,8 @@ export const CallProvider = ({ children }) => {
 
         } catch (error) {
             addLog(`Call failed: ${error}`);
+            logCallError(error, 'makeCall - SIP call failure');
+            logCallStateChange('calling', 'idle', targetNumber);
             setCallState(prev => ({ ...prev, callStatus: 'idle', remoteNumber: '' }));
             // Clean up WebSocket connection on call failure
             await cleanupConnection();
@@ -203,8 +231,10 @@ export const CallProvider = ({ children }) => {
             try {
                 await simpleUserRef.current.hangup();
                 addLog('Call hung up');
+                logCallControl('hangup', { phoneNumber: callState.remoteNumber });
             } catch (error) {
                 addLog(`Hangup error: ${error}`);
+                logCallError(error, 'hangupCall');
             }
             // Clean up WebSocket connection after hangup
             await cleanupConnection();
@@ -216,8 +246,10 @@ export const CallProvider = ({ children }) => {
             try {
                 await simpleUserRef.current.answer();
                 addLog('Call answered');
+                logCallControl('answer', { phoneNumber: callState.remoteNumber });
             } catch (error) {
                 addLog(`Answer error: ${error}`);
+                logCallError(error, 'answerCall');
             }
         }
     };
@@ -228,13 +260,16 @@ export const CallProvider = ({ children }) => {
                 if (callState.isMuted) {
                     simpleUserRef.current.unmute();
                     addLog('Call unmuted');
+                    logCallControl('unmute', { phoneNumber: callState.remoteNumber });
                 } else {
                     simpleUserRef.current.mute();
                     addLog('Call muted');
+                    logCallControl('mute', { phoneNumber: callState.remoteNumber });
                 }
                 setCallState(prev => ({ ...prev, isMuted: !prev.isMuted }));
             } catch (error) {
                 addLog(`Mute toggle error: ${error}`);
+                logCallError(error, 'toggleMute');
             }
         }
     };
@@ -245,13 +280,16 @@ export const CallProvider = ({ children }) => {
                 if (callState.isOnHold) {
                     await simpleUserRef.current.unhold();
                     addLog('Call resumed');
+                    logCallControl('unhold', { phoneNumber: callState.remoteNumber });
                 } else {
                     await simpleUserRef.current.hold();
                     addLog('Call put on hold');
+                    logCallControl('hold', { phoneNumber: callState.remoteNumber });
                 }
                 setCallState(prev => ({ ...prev, isOnHold: !prev.isOnHold }));
             } catch (error) {
                 addLog(`Hold toggle error: ${error}`);
+                logCallError(error, 'toggleHold');
             }
         }
     };
@@ -261,8 +299,10 @@ export const CallProvider = ({ children }) => {
             try {
                 simpleUserRef.current.sendDTMF(digit);
                 addLog(`DTMF sent: ${digit}`);
+                logCallControl('dtmf', { digit, phoneNumber: callState.remoteNumber });
             } catch (error) {
                 addLog(`DTMF error: ${error}`);
+                logCallError(error, 'sendDTMF');
             }
         }
     };
