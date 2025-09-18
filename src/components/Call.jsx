@@ -49,7 +49,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
   // Derived state from CallProvider
   const isInCall = callState.callStatus === 'in-call'
-  const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing'
+  const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing' || callStatus === 'preparing'
   const isMuted = callState.isMuted
 
   // Sync with CallProvider state changes
@@ -353,7 +353,11 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                   <input
                     type="text"
                     value={editableCallerID}
-                    onChange={(e) => setEditableCallerID(e.target.value)}
+                    onChange={(e) => {
+                      // Remove all non-numeric characters
+                      const sanitized = e.target.value.replace(/[^\d]/g, '')
+                      setEditableCallerID(sanitized)
+                    }}
                     placeholder={t('call.callerIDPlaceholder')}
                     disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'ended'}
                     className={`w-full bg-transparent border-none pl-8 pr-4 py-3 text-white placeholder-white/40 focus:outline-none min-h-[50px] ${isInCall || callState.callStatus === 'calling' || callStatus === 'ended' ? 'cursor-not-allowed' : ''}`}
@@ -391,8 +395,10 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
                     type="text"
                     value={phoneNumber}
                     onChange={(e) => {
-                      setPhoneNumber(e.target.value)
-                      validatePhoneNumber(e.target.value, setPhoneNumberError)
+                      // Remove all non-numeric characters
+                      const sanitized = e.target.value.replace(/[^\d]/g, '')
+                      setPhoneNumber(sanitized)
+                      validatePhoneNumber(sanitized, setPhoneNumberError)
                     }}
                     placeholder={t('call.phoneNumberPlaceholder')}
                     disabled={isInCall || callState.callStatus === 'calling' || callStatus === 'preparing'}
