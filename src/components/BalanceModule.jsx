@@ -313,6 +313,18 @@ function BalanceModule({ onNavigateToSupport }) {
     fetchJournal()
   }, [])
 
+  // Poll invoices every 15 seconds when there's a pending invoice
+  useEffect(() => {
+    if (!firstPendingInvoice) return
+
+    const pollInterval = setInterval(() => {
+      console.log('Polling for invoice status updates...')
+      refreshInvoices()
+    }, 15000) // 15 seconds
+
+    return () => clearInterval(pollInterval)
+  }, [firstPendingInvoice, refreshInvoices])
+
   // Get the first pending invoice (most recent incomplete one) - memoized for performance
   const firstPendingInvoice = useMemo(() => {
     const pendingInvoices = getPendingInvoices()
