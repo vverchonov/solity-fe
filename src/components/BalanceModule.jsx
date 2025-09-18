@@ -313,18 +313,6 @@ function BalanceModule({ onNavigateToSupport }) {
     fetchJournal()
   }, [])
 
-  // Poll invoices every 15 seconds when there's a pending invoice
-  useEffect(() => {
-    if (!firstPendingInvoice) return
-
-    const pollInterval = setInterval(() => {
-      console.log('Polling for invoice status updates...')
-      refreshInvoices()
-    }, 15000) // 15 seconds
-
-    return () => clearInterval(pollInterval)
-  }, [firstPendingInvoice, refreshInvoices])
-
   // Get the first pending invoice (most recent incomplete one) - memoized for performance
   const firstPendingInvoice = useMemo(() => {
     const pendingInvoices = getPendingInvoices()
@@ -339,9 +327,45 @@ function BalanceModule({ onNavigateToSupport }) {
     return result
   }, [invoices])
 
+  // Check if we should disable top-up based on any pending or processing invoice
+  const shouldDisableTopUp = useMemo(() => {
+    const result = invoices.some(invoice => invoice.status === 'pending' || invoice.status === 'processing')
+    console.log('BalanceModule shouldDisableTopUp check:', {
+      invoicesCount: invoices.length,
+      invoiceStatuses: invoices.map(inv => ({ id: inv.id, status: inv.status })),
+      shouldDisable: result
+    })
+    return result
+  }, [invoices])
+
+  // Poll invoices every 15 seconds when first invoice is pending or processing
+  useEffect(() => {
+    if (!shouldDisableTopUp) return
+
+    const pollInterval = setInterval(() => {
+      console.log('Polling for invoice status updates...')
+      refreshInvoices()
+    }, 15000) // 15 seconds
+
+    return () => clearInterval(pollInterval)
+  }, [shouldDisableTopUp, refreshInvoices])
+
   // Helper functions for invoice display
   const formatInvoiceAmount = (lamports) => {
     return (lamports / 1e9).toFixed(4) + ' SOL'
+  }
+
+  // Get appropriate button text based on current state
+  const getTopUpButtonText = () => {
+    if (isTopUpLoading) return t('balance.preparing')
+    if (hasActiveInvoice()) return t('balance.invoiceActive')
+    if (shouldDisableTopUp) {
+      const pendingInvoice = invoices.find(invoice => invoice.status === 'pending')
+      const processingInvoice = invoices.find(invoice => invoice.status === 'processing')
+      if (pendingInvoice) return t('balance.pendingInvoice')
+      if (processingInvoice) return t('balance.paymentProcessing')
+    }
+    return t('balance.add')
   }
 
   const formatInvoiceStatus = (status) => {
@@ -593,8 +617,8 @@ function BalanceModule({ onNavigateToSupport }) {
                     <button
                       key={amount}
                       onClick={() => handleQuickTopUp(amount)}
-                      disabled={!isWalletConnected || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice}
-                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${!isWalletConnected || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice
+                      disabled={!isWalletConnected || isTopUpLoading || hasActiveInvoice() || shouldDisableTopUp}
+                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${!isWalletConnected || isTopUpLoading || hasActiveInvoice() || shouldDisableTopUp
                         ? 'bg-gray-600 text-gray-400 border-gray-600 cursor-not-allowed'
                         : topUpAmount === amount.toString()
                           ? 'bg-white text-gray-900 border-white'
@@ -636,8 +660,8 @@ function BalanceModule({ onNavigateToSupport }) {
                       e.preventDefault();
                     }}
                     placeholder={t('balance.enterSolAmount')}
-                    disabled={!isWalletConnected || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice}
-                    className={`flex-1 border rounded-xl px-3 py-2 text-sm focus:outline-none transition-all ${isWalletConnected && !isTopUpLoading && !hasActiveInvoice() && !firstPendingInvoice && !latestProcessingInvoice
+                    disabled={!isWalletConnected || isTopUpLoading || hasActiveInvoice() || shouldDisableTopUp}
+                    className={`flex-1 border rounded-xl px-3 py-2 text-sm focus:outline-none transition-all ${isWalletConnected && !isTopUpLoading && !hasActiveInvoice() && !shouldDisableTopUp
                       ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:border-blue-400'
                       : 'bg-gray-600 border-gray-600 text-gray-400 placeholder-gray-500 cursor-not-allowed'
                       }`}
@@ -646,13 +670,13 @@ function BalanceModule({ onNavigateToSupport }) {
                     onClick={() => {
                       handleAddFunds()
                     }}
-                    disabled={!isWalletConnected || !topUpAmount || parseFloat(topUpAmount) <= 0 || isTopUpLoading || hasActiveInvoice() || firstPendingInvoice || latestProcessingInvoice}
-                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isWalletConnected && topUpAmount && parseFloat(topUpAmount) > 0 && !isTopUpLoading && !hasActiveInvoice() && !firstPendingInvoice && !latestProcessingInvoice
+                    disabled={!isWalletConnected || !topUpAmount || parseFloat(topUpAmount) <= 0 || isTopUpLoading || hasActiveInvoice() || shouldDisableTopUp}
+                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isWalletConnected && topUpAmount && parseFloat(topUpAmount) > 0 && !isTopUpLoading && !hasActiveInvoice() && !shouldDisableTopUp
                       ? 'bg-white hover:bg-gray-100 text-gray-900'
                       : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       }`}
                   >
-                    {isTopUpLoading ? t('balance.preparing') : hasActiveInvoice() ? t('balance.invoiceActive') : firstPendingInvoice ? t('balance.pendingInvoice') : latestProcessingInvoice ? t('balance.paymentProcessing') : t('balance.add')}
+                    {getTopUpButtonText()}
                   </button>
                 </div>
               </div>
