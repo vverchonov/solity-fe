@@ -56,7 +56,9 @@
     "costPerMinute": "Cost per minute",
     "destination": "Destination",
     "enterPhoneFirst": "Please enter a phone number first",
-    "rateCheckFailed": "Failed to check rate"
+    "rateCheckFailed": "Failed to check rate",
+    "showCallModal": "Show call modal",
+    "show": "Show"
   },
   "status": {
     "idle": "Idle",

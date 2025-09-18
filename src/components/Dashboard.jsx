@@ -192,6 +192,11 @@ function Dashboard() {
             if (startTime !== undefined) setCallStartTime(startTime)
             if (status !== undefined) setCallStatus(status)
           }}
+          onShowModal={() => {
+            setIsModalVisible(true)
+            setIsModalMinimized(false)
+          }}
+          isModalVisible={isModalVisible}
         />
       case 'Balance':
         return <BalanceModule onNavigateToSupport={() => setActiveModule('Support')} />

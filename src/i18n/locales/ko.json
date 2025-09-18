@@ -56,7 +56,9 @@
     "costPerMinute": "분당 비용",
     "destination": "목적지",
     "enterPhoneFirst": "먼저 전화번호를 입력해 주세요",
-    "rateCheckFailed": "요금 확인에 실패했습니다"
+    "rateCheckFailed": "요금 확인에 실패했습니다",
+    "showCallModal": "통화 모달 표시",
+    "show": "표시"
   },
   "status": {
     "idle": "대기",

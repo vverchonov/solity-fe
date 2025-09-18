@@ -10,7 +10,7 @@ import apiClient from '../lib/axios'
 // Phone validation constants
 const PHONE_REGEX = /^[1-9]\d{1,14}$/
 
-function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) {
+function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, onShowModal, isModalVisible }) {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [phoneNumberError, setPhoneNumberError] = useState(null)
   const [callerID, setCallerID] = useState('17349303030')
@@ -361,7 +361,22 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
           <div className='w-full'>
             {/* Status */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-              <span className={`${getStatusPill().className} self-start`}>{getStatusPill().text}</span>
+              <div className="flex items-center gap-2">
+                <span className={`${getStatusPill().className} self-start`}>{getStatusPill().text}</span>
+                {isCallActive && !isModalVisible && (
+                  <button
+                    onClick={onShowModal}
+                    className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/40 border border-blue-400/30 hover:border-blue-400/60 text-blue-300 hover:text-blue-200 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1"
+                    title={t('call.showCallModal')}
+                  >
+                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    {t('call.show')}
+                  </button>
+                )}
+              </div>
               {isInCall && (
                 <span className="text-white/70 text-sm">
                   {t('call.callDuration')}: {formatCallDuration(callDuration)}

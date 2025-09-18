@@ -56,7 +56,9 @@
     "costPerMinute": "每分钟费用",
     "destination": "目的地",
     "enterPhoneFirst": "请先输入电话号码",
-    "rateCheckFailed": "查询费率失败"
+    "rateCheckFailed": "查询费率失败",
+    "showCallModal": "显示通话窗口",
+    "show": "显示"
   },
   "status": {
     "idle": "空闲",
