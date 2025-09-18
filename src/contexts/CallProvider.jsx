@@ -58,84 +58,6 @@ export const CallProvider = ({ children }) => {
         return el;
     };
 
-    const connectToServer = async () => {
-        try {
-            addLog('Connecting to server...');
-
-            // NOTE: This legacy connectToServer function should use credentials from /tele/credentials
-            // The new call flow uses makeCall() with dynamic credentials instead
-            const options = {
-                aor: `sip:${callConfig.username}@solityapp.net`, // Should use credentials.domain
-                media: {
-                    constraints: { audio: true, video: false },
-                    remote: { audio: getAudioElement('remoteAudio') }
-                },
-                userAgentOptions: {
-                    authorizationUsername: callConfig.username,
-                    authorizationPassword: callConfig.password,
-                    displayName: DISPLAY_NAME
-                }
-            };
-
-            const simpleUser = new Web.SimpleUser('wss://solityapp.net:8089/ws', options); // Should use credentials.wss
-            simpleUserRef.current = simpleUser;
-
-            // Set up event handlers
-            simpleUser.delegate = {
-                onCallReceived: () => {
-                    addLog('Incoming call received');
-                    setCallState(prev => ({ ...prev, callStatus: 'incoming' }));
-                },
-                onCallAnswered: () => {
-                    addLog('Call answered');
-                    setCallState(prev => ({ ...prev, callStatus: 'in-call' }));
-                },
-                onCallHangup: () => {
-                    addLog('Call ended');
-                    setCallState(prev => ({
-                        ...prev,
-                        callStatus: 'idle',
-                        currentCall: null,
-                        isMuted: false,
-                        isOnHold: false
-                    }));
-                },
-                onCallHold: (held) => {
-                    addLog(held ? 'Call put on hold' : 'Call resumed from hold');
-                    setCallState(prev => ({ ...prev, isOnHold: held }));
-                },
-                onRegistered: () => {
-                    addLog('Successfully registered with server');
-                    setCallState(prev => ({ ...prev, isRegistered: true }));
-                },
-                onUnregistered: () => {
-                    addLog('Unregistered from server');
-                    setCallState(prev => ({ ...prev, isRegistered: false }));
-                },
-                onServerConnect: () => {
-                    addLog('Connected to server');
-                    setCallState(prev => ({ ...prev, isConnected: true }));
-                },
-                onServerDisconnect: () => {
-                    addLog('Disconnected from server');
-                    setCallState(prev => ({
-                        ...prev,
-                        isConnected: false,
-                        isRegistered: false,
-                        callStatus: 'idle',
-                        currentCall: null
-                    }));
-                }
-            };
-
-            await simpleUser.connect();
-            await simpleUser.register();
-            setCallState(prev => ({ ...prev, currentCall: simpleUser }));
-
-        } catch (error) {
-            addLog(`Connection failed: ${error}`);
-        }
-    };
 
     const disconnect = async () => {
         if (simpleUserRef.current) {
@@ -146,20 +68,6 @@ export const CallProvider = ({ children }) => {
                 addLog(`Disconnect error: ${error}`);
             }
             simpleUserRef.current = null;
-        }
-    };
-
-    const updateCallerID = async (callerID) => {
-        if (!callerID) return false;
-        try {
-            await axios.post(`${BACKEND_URL}/updateExtension?id=${callConfig.username}`, {
-                callerID: callerID
-            });
-            addLog(`Caller ID updated to ${callerID}`);
-            return true;
-        } catch (error) {
-            addLog(`Failed to update Caller ID: ${error}`);
-            return false;
         }
     };
 
@@ -393,7 +301,6 @@ export const CallProvider = ({ children }) => {
         setCallConfig,
         callState,
         logs,
-        connectToServer,
         disconnect,
         makeCall,
         hangupCall,

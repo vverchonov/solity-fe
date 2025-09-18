@@ -37,7 +37,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
     hangupCall,
     toggleMute,
     sendDTMF,
-    connectToServer,
     callConfig,
     setCallConfig
   } = useCall()
