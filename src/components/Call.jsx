@@ -363,7 +363,16 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
               <div className="flex items-center gap-2">
                 <span className={`${getStatusPill().className} self-start`}>{getStatusPill().text}</span>
-                {isCallActive && !isModalVisible && (
+                {(() => {
+                  console.log('Toggle pill debug:', {
+                    isCallActive,
+                    isModalVisible,
+                    callStateStatus: callState.callStatus,
+                    callStatus,
+                    shouldShow: isCallActive && !isModalVisible
+                  })
+                  return isCallActive && !isModalVisible
+                })() && (
                   <button
                     onClick={onShowModal}
                     className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/40 border border-blue-400/30 hover:border-blue-400/60 text-blue-300 hover:text-blue-200 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1"
