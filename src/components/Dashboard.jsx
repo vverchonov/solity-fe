@@ -265,8 +265,8 @@ function Dashboard() {
       <div className="relative p-6">
         <div className="max-w-7xl mx-auto">
           {/* Mobile Navigation Bar - Shows on screens < 650px */}
-          <div className="max-[649px]:block hidden mb-6">
-            <div className="card p-3">
+          <div className="max-[649px]:block hidden mb-6 relative z-50">
+            <div className="card p-3 overflow-visible">
               <div className="flex items-center gap-4">
                 {/* Logo */}
                 <div className="flex items-center">
@@ -292,7 +292,7 @@ function Dashboard() {
                 <div className="flex-1"></div>
 
                 {/* Username, Language Toggle, Status & Logout - Always Visible */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 overflow-visible">
                   {/* Username */}
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 bg-white/10 rounded-full flex items-center justify-center">

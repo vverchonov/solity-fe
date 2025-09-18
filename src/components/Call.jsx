@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Balance from './Balance'
 import { useCall } from '../contexts/CallProvider'
 import { useUser } from '../contexts/UserContext'
@@ -69,11 +69,19 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
 
   // Derived state from CallProvider
   const isInCall = callState.callStatus === 'in-call'
-  const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing' || callStatus === 'preparing' || callStatus === 'creating-call' || callStatus === 'pending'
+  const isCallActive = useMemo(() => {
+    const activeStates = ['in-call', 'calling', 'ringing', 'preparing', 'creating-call', 'pending']
+    return activeStates.includes(callState.callStatus) || activeStates.includes(callStatus)
+  }, [callState.callStatus, callStatus])
   const isMuted = callState.isMuted
 
   // Sync with CallProvider state changes
   useEffect(() => {
+    // Don't interfere during call initialization states
+    if (callStatus === 'creating-call' || callStatus === 'pending') {
+      return
+    }
+
     if (callState.callStatus === 'in-call' && callStatus !== 'in-call') {
       if (!callStartTime) {
         setCallStartTime(Date.now())
@@ -238,9 +246,27 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
   }
 
   const handleStartCall = async () => {
-    if (phoneNumber.trim()) {
+    // Capture current phone number value to ensure we use the latest
+    const currentPhoneNumber = phoneNumber.trim()
+
+    if (currentPhoneNumber) {
+      // Ensure the phone number state is up to date for the modal
+      if (phoneNumber !== currentPhoneNumber) {
+        setPhoneNumber(currentPhoneNumber)
+      }
+
+      // Set both status and start time atomically to minimize re-renders
       setCallStatus('creating-call') // Show "creating call" status during API requests
       setCallStartTime(Date.now())
+
+      // Immediately notify parent with current phone number to ensure modal shows correct number
+      if (onCallStateChange) {
+        onCallStateChange({
+          phoneNumber: currentPhoneNumber,
+          startTime: Date.now(),
+          status: 'creating-call'
+        })
+      }
 
       try {
         // Step 1: Request extension setup
@@ -275,7 +301,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
         setCallStatus('pending') // Change to pending when API requests are done
 
         // Step 3: Make call with fresh credentials
-        await makeCall(phoneNumber, freshCredentials.callerID || callerID, freshCredentials)
+        await makeCall(currentPhoneNumber, freshCredentials.callerID || callerID, freshCredentials)
 
         // After makeCall is initiated, set to ringing
         setCallStatus('ringing')
