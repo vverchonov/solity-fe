@@ -271,6 +271,7 @@
     "errorLoadingInvoices": "인보이스 로딩 오류",
     "recentInvoices": "최근 인보이스",
     "recentActivity": "최근 활동",
+    "loadMore": "더 보기",
     "currentRates": "현재 요금",
     "searchRates": "방향, 코드 또는 경로로 검색...",
     "noRatesFound": "검색과 일치하는 요금을 찾을 수 없습니다.",

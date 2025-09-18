@@ -271,6 +271,7 @@
     "errorLoadingInvoices": "Error loading invoices",
     "recentInvoices": "Recent Invoices",
     "recentActivity": "Recent Activity",
+    "loadMore": "Load More",
     "currentRates": "Current Rates",
     "searchRates": "Search by direction, codes, or route...",
     "noRatesFound": "No rates found matching your search.",

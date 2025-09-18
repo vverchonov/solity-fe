@@ -271,6 +271,7 @@
     "errorLoadingInvoices": "加载发票错误",
     "recentInvoices": "最近发票",
     "recentActivity": "最近活动",
+    "loadMore": "加载更多",
     "currentRates": "当前费率",
     "searchRates": "按方向、代码或路由搜索...",
     "noRatesFound": "未找到匹配搜索的费率。",

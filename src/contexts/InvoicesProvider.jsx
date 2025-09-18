@@ -31,7 +31,7 @@ export const InvoicesProvider = ({ children }) => {
     setError(null)
 
     try {
-      const result = await paymentsAPI.getInvoices(offset, 100)
+      const result = await paymentsAPI.getInvoices(offset, limit)
 
       if (result.success) {
 
@@ -86,7 +86,7 @@ export const InvoicesProvider = ({ children }) => {
       }
 
       // Always fetch fresh invoices
-      fetchInvoices(0, 20, true)
+      fetchInvoices(0, 100, true)
     }
 
     initializeInvoices()
@@ -102,7 +102,7 @@ export const InvoicesProvider = ({ children }) => {
   const refreshInvoices = async () => {
     setCurrentOffset(0)
     setHasMore(true)
-    await fetchInvoices(0, 20, true)
+    await fetchInvoices(0, 100, true)
   }
 
   // Invalidate invoices cache - call this after prepare invoice success

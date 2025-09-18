@@ -21,6 +21,8 @@ function BalanceModule({ onNavigateToSupport }) {
   const [journal, setJournal] = useState([])
   const [isJournalLoading, setIsJournalLoading] = useState(false)
   const [journalError, setJournalError] = useState(null)
+  const [journalOffset, setJournalOffset] = useState(0)
+  const [hasMoreJournal, setHasMoreJournal] = useState(true)
   const navigate = useNavigate()
   const { user, clearUser } = useUser()
   const { t } = useI18n()
@@ -47,7 +49,7 @@ function BalanceModule({ onNavigateToSupport }) {
   } = useBalance()
 
   // Use invoices provider to get pending invoices and cancel functionality
-  const { invoices, getPendingInvoices, cancelInvoice: cancelInvoiceFromProvider, refreshInvoices, isLoading: invoicesLoading, error: invoicesError } = useInvoices()
+  const { invoices, getPendingInvoices, cancelInvoice: cancelInvoiceFromProvider, refreshInvoices, loadMoreInvoices, hasMore, isLoading: invoicesLoading, error: invoicesError } = useInvoices()
 
   // Use logs provider for tracking interactions
   const {
@@ -99,7 +101,7 @@ function BalanceModule({ onNavigateToSupport }) {
           // Refetch invoices and journal immediately after successful completion
           await Promise.all([
             refreshInvoices(),
-            fetchJournal()
+            fetchJournal(0, false)
           ])
         } else {
         }
@@ -114,7 +116,7 @@ function BalanceModule({ onNavigateToSupport }) {
         setTimeout(() => {
           Promise.all([
             refreshInvoices(),
-            fetchJournal()
+            fetchJournal(0, false)
           ])
         }, 1000)
       } else {
@@ -235,7 +237,7 @@ function BalanceModule({ onNavigateToSupport }) {
           // Refetch invoices and journal immediately after successful completion
           await Promise.all([
             refreshInvoices(),
-            fetchJournal()
+            fetchJournal(0, false)
           ])
         } else {
         }
@@ -250,7 +252,7 @@ function BalanceModule({ onNavigateToSupport }) {
         setTimeout(() => {
           Promise.all([
             refreshInvoices(),
-            fetchJournal()
+            fetchJournal(0, false)
           ])
         }, 1000)
       } else {
@@ -266,18 +268,32 @@ function BalanceModule({ onNavigateToSupport }) {
     }
   }
 
-  const fetchJournal = async () => {
+  const fetchJournal = async (offset = 0, append = false) => {
     setIsJournalLoading(true)
-    setJournalError(null)
+    if (!append) {
+      setJournalError(null)
+    }
     try {
       const response = await apiClient.get('/user/journal', {
         params: {
-          offset: 0,
+          offset,
           limit: 100
         }
       })
       if (response.data && response.data.journal) {
-        setJournal(response.data.journal)
+        const newEntries = response.data.journal
+        const totalCount = response.data.total || 0
+
+        if (append) {
+          setJournal(prev => [...prev, ...newEntries])
+          setJournalOffset(prev => prev + newEntries.length)
+        } else {
+          setJournal(newEntries)
+          setJournalOffset(newEntries.length)
+        }
+
+        // Check if there are more entries to load
+        setHasMoreJournal(offset + newEntries.length < totalCount)
       } else {
         setJournalError('No journal data received')
       }
@@ -285,6 +301,12 @@ function BalanceModule({ onNavigateToSupport }) {
       setJournalError(error.response?.data?.error || error.message || 'Failed to fetch journal')
     } finally {
       setIsJournalLoading(false)
+    }
+  }
+
+  const loadMoreJournal = () => {
+    if (hasMoreJournal && !isJournalLoading) {
+      fetchJournal(journalOffset, true)
     }
   }
 
@@ -314,7 +336,7 @@ function BalanceModule({ onNavigateToSupport }) {
 
   // Fetch journal on component mount
   useEffect(() => {
-    fetchJournal()
+    fetchJournal(0, false)
   }, [])
 
   // Get the first pending invoice (most recent incomplete one) - memoized for performance
@@ -436,9 +458,9 @@ function BalanceModule({ onNavigateToSupport }) {
     return kindMap[kind] || kind
   }
 
-  // Get recent invoices and journal entries (limit to first 10)
-  const displayInvoices = invoices.slice(0, 10)
-  const displayJournal = journal.slice(0, 10)
+  // Get all invoices and journal entries
+  const displayInvoices = invoices
+  const displayJournal = journal
 
   // Filter and search rates - adapted for new data structure
   const filteredRates = rates.filter(rate => {
@@ -785,6 +807,19 @@ function BalanceModule({ onNavigateToSupport }) {
                           </div>
                         ))
                       )}
+
+                      {/* Load More Invoices Button */}
+                      {hasMore && displayInvoices.length > 0 && (
+                        <div className="mt-3 text-center">
+                          <button
+                            onClick={loadMoreInvoices}
+                            disabled={invoicesLoading}
+                            className="text-white/70 hover:text-white text-sm py-2 px-4 rounded-lg hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {invoicesLoading ? t('common.loading') : t('balance.loadMore')}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -859,6 +894,19 @@ function BalanceModule({ onNavigateToSupport }) {
                             </div>
                           </div>
                         ))
+                      )}
+
+                      {/* Load More Journal Button */}
+                      {hasMoreJournal && displayJournal.length > 0 && (
+                        <div className="mt-3 text-center">
+                          <button
+                            onClick={loadMoreJournal}
+                            disabled={isJournalLoading}
+                            className="text-white/70 hover:text-white text-sm py-2 px-4 rounded-lg hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isJournalLoading ? t('common.loading') : t('balance.loadMore')}
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
