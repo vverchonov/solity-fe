@@ -20,7 +20,7 @@ export const paymentsAPI = {
   },
 
   // Get User Journal with pagination
-  getJournal: async (offset = 0, limit = 20) => {
+  getJournal: async (offset = 0, limit = 100) => {
     try {
       const response = await apiClient.get('/user/journal', {
         params: {
@@ -80,7 +80,7 @@ export const paymentsAPI = {
   },
 
   // Get User Invoices with pagination
-  getInvoices: async (offset = 0, limit = 20) => {
+  getInvoices: async (offset = 0, limit = 100) => {
     try {
       const response = await apiClient.get('/user/invoices', {
         params: {

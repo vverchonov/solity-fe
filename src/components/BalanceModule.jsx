@@ -269,7 +269,12 @@ function BalanceModule({ onNavigateToSupport }) {
     setIsJournalLoading(true)
     setJournalError(null)
     try {
-      const response = await apiClient.get('/user/journal')
+      const response = await apiClient.get('/user/journal', {
+        params: {
+          offset: 0,
+          limit: 100
+        }
+      })
       if (response.data && response.data.journal) {
         setJournal(response.data.journal)
       } else {
