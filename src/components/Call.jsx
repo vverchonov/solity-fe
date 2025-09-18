@@ -46,6 +46,26 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
   const { user, isUserInactive } = useUser()
   const { t } = useI18n()
 
+  // Validation function for phone numbers using schema validation
+  const validatePhoneNumber = (phoneStr, setError) => {
+    // Extract only digits
+    const digitsOnly = phoneStr.replace(/[^\d]/g, '')
+
+    // Check length (7-15 digits)
+    if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+      setError('Phone number must be 7-15 digits long')
+      return false
+    }
+
+    // Check regex pattern (starts with 1-9, followed by 1-14 digits)
+    if (!PHONE_REGEX.test(digitsOnly)) {
+      setError('Only digits are allowed')
+      return false
+    }
+
+    setError(null)
+    return true
+  }
 
   // Derived state from CallProvider
   const isInCall = callState.callStatus === 'in-call'
@@ -101,27 +121,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
     if (!editableCallerID.trim() || editableCallerID === callerID) {
       setCallerIDError(null)
       return
-    }
-
-    // Validation function for phone numbers using schema validation
-    const validatePhoneNumber = (phoneStr, setError) => {
-      // Extract only digits
-      const digitsOnly = phoneStr.replace(/[^\d]/g, '')
-
-      // Check length (7-15 digits)
-      if (digitsOnly.length < 7 || digitsOnly.length > 15) {
-        setError('Phone number must be 7-15 digits long')
-        return false
-      }
-
-      // Check regex pattern (starts with 1-9, followed by 1-14 digits)
-      if (!PHONE_REGEX.test(digitsOnly)) {
-        setError('Only digits are allowed')
-        return false
-      }
-
-      setError(null)
-      return true
     }
 
     const validateCallerID = (newCallerID) => {
@@ -490,7 +489,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
               {numberPadButtons.flat().map((btn) => (
                 <button
                   key={btn}
-                  onClick={() => handleNumberClick(btn)}
+                  onClick={() => isInCall ? handleDTMF(btn) : handleNumberClick(btn)}
                   className="bg-white/5 hover:bg-white/10 border border-white/10 text-white text-lg font-medium py-4 px-6 rounded-xl transition-all h-14 flex items-center justify-center"
                 >
                   {btn}
