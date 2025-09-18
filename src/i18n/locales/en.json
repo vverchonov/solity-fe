@@ -33,8 +33,8 @@
     "endCall": "End Call",
     "randomize": "Randomize",
     "enterCallerID": "Enter your caller ID(phone number)",
-    "phoneNumberPlaceholder": "e.g. +44 20 7946 0958",
-    "callerIDPlaceholder": "e.g. +1 555 0123",
+    "phoneNumberPlaceholder": "e.g. 1 800 207 9460",
+    "callerIDPlaceholder": "e.g. 1 555 0123",
     "validatingCallerID": "Validating caller ID...",
     "callerIDError": "Caller ID must be 7-15 digits",
     "callDuration": "Call duration",
@@ -125,54 +125,94 @@
       "solityNetCall": {
         "title": "SolityNET Call",
         "description": "We're rolling out the SolityNET calling feature to the public. It took just three months to go from idea to live product - our first step toward becoming the leading crypto-native mobility provider.",
-        "details": ["Public launch complete", "3 months development", "Crypto-native mobility"]
+        "details": [
+          "Public launch complete",
+          "3 months development",
+          "Crypto-native mobility"
+        ]
       },
       "coverageIncrease": {
         "title": "SolityNET Coverage Increase",
         "description": "Daily coverage expansions are planned. 40+ countries are queued for rollout. We'll post day-by-day updates on X.",
-        "details": ["40+ countries queued", "Daily expansions", "X updates"]
+        "details": [
+          "40+ countries queued",
+          "Daily expansions",
+          "X updates"
+        ]
       },
       "solityNetApi": {
         "title": "SolityNET API",
         "description": "Opening up the SolityNET API brings full integration flexibility. Hook up your own systems - or connect an AI assistant that can place calls on your behalf, from ordering pizza to scheduling business meetings.",
-        "details": ["Full integration flexibility", "AI assistant support", "Business automation"]
+        "details": [
+          "Full integration flexibility",
+          "AI assistant support",
+          "Business automation"
+        ]
       },
       "solityNetSms": {
         "title": "SolityNET SMS",
         "description": "Decentralized outbound SMS is fully feasible and in active development. As with calling, we're focusing on sending only; we won't support inbound SMS reception to avoid potential exposure of personal information.",
-        "details": ["Outbound SMS only", "Privacy focused", "Decentralized"]
+        "details": [
+          "Outbound SMS only",
+          "Privacy focused",
+          "Decentralized"
+        ]
       },
       "aiAssistant": {
         "title": "Solity AI Assistant",
         "description": "A test launch of the AI assistant is planned before eSIM, since it's a core mobility feature. It can replace voicemail, screen incoming calls as your gatekeeper, and handle simple tasks like \\\"book a table\\\" or \\\"order pizza.\\\"",
-        "details": ["Voicemail replacement", "Call screening", "Task automation"]
+        "details": [
+          "Voicemail replacement",
+          "Call screening",
+          "Task automation"
+        ]
       },
       "esimUs": {
         "title": "Solity eSIM US",
         "description": "The United States will be our first eSIM market, offering direct telephony with unique/custom extension numbers. Global coverage is a key goal on our roadmap.",
-        "details": ["US first market", "Custom extensions", "Global coverage goal"]
+        "details": [
+          "US first market",
+          "Custom extensions",
+          "Global coverage goal"
+        ]
       }
     },
     "phases": {
       "phase1": {
         "title": "Phase 1 | Foundation",
         "subtitle": "Now → 100 concurrent calls",
-        "features": ["Stable core dialer + billing in SOL", "Rate limiter v2", "Basic dashboards (P95)"]
+        "features": [
+          "Stable core dialer + billing in SOL",
+          "Rate limiter v2",
+          "Basic dashboards (P95)"
+        ]
       },
       "phase2": {
         "title": "Phase 2 | Scale-out",
         "subtitle": "100 → 1,000 concurrent calls",
-        "features": ["Autoscaling workers (HPA)", "Multi-region ingress + failover", "Background number reputation checks"]
+        "features": [
+          "Autoscaling workers (HPA)",
+          "Multi-region ingress + failover",
+          "Background number reputation checks"
+        ]
       },
       "phase3": {
         "title": "Phase 3 | Global",
         "subtitle": "Multi-region + routing policies",
-        "features": ["Smart routing by latency/cost", "Customer traffic isolation", "Disaster recovery drills (quarterly)"]
+        "features": [
+          "Smart routing by latency/cost",
+          "Customer traffic isolation",
+          "Disaster recovery drills (quarterly)"
+        ]
       },
       "phase4": {
         "title": "Phase 4 | Enterprise",
         "subtitle": "Security & compliance uplift",
-        "features": ["KMS key management + rotations", "SAML SSO / SCIM", "Fine-grained org controls"]
+        "features": [
+          "KMS key management + rotations",
+          "SAML SSO / SCIM",
+          "Fine-grained org controls"
+        ]
       }
     },
     "eta": "ETA"

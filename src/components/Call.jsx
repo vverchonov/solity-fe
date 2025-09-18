@@ -13,8 +13,8 @@ const PHONE_REGEX = /^[1-9]\d{1,14}$/
 function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [phoneNumberError, setPhoneNumberError] = useState(null)
-  const [callerID, setCallerID] = useState('+17349303030')
-  const [editableCallerID, setEditableCallerID] = useState('+17349303030')
+  const [callerID, setCallerID] = useState('17349303030')
+  const [editableCallerID, setEditableCallerID] = useState('17349303030')
   const [callerIDError, setCallerIDError] = useState(null)
   const [isUpdatingCallerID, setIsUpdatingCallerID] = useState(false)
   const [soundDisabled, setSoundDisabled] = useState(false)
@@ -207,7 +207,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
       '18663100001', '18557693779', '17804983490', '19058482700'
     ]
     const randomIndex = Math.floor(Math.random() * phoneNumbers.length)
-    const randomNum = '+' + phoneNumbers[randomIndex]
+    const randomNum = phoneNumbers[randomIndex]
     setEditableCallerID(randomNum)
   }
 

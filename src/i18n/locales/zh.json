@@ -33,8 +33,8 @@
     "endCall": "结束通话",
     "randomize": "随机化",
     "enterCallerID": "输入您的主叫号码（电话号码）",
-    "phoneNumberPlaceholder": "例如：+86 138 0013 8000",
-    "callerIDPlaceholder": "例如：+86 138 0013 8000",
+    "phoneNumberPlaceholder": "例如：86 138 0013 8000",
+    "callerIDPlaceholder": "例如：86 138 0013 8000",
     "validatingCallerID": "验证主叫号码中...",
     "callerIDError": "主叫号码必须是7-15位数字",
     "callDuration": "通话时长",
@@ -125,54 +125,94 @@
       "solityNetCall": {
         "title": "SolityNET通话",
         "description": "我们正在向公众推出SolityNET通话功能。从想法到上线产品只用了三个月——这是我们成为领先的加密原生移动服务提供商的第一步。",
-        "details": ["公开发布完成", "3个月开发", "加密原生移动"]
+        "details": [
+          "公开发布完成",
+          "3个月开发",
+          "加密原生移动"
+        ]
       },
       "coverageIncrease": {
         "title": "SolityNET覆盖范围增加",
         "description": "计划每日覆盖扩展。40多个国家排队推出。我们将在X上发布逐日更新。",
-        "details": ["40多个国家排队", "每日扩展", "X更新"]
+        "details": [
+          "40多个国家排队",
+          "每日扩展",
+          "X更新"
+        ]
       },
       "solityNetApi": {
         "title": "SolityNET API",
         "description": "开放SolityNET API带来完全的集成灵活性。连接您自己的系统——或连接AI助手，可以代您拨打电话，从订购披萨到安排商务会议。",
-        "details": ["完全集成灵活性", "AI助手支持", "业务自动化"]
+        "details": [
+          "完全集成灵活性",
+          "AI助手支持",
+          "业务自动化"
+        ]
       },
       "solityNetSms": {
         "title": "SolityNET短信",
         "description": "去中心化出站短信完全可行且正在积极开发中。与通话一样，我们专注于发送功能；我们不支持入站短信接收，以避免个人信息的潜在暴露。",
-        "details": ["仅出站短信", "注重隐私", "去中心化"]
+        "details": [
+          "仅出站短信",
+          "注重隐私",
+          "去中心化"
+        ]
       },
       "aiAssistant": {
         "title": "Solity AI助手",
         "description": "AI助手的测试发布计划在eSIM之前，因为这是核心移动功能。它可以替代语音邮件，作为您的守门员筛选来电，并处理简单任务，如\"预订餐桌\"或\"订披萨\"。",
-        "details": ["语音邮件替代", "来电筛选", "任务自动化"]
+        "details": [
+          "语音邮件替代",
+          "来电筛选",
+          "任务自动化"
+        ]
       },
       "esimUs": {
         "title": "Solity eSIM美国",
         "description": "美国将是我们的第一个eSIM市场，提供具有唯一/自定义分机号码的直接电话服务。全球覆盖是我们路线图上的关键目标。",
-        "details": ["美国首个市场", "自定义分机", "全球覆盖目标"]
+        "details": [
+          "美国首个市场",
+          "自定义分机",
+          "全球覆盖目标"
+        ]
       }
     },
     "phases": {
       "phase1": {
         "title": "阶段1 | 基础",
         "subtitle": "现在 → 100个并发通话",
-        "features": ["稳定的核心拨号器 + SOL计费", "限速器v2", "基本仪表板(P95)"]
+        "features": [
+          "稳定的核心拨号器 + SOL计费",
+          "限速器v2",
+          "基本仪表板(P95)"
+        ]
       },
       "phase2": {
         "title": "阶段2 | 扩展",
         "subtitle": "100 → 1,000个并发通话",
-        "features": ["自动扩展工作器(HPA)", "多区域入口 + 故障转移", "后台号码声誉检查"]
+        "features": [
+          "自动扩展工作器(HPA)",
+          "多区域入口 + 故障转移",
+          "后台号码声誉检查"
+        ]
       },
       "phase3": {
         "title": "阶段3 | 全球",
         "subtitle": "多区域 + 路由策略",
-        "features": ["按延迟/成本智能路由", "客户流量隔离", "灾难恢复演练(季度)"]
+        "features": [
+          "按延迟/成本智能路由",
+          "客户流量隔离",
+          "灾难恢复演练(季度)"
+        ]
       },
       "phase4": {
         "title": "阶段4 | 企业",
         "subtitle": "安全性和合规性提升",
-        "features": ["KMS密钥管理 + 轮换", "SAML SSO / SCIM", "细粒度组织控制"]
+        "features": [
+          "KMS密钥管理 + 轮换",
+          "SAML SSO / SCIM",
+          "细粒度组织控制"
+        ]
       }
     },
     "eta": "预计时间"
