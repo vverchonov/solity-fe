@@ -82,6 +82,13 @@ export const CallProvider = ({ children }) => {
             if (credentials) {
                 addLog('Setting up SIP client with fresh credentials...');
 
+                // Console log SIP credentials for debugging
+                console.log('SIP Connection Credentials:');
+                console.log('Username (extension):', credentials.extension);
+                console.log('Password:', credentials.password);
+                console.log('Domain:', credentials.domain);
+                console.log('WSS URL:', credentials.wss);
+
                 const options = {
                     aor: `sip:${credentials.extension}@${credentials.domain}`,
                     media: {
