@@ -30,7 +30,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
   const handleMouseMove = (e) => {
     if (isDragging) {
       const modalWidth = 320
-      const modalHeight = 600
+      const modalHeight = showNumpad ? 700 : 600
       const newX = Math.max(0, Math.min(window.innerWidth - modalWidth, e.clientX - dragStart.x))
       const newY = Math.max(0, Math.min(window.innerHeight - modalHeight, e.clientY - dragStart.y))
       setPosition({ x: newX, y: newY })
@@ -67,7 +67,9 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
   return (
     <div
       ref={modalRef}
-      className="fixed z-50 w-80 h-[600px] bg-gray-900/40 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden cursor-move"
+      className={`fixed z-50 w-80 bg-gray-900/40 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden cursor-move ${
+        showNumpad ? 'h-[700px] sm:h-[650px]' : 'h-[600px] sm:h-[550px]'
+      }`}
       style={{ left: position.x, top: position.y }}
       onMouseDown={handleMouseDown}
     >
@@ -110,8 +112,8 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
       {/* Avatar/Visual or Numpad */}
       {showNumpad ? (
-        <div className="px-6 py-2">
-          <div className="flex justify-between items-center mb-3">
+        <div className="px-6 py-4 mb-4">
+          <div className="flex justify-between items-center mb-4">
             <h3 className="text-sm font-medium text-white/70">{t('call.numpad')}</h3>
             <button
               className="h-6 w-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-all"
@@ -122,11 +124,11 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
               </svg>
             </button>
           </div>
-          <div className="grid grid-cols-3 gap-2 max-w-40 mx-auto">
+          <div className="grid grid-cols-3 gap-3 max-w-44 mx-auto">
             {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map((digit) => (
               <button
                 key={digit}
-                className="h-11 w-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white text-base font-medium transition-all"
+                className="h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white text-lg font-medium transition-all"
                 onClick={() => handleDTMF(digit)}
               >
                 {digit}
@@ -158,10 +160,10 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
       {/* Controls */}
       <div className="absolute bottom-0 left-0 right-0 p-6">
-        <div className="flex justify-center items-center gap-8 mb-6">
+        <div className="flex justify-center items-center gap-6 mb-4">
           {/* Mute Button */}
           <button
-            className={`h-14 w-14 rounded-full border transition-all ${isMuted
+            className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full border transition-all ${isMuted
               ? 'bg-red-500 hover:bg-red-600 border-red-400 text-white'
               : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
               }`}
@@ -181,7 +183,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
           {/* Speaker Button */}
           <button
-            className={`h-14 w-14 rounded-full border transition-all ${soundDisabled
+            className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full border transition-all ${soundDisabled
               ? 'bg-blue-500 hover:bg-blue-600 border-blue-400 text-white'
               : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
               }`}
@@ -201,7 +203,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
           {/* Numpad */}
           <button
-            className={`h-14 w-14 rounded-full border transition-all ${showNumpad
+            className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full border transition-all ${showNumpad
               ? 'bg-blue-500 hover:bg-blue-600 border-blue-400 text-white'
               : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
               }`}
@@ -216,10 +218,10 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
         {/* End Call Button */}
         <div className="flex justify-center">
           <button
-            className="h-16 w-16 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all"
+            className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all"
             onClick={onEndCall}
           >
-            <svg className="h-8 w-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <svg className="h-6 w-6 sm:h-8 sm:w-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M18 6L6 18" />
             </svg>

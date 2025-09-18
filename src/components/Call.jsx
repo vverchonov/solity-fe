@@ -336,7 +336,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange }) 
           <div className='w-full'>
             {/* Status */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-              <span className={getStatusPill().className}>{getStatusPill().text}</span>
+              <span className={`${getStatusPill().className} self-start`}>{getStatusPill().text}</span>
               {isInCall && (
                 <span className="text-white/70 text-sm">
                   {t('call.callDuration')}: {formatCallDuration(callDuration)}

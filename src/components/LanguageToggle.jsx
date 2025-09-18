@@ -44,7 +44,7 @@ const LanguageToggle = ({ compact = false }) => {
         </button>
 
         {isOpen && (
-          <div className="absolute top-full right-0 mt-2 bg-gray-900/95 backdrop-blur-lg border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 min-w-[140px]">
+          <div className="absolute top-full right-0 mt-2 bg-gray-900/95 backdrop-blur-lg border border-white/10 rounded-xl overflow-hidden shadow-2xl z-[999] min-w-[140px]">
             {languages.map((language) => (
               <button
                 key={language.code}
@@ -93,7 +93,7 @@ const LanguageToggle = ({ compact = false }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900/95 backdrop-blur-lg border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900/95 backdrop-blur-lg border border-white/10 rounded-xl overflow-hidden shadow-2xl z-[999]">
           {languages.map((language) => (
             <button
               key={language.code}
