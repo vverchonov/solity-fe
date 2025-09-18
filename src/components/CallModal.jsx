@@ -112,7 +112,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
       {/* Avatar/Visual or Numpad */}
       {showNumpad ? (
-        <div className="px-6 py-4 mb-4">
+        <div className="px-6 py-4 pb-32">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-sm font-medium text-white/70">{t('call.numpad')}</h3>
             <button
