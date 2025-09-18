@@ -148,7 +148,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
           </div>
 
           {/* Call Status */}
-          <div className="px-6 pb-32 text-center">
+          <div className="px-6 py-4 text-center">
             <div className="text-sm text-white/60">
               {isMuted && t('call.microphoneMuted')}
               {soundDisabled && !isMuted && t('call.soundDisabled')}
@@ -159,7 +159,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
       )}
 
       {/* Controls */}
-      <div className="absolute bottom-0 left-0 right-0 p-6">
+      <div className="absolute bottom-6 left-0 right-0 px-6">
         <div className="flex justify-center items-center gap-6 mb-4">
           {/* Mute Button */}
           <button
