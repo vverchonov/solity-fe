@@ -159,7 +159,7 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
       )}
 
       {/* Controls */}
-      <div className="absolute bottom-6 left-0 right-0 px-6">
+      <div className="absolute bottom-16 left-0 right-0 px-6">
         <div className="flex justify-center items-center gap-6 mb-4">
           {/* Mute Button */}
           <button
