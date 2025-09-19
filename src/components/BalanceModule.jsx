@@ -31,7 +31,7 @@ function BalanceModule({ onNavigateToSupport }) {
   const { rates: apiRates, isLoading: ratesLoading, error: ratesError } = useRates()
 
   // Use wallet provider
-  const { isWalletConnected, walletAddress, isConnecting, connectWallet, disconnectWallet, walletProvider } = useWallet()
+  const { isWalletConnected, walletAddress, isConnecting, connectWallet, disconnectWallet, reconnectWallet, walletProvider } = useWallet()
 
   // Use balance provider
   const {
@@ -78,14 +78,23 @@ function BalanceModule({ onNavigateToSupport }) {
     const invoiceId = invoiceData.invoice || invoiceData.id
     logTransactionStart(invoiceId, (invoiceData.lamports / 1e9))
 
-    if (!walletProvider) {
-      logTransactionError('Wallet not connected', invoiceId)
-      return
-    }
-
     try {
+      // Force wallet reconnection before transaction to ensure user signs both login and transaction manually
+      const reconnectResult = await reconnectWallet()
+      if (!reconnectResult.success) {
+        logTransactionError('Failed to reconnect wallet', invoiceId)
+        return
+      }
+
+      // Get fresh wallet provider after reconnection
+      const freshWalletProvider = window.phantom?.solana
+      if (!freshWalletProvider) {
+        logTransactionError('Wallet not available after reconnection', invoiceId)
+        return
+      }
+
       // Execute Solana payment using the prepared invoice data
-      const paymentResult = await solanaService.executePayment(invoiceData, walletProvider)
+      const paymentResult = await solanaService.executePayment(invoiceData, freshWalletProvider)
 
       if (paymentResult.success) {
         const invoiceId = invoiceData.invoice || invoiceData.id
@@ -201,12 +210,21 @@ function BalanceModule({ onNavigateToSupport }) {
   const handlePayInvoice = async (invoiceId) => {
     logTransactionStart(invoiceId, 0) // Amount will be updated when we get invoice details
 
-    if (!walletProvider) {
-      logTransactionError('Wallet not connected', invoiceId)
-      return
-    }
-
     try {
+      // Force wallet reconnection before transaction to ensure user signs both login and transaction manually
+      const reconnectResult = await reconnectWallet()
+      if (!reconnectResult.success) {
+        logTransactionError('Failed to reconnect wallet', invoiceId)
+        return
+      }
+
+      // Get fresh wallet provider after reconnection
+      const freshWalletProvider = window.phantom?.solana
+      if (!freshWalletProvider) {
+        logTransactionError('Wallet not available after reconnection', invoiceId)
+        return
+      }
+
       // 1. Get invoice details by ID
       const invoiceResult = await paymentsAPI.getInvoiceById(invoiceId)
 
@@ -221,8 +239,7 @@ function BalanceModule({ onNavigateToSupport }) {
       const invoiceData = invoiceResponse.invoice || invoiceResponse
 
       // 2. Execute Solana payment using the invoice data
-
-      const paymentResult = await solanaService.executePayment(invoiceData, walletProvider)
+      const paymentResult = await solanaService.executePayment(invoiceData, freshWalletProvider)
 
       if (paymentResult.success) {
         logTransactionSigned(paymentResult.signature, invoiceId)

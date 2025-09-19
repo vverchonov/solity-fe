@@ -90,6 +90,27 @@ export const WalletProvider = ({ children }) => {
     }
   }
 
+  // Force wallet reconnection - ensures user signs both login and transaction manually
+  const reconnectWallet = async () => {
+    try {
+      // First disconnect the current session
+      if (window.phantom?.solana && isWalletConnected) {
+        await window.phantom.solana.disconnect()
+      }
+    } catch (error) {
+      // Continue with reconnection even if disconnect fails
+    }
+
+    // Clear all wallet state
+    setIsWalletConnected(false)
+    setWalletAddress(null)
+    sessionStorage.removeItem('walletConnected')
+    sessionStorage.removeItem('walletAddress')
+
+    // Now reconnect with fresh user approval
+    return await connectWallet()
+  }
+
   // Listen for wallet account changes
   useEffect(() => {
     if (window.phantom?.solana) {
@@ -120,6 +141,7 @@ export const WalletProvider = ({ children }) => {
     isConnecting,
     connectWallet,
     disconnectWallet,
+    reconnectWallet,
     walletProvider: isWalletConnected ? window.phantom?.solana : null // Add the actual wallet provider
   }
 
