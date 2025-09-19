@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { ratesAPI } from '../services/rates'
+import { apiDebouncer } from '../utils/debounce'
 
 const RatesContext = createContext()
 
@@ -23,7 +24,9 @@ export const RatesProvider = ({ children }) => {
         setIsLoading(true)
         setError(null)
         
-        const result = await ratesAPI.getCurrentRates()
+        const result = await apiDebouncer.debounce('getCurrentRates', async () => {
+          return await ratesAPI.getCurrentRates()
+        })
         if (result.success) {
           setRates(result.data.rates || result.data || [])
         } else {
@@ -57,7 +60,9 @@ export const RatesProvider = ({ children }) => {
     setError(null)
     
     try {
-      const result = await ratesAPI.getCurrentRates()
+      const result = await apiDebouncer.debounce('getCurrentRates', async () => {
+        return await ratesAPI.getCurrentRates()
+      })
       if (result.success) {
         setRates(result.data.rates || result.data || [])
       } else {

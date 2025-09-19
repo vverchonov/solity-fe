@@ -296,11 +296,13 @@ function BalanceModule({ onNavigateToSupport }) {
       setJournalError(null)
     }
     try {
-      const response = await apiClient.get('/user/journal', {
-        params: {
-          offset,
-          limit: 100
-        }
+      const response = await apiDebouncer.debounce(`getJournal-${offset}`, async () => {
+        return await apiClient.get('/user/journal', {
+          params: {
+            offset,
+            limit: 100
+          }
+        })
       })
       if (response.data && response.data.journal) {
         const newEntries = response.data.journal
@@ -335,7 +337,12 @@ function BalanceModule({ onNavigateToSupport }) {
   const handleRefreshBalance = async () => {
     setIsRefreshingBalance(true)
     try {
-      // Use BalanceProvider's refresh method (avoids duplicate API call)
+      // Clear cache to ensure fresh data when user manually refreshes
+      apiDebouncer.clearKey('getBalance')
+      apiDebouncer.clearKey('getInvoices-0-100')
+      apiDebouncer.clearKey('getJournal-0')
+
+      // Use BalanceProvider's refresh method
       await refreshBalance()
       logBalanceRefresh(true)
 

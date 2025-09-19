@@ -122,7 +122,7 @@ export const InvoicesProvider = ({ children }) => {
     refreshInvoices()
   }
 
-  // Get invoice by ID
+  // Get invoice by ID (debounced)
   const getInvoiceById = async (invoiceId) => {
     if (!user) {
       return {
@@ -131,9 +131,10 @@ export const InvoicesProvider = ({ children }) => {
       }
     }
 
-
     try {
-      const result = await paymentsAPI.getInvoiceById(invoiceId)
+      const result = await apiDebouncer.debounce(`getInvoiceById-${invoiceId}`, async () => {
+        return await paymentsAPI.getInvoiceById(invoiceId)
+      })
       return result
     } catch (error) {
       return {
@@ -158,7 +159,7 @@ export const InvoicesProvider = ({ children }) => {
     return invoices.some(invoice => invoice.id === invoiceId)
   }
 
-  // Cancel invoice
+  // Cancel invoice (not debounced - single action)
   const cancelInvoice = async (invoiceId) => {
     if (!user) {
       return {
@@ -167,8 +168,10 @@ export const InvoicesProvider = ({ children }) => {
       }
     }
 
-
     try {
+      // Clear cache for this specific invoice to ensure fresh data after cancellation
+      apiDebouncer.clearKey(`getInvoiceById-${invoiceId}`)
+
       const result = await paymentsAPI.cancelInvoice(invoiceId)
 
       if (result.success) {

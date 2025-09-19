@@ -6,6 +6,7 @@ import { useLogs } from '../contexts/LogsProvider'
 import { useTele } from '../contexts/TeleProvider'
 import { useI18n } from '../contexts/I18nProvider'
 import apiClient from '../lib/axios'
+import { apiDebouncer } from '../utils/debounce'
 
 // Phone validation constants for international numbers
 const PHONE_REGEX = /^\d{7,15}$/
@@ -283,7 +284,9 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
     try {
       // Remove all non-numeric characters from phone number
       const numbersOnly = phoneNumber.replace(/[^\d]/g, '')
-      const response = await apiClient.get(`/rates/resolve/?number=${encodeURIComponent(numbersOnly)}`)
+      const response = await apiDebouncer.debounce(`resolveRate-${numbersOnly}`, async () => {
+        return await apiClient.get(`/rates/resolve/?number=${encodeURIComponent(numbersOnly)}`)
+      })
       setRateInfo(response.data)
     } catch (error) {
       setRateError(error.response?.data?.error || t('call.rateCheckFailed'))

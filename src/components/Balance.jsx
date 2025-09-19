@@ -265,7 +265,11 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const handleRefreshBalance = async () => {
     setIsRefreshingBalance(true)
     try {
-      // Use BalanceProvider's refresh method (avoids duplicate API call)
+      // Clear cache to ensure fresh data when user manually refreshes
+      apiDebouncer.clearKey('getBalance')
+      apiDebouncer.clearKey('getInvoices-0-100')
+
+      // Use BalanceProvider's refresh method
       await refreshBalance()
 
       // Also refresh invoices

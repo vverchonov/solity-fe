@@ -123,7 +123,7 @@ export const BalanceProvider = ({ children }) => {
       const lamports = paymentsUtils.solToLamports(solAmount)
 
 
-      // Prepare invoice
+      // Prepare invoice (not debounced - single action creates unique invoice)
       const prepareResult = await paymentsAPI.prepareInvoice(lamports)
 
       if (prepareResult.success) {
@@ -168,6 +168,7 @@ export const BalanceProvider = ({ children }) => {
       // Extract invoice ID from the invoice field (assuming it's the ID)
       const invoiceId = activeInvoice.invoice
 
+      // Cancel invoice (not debounced - single action)
       const result = await paymentsAPI.cancelInvoice(invoiceId)
 
       if (result.success) {

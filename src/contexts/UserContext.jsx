@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { authAPI, tokenUtils } from '../services/auth'
+import { apiDebouncer } from '../utils/debounce'
 
 const UserContext = createContext()
 
@@ -31,8 +32,10 @@ export const UserProvider = ({ children }) => {
             setShouldRedirectToDashboard(true)
             setIsLoading(false)
 
-            // Optionally refresh in background to get latest data
-            authAPI.refreshToken().then((refreshResult) => {
+            // Optionally refresh in background to get latest data (debounced)
+            apiDebouncer.debounce('refreshToken', async () => {
+              return await authAPI.refreshToken()
+            }).then((refreshResult) => {
               if (refreshResult.success) {
                 const updatedUserData = refreshResult.data.user
                 setUser(updatedUserData)
@@ -41,8 +44,10 @@ export const UserProvider = ({ children }) => {
               // Ignore background refresh failures
             })
           } else {
-            // No cached data, need to refresh
-            const refreshResult = await authAPI.refreshToken()
+            // No cached data, need to refresh (debounced)
+            const refreshResult = await apiDebouncer.debounce('refreshToken', async () => {
+              return await authAPI.refreshToken()
+            })
             if (refreshResult.success) {
               const userData = refreshResult.data.user
 
