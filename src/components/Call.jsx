@@ -7,14 +7,78 @@ import { useTele } from '../contexts/TeleProvider'
 import { useI18n } from '../contexts/I18nProvider'
 import apiClient from '../lib/axios'
 
-// Phone validation constants
-const PHONE_REGEX = /^[1-9]\d{1,14}$/
+// Phone validation constants for US/Canada
+const PHONE_REGEX = /^1?\d{10}$/
+
+// Available caller ID numbers
+const CALLER_ID_NUMBERS = [
+  '17349303030', '18009488488', '18775477272', '18007223727', '14198857000',
+  '18334800148', '18887706637', '14252149903', '18004235709', '19259693900',
+  '18665535554', '16265845880', '14169671010', '14164390000', '15194390000',
+  '18663100001', '18557693779', '17804983490', '19058482700', '13857078616',
+  '18007861000', '14793589274', '18012538600', '18667917626', '17024444800',
+  '17027977777', '17252672262', '17026433060', '18888997770', '18185760003',
+  '18187132707', '18189001017', '18187895937', '18008648377', '18188458586',
+  '18182438999', '13237212100', '17142369300', '17145400404', '19494283900',
+  '19498595611', '16192323861', '16194276701', '16192056140', '17603519800',
+  '17603440961', '17603441579', '16022545154', '16022629916', '16023148470',
+  '16022186001', '16022221111', '16024621563', '16024378400', '14808219447',
+  '16023055500', '18559552534', '14802487002', '14809870888', '14804046469',
+  '14808306900', '14808324996', '16029556600', '15053445911', '15053410831',
+  '15058809800', '15058844928', '15055809693', '15055083091', '15053232594',
+  '15052937272', '15052964871', '15057960311', '14696428868', '12142909090',
+  '12142998982', '14693990081', '19728033903', '12144281555', '12142109098',
+  '12149464711', '14699312280', '19729264180', '14694389223', '19722405017',
+  '19722260725', '14698928883', '14693674200', '19724757511', '12148708201',
+  '14698140185', '19725092700', '19724232303', '14694093123', '19728464255',
+  '12143879500', '14692155740', '14043903009', '14047481912', '14049074452',
+  '14707888255', '19172317217', '16154658300', '16156498009', '16153407500',
+  '16156695440', '16158802001', '16152286794', '16158893032', '16158060187',
+  '19315285988', '19315264231', '19315264660', '19315201225', '19315263344',
+  '19318541378', '19314000044', '15029013831', '15027748555', '15027763713',
+  '15026372424', '15029617600', '15027351215', '15024588888', '15029386262',
+  '15025093033', '15022429311', '15022405555', '15022530085', '15022445800',
+  '15022419996', '15132877000', '15137212787', '15136843262', '12123661182',
+  '12123889474', '12122670860', '16465594878', '17183882216', '17862301441',
+  '13058516773', '17342135625', '18572264942', '13239904301', '17738321300',
+  '13052003190', '17867031451', '13056312265', '17542004857', '18778390526',
+  '13033332453', '13036982811', '18588808778', '18588680925', '12029370001',
+  '16172270765', '16172616600', '16177421713', '13463955233', '16147988802',
+  '16144421888', '16147714800', '16143083333', '16148781200', '16142211600',
+  '16143177798', '16148019130', '16149491078', '16148014300', '16142573000',
+  '16142992180', '16142942545', '16142474000', '16142620988', '16144789999',
+  '16148554900', '13307853724', '12347889135', '13306597118', '13307625877',
+  '13309269774', '12343340124', '13309238232', '13306722640', '12169612560',
+  '12163310338', '12168626427', '12166514007', '14405035506', '12162218127',
+  '12165213280', '12162268828', '12165210301', '12162265200', '14408657773',
+  '18006911699', '12165211155', '12163073205', '16172669210', '17812704212',
+  '17813061222', '12129417994', '12129664100', '15623432300', '17734862280',
+  '13122198510', '13037331616', '15128925550', '15122916056', '13252685906',
+  '12063293008', '12064201548', '12064574274', '13124963792', '15122800900',
+  '18326783010', '18326783105', '17137835780', '12817526044', '18326783104',
+  '18325361155', '13853139766', '15208886858', '15208869573', '17732816688',
+  '15124513708', '15123265533', '16172651272', '15128363344', '16172446997',
+  '15125519334', '16176573603', '15123877642', '14254675575', '17733488058',
+  '13129209332', '17735165833', '15124730222', '15124773472', '13057042126',
+  '13056828889', '13034431822', '12124731452', '15032284651', '19549687747',
+  '17039998701', '17186449536', '15048617454', '17708885500', '15403420222',
+  '12625056279', '17817722017'
+]
+
+// Helper function to get a random caller ID
+const getRandomCallerID = () => {
+  const randomIndex = Math.floor(Math.random() * CALLER_ID_NUMBERS.length)
+  return CALLER_ID_NUMBERS[randomIndex]
+}
 
 function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, onShowModal, isModalVisible }) {
+  // Get initial random caller ID
+  const initialCallerID = getRandomCallerID()
+
   const [phoneNumber, setPhoneNumber] = useState('')
   const [phoneNumberError, setPhoneNumberError] = useState(null)
-  const [callerID, setCallerID] = useState('17349303030')
-  const [editableCallerID, setEditableCallerID] = useState('17349303030')
+  const [callerID, setCallerID] = useState(initialCallerID)
+  const [editableCallerID, setEditableCallerID] = useState(initialCallerID)
   const [callerIDError, setCallerIDError] = useState(null)
   const [isUpdatingCallerID, setIsUpdatingCallerID] = useState(false)
   const [soundDisabled, setSoundDisabled] = useState(false)
@@ -54,20 +118,48 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
     // Extract only digits
     const digitsOnly = phoneStr.replace(/[^\d]/g, '')
 
-    // Check length (7-15 digits)
-    if (digitsOnly.length < 7 || digitsOnly.length > 15) {
-      setError('Phone number must be 7-15 digits long')
+    // Check if number starts with 1 (US/Canada only)
+    if (digitsOnly.length > 0 && !digitsOnly.startsWith('1')) {
+      setError('Phone number must start with 1 (US/Canada only)')
       return false
     }
 
-    // Check regex pattern (starts with 1-9, followed by 1-14 digits)
-    if (!PHONE_REGEX.test(digitsOnly)) {
-      setError('Only digits are allowed')
+    // Check length (10-11 digits for US/Canada: 1 + 10 digits or 10 digits)
+    if (digitsOnly.length < 10 || digitsOnly.length > 11) {
+      setError('Phone number must be 10-11 digits long')
       return false
+    }
+
+    // For 10-digit numbers, ensure they're valid US format (area code can't start with 0 or 1)
+    if (digitsOnly.length === 10) {
+      const areaCode = digitsOnly.substring(0, 3)
+      if (areaCode.startsWith('0') || areaCode.startsWith('1')) {
+        setError('Invalid area code (cannot start with 0 or 1)')
+        return false
+      }
+    }
+
+    // For 11-digit numbers, ensure they start with 1 and have valid area code
+    if (digitsOnly.length === 11) {
+      if (!digitsOnly.startsWith('1')) {
+        setError('11-digit numbers must start with 1')
+        return false
+      }
+      const areaCode = digitsOnly.substring(1, 4)
+      if (areaCode.startsWith('0') || areaCode.startsWith('1')) {
+        setError('Invalid area code (cannot start with 0 or 1)')
+        return false
+      }
     }
 
     setError(null)
     return true
+  }
+
+  // Helper function to check if a number starts with 1
+  const startsWithOne = (phoneStr) => {
+    const digitsOnly = phoneStr.replace(/[^\d]/g, '')
+    return digitsOnly.length > 0 && digitsOnly.startsWith('1')
   }
 
   // Derived state from CallProvider
@@ -248,15 +340,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
 
 
   const randomizeCallerID = () => {
-    const phoneNumbers = [
-      '17349303030', '18009488488', '18775477272', '18007223727', '14198857000',
-      '18334800148', '18887706637', '14252149903', '18004235709', '19259693900',
-      '18665535554', '16265845880', '14169671010', '14164390000', '15194390000',
-      '18663100001', '18557693779', '17804983490', '19058482700'
-    ]
-    const randomIndex = Math.floor(Math.random() * phoneNumbers.length)
-    const randomNum = phoneNumbers[randomIndex]
-    setEditableCallerID(randomNum)
+    setEditableCallerID(getRandomCallerID())
   }
 
 
@@ -504,10 +588,10 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
                 </div>
                 <button
                   onClick={isCallActive ? handleEndCall : handleStartCall}
-                  disabled={callStatus === 'ended' || (!isCallActive && (!phoneNumber.trim() || phoneNumberError || callerIDError))}
+                  disabled={callStatus === 'ended' || (!isCallActive && (!phoneNumber.trim() || phoneNumberError || callerIDError || !startsWithOne(phoneNumber) || !startsWithOne(editableCallerID)))}
                   className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] border ${isCallActive
                     ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-600/30 hover:border-red-600/50'
-                    : callStatus === 'ended' || !phoneNumber.trim() || phoneNumberError || callerIDError
+                    : callStatus === 'ended' || !phoneNumber.trim() || phoneNumberError || callerIDError || !startsWithOne(phoneNumber) || !startsWithOne(editableCallerID)
                       ? 'bg-gray-600/20 text-gray-500 border-gray-600/30 cursor-not-allowed'
                       : 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-600/30 hover:border-green-600/50'
                     }`}
