@@ -15,34 +15,13 @@ export const WalletProvider = ({ children }) => {
   const [walletAddress, setWalletAddress] = useState(null)
   const [isConnecting, setIsConnecting] = useState(false)
 
-  // Check for existing wallet connection on mount
+  // Clear any stale wallet data on mount - no auto-connection
   useEffect(() => {
-    const checkWalletConnection = async () => {
-      try {
-        // Check session storage for wallet state
-        const savedWalletState = sessionStorage.getItem('walletConnected')
-        const savedWalletAddress = sessionStorage.getItem('walletAddress')
-
-        if (savedWalletState === 'true' && savedWalletAddress && window.phantom?.solana) {
-          // Check if wallet is still actually connected
-          const response = await window.phantom.solana.connect({ onlyIfTrusted: true })
-          if (response.publicKey) {
-            setIsWalletConnected(true)
-            setWalletAddress(response.publicKey.toString())
-          } else {
-            // Clear stale session data
-            sessionStorage.removeItem('walletConnected')
-            sessionStorage.removeItem('walletAddress')
-          }
-        }
-      } catch (error) {
-        // Clear stale session data on error
-        sessionStorage.removeItem('walletConnected')
-        sessionStorage.removeItem('walletAddress')
-      }
-    }
-
-    checkWalletConnection()
+    // Always start with clean wallet state - require explicit user connection
+    sessionStorage.removeItem('walletConnected')
+    sessionStorage.removeItem('walletAddress')
+    setIsWalletConnected(false)
+    setWalletAddress(null)
   }, [])
 
   const connectWallet = async () => {
@@ -58,9 +37,9 @@ export const WalletProvider = ({ children }) => {
         setIsWalletConnected(true)
         setWalletAddress(address)
 
-        // Persist connection state in session storage
-        sessionStorage.setItem('walletConnected', 'true')
-        sessionStorage.setItem('walletAddress', address)
+        // Don't persist connection state - require manual connection each time
+        // sessionStorage.setItem('walletConnected', 'true')
+        // sessionStorage.setItem('walletAddress', address)
 
         return { success: true, address }
       } else {
@@ -82,11 +61,9 @@ export const WalletProvider = ({ children }) => {
       }
     } catch (error) {
     } finally {
-      // Always clear local state and session storage
+      // Always clear local state (no session storage persistence)
       setIsWalletConnected(false)
       setWalletAddress(null)
-      sessionStorage.removeItem('walletConnected')
-      sessionStorage.removeItem('walletAddress')
     }
   }
 
@@ -101,11 +78,9 @@ export const WalletProvider = ({ children }) => {
       // Continue with reconnection even if disconnect fails
     }
 
-    // Clear all wallet state
+    // Clear all wallet state (no session storage persistence)
     setIsWalletConnected(false)
     setWalletAddress(null)
-    sessionStorage.removeItem('walletConnected')
-    sessionStorage.removeItem('walletAddress')
 
     // Now reconnect with fresh user approval
     return await connectWallet()
@@ -118,12 +93,11 @@ export const WalletProvider = ({ children }) => {
         if (publicKey) {
           const address = publicKey.toString()
           setWalletAddress(address)
-          sessionStorage.setItem('walletAddress', address)
+          // Don't persist to session storage
         } else {
           setIsWalletConnected(false)
           setWalletAddress(null)
-          sessionStorage.removeItem('walletConnected')
-          sessionStorage.removeItem('walletAddress')
+          // No session storage to clear
         }
       }
 

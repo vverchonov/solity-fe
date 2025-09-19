@@ -122,11 +122,18 @@ function BalanceModule({ onNavigateToSupport }) {
         handleRefreshBalance()
 
         // Also refresh invoices and journal after successful payment (additional refresh)
-        setTimeout(() => {
-          Promise.all([
+        setTimeout(async () => {
+          await Promise.all([
             refreshInvoices(),
             fetchJournal(0, false)
           ])
+
+          // Reconnect wallet after successful transaction to reset session
+          try {
+            await reconnectWallet()
+          } catch (error) {
+            console.log('Post-transaction wallet reconnection failed:', error)
+          }
         }, 1000)
       } else {
 
@@ -266,11 +273,18 @@ function BalanceModule({ onNavigateToSupport }) {
         handleRefreshBalance()
 
         // Also refresh invoices and journal after successful payment
-        setTimeout(() => {
-          Promise.all([
+        setTimeout(async () => {
+          await Promise.all([
             refreshInvoices(),
             fetchJournal(0, false)
           ])
+
+          // Reconnect wallet after successful transaction to reset session
+          try {
+            await reconnectWallet()
+          } catch (error) {
+            console.log('Post-transaction wallet reconnection failed:', error)
+          }
         }, 1000)
       } else {
 

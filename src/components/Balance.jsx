@@ -118,8 +118,15 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
         handleRefreshBalance()
 
         // Also refresh invoices after successful payment (additional refresh)
-        setTimeout(() => {
-          refreshInvoices()
+        setTimeout(async () => {
+          await refreshInvoices()
+
+          // Reconnect wallet after successful transaction to reset session
+          try {
+            await reconnectWallet()
+          } catch (error) {
+            console.log('Post-transaction wallet reconnection failed:', error)
+          }
         }, 1000)
       } else {
 
@@ -232,8 +239,15 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
         handleRefreshBalance()
 
         // Also refresh invoices after successful payment (additional refresh)
-        setTimeout(() => {
-          refreshInvoices()
+        setTimeout(async () => {
+          await refreshInvoices()
+
+          // Reconnect wallet after successful transaction to reset session
+          try {
+            await reconnectWallet()
+          } catch (error) {
+            console.log('Post-transaction wallet reconnection failed:', error)
+          }
         }, 1000)
       } else {
 
