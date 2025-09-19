@@ -1,6 +1,5 @@
 import { Connection, Transaction, SystemProgram, ComputeBudgetProgram, PublicKey } from "@solana/web3.js";
 import { createMemoInstruction } from "@solana/spl-memo";
-import bs58 from "bs58";
 
 // Initialize connection using RPC URL from environment
 const connection = new Connection(
@@ -49,11 +48,8 @@ export const solanaService = {
 
       // Add memo instruction if provided
       if (memo) {
-        try {
-          const memoIx = createMemoInstruction(memo, [fromPubkey]);
-          transaction.add(memoIx);
-        } catch (error) {
-        }
+        const memoIx = createMemoInstruction(memo, [fromPubkey]);
+        transaction.add(memoIx);
       }
 
       // Create transfer instruction
@@ -69,7 +65,6 @@ export const solanaService = {
       const latestBlockhash = await connection.getLatestBlockhash();
       transaction.recentBlockhash = latestBlockhash.blockhash;
       transaction.feePayer = fromPubkey;
-
 
 
       return {
@@ -91,10 +86,15 @@ export const solanaService = {
   signAndSendTransaction: async (transaction, walletProvider) => {
     try {
 
-      // Sign and send transaction using Phantom's signAndSendTransaction method
-      // This will show the transaction details in Phantom for user approval
-      const { signature } = await walletProvider.signAndSendTransaction(transaction);
+      // Sign transaction with Phantom wallet (user approval required)
+      const signedTx = await walletProvider.signTransaction(transaction);
 
+      // Send raw transaction to Solana network
+      const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: 'confirmed',
+        maxRetries: 3,
+      });
 
       // Confirm transaction
       const confirmation = await connection.confirmTransaction(
