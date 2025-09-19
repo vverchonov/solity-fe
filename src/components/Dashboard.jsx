@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Call from './Call'
 import Support from './Support'
@@ -23,6 +23,9 @@ function Dashboard() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [soundDisabled, setSoundDisabled] = useState(false)
   const [ringingTimeout, setRingingTimeout] = useState(null)
+
+  // Audio ref for global ringback sound
+  const ringbackAudioRef = useRef(null)
   const navigate = useNavigate()
   const { health, isServerHealthy, getUnhealthyServices } = useHealth()
   const { user, clearUser } = useUser()
@@ -96,9 +99,70 @@ function Dashboard() {
     }
   }, [callState.callStatus, callStartTime, callStatus, isModalMinimized, ringingTimeout, hangupCall])
 
+  // Manage call duration globally at Dashboard level
+  useEffect(() => {
+    let interval = null
+    const isInCall = callState.callStatus === 'in-call'
+
+    if (isInCall && callStartTime) {
+      interval = setInterval(() => {
+        setCallDuration(Math.floor((Date.now() - callStartTime) / 1000))
+      }, 1000)
+    } else if (!isInCall) {
+      // Only reset duration when call is completely ended
+      if (callState.callStatus === 'idle') {
+        setCallDuration(0)
+      }
+    }
+    return () => clearInterval(interval)
+  }, [callState.callStatus, callStartTime])
+
+  // Handle global ringback audio playback
+  useEffect(() => {
+    const audio = ringbackAudioRef.current
+    if (!audio || soundDisabled) return
+
+    const isRinging = callStatus === 'ringing' || callState.callStatus === 'calling'
+    const isCallConnectedOrEnded = callStatus === 'in-call' || callState.callStatus === 'in-call' ||
+      callStatus === 'ended' || callStatus === 'ready' ||
+      callState.callStatus === 'idle'
+
+    if (isRinging && !isCallConnectedOrEnded) {
+      // Start playing ringback sound
+      audio.volume = 0.3 // 30% volume
+      audio.loop = true
+      audio.currentTime = 0
+
+      const playPromise = audio.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log('Failed to play ringback audio:', error)
+        })
+      }
+    } else {
+      // Stop playing ringback sound
+      audio.pause()
+      audio.currentTime = 0
+    }
+
+    // Cleanup function to stop audio when component unmounts
+    return () => {
+      if (audio) {
+        audio.pause()
+        audio.currentTime = 0
+      }
+    }
+  }, [callStatus, callState.callStatus, soundDisabled])
+
   // Call handlers
   const handleEndCall = async () => {
     try {
+      // Stop ringback audio immediately when ending call
+      if (ringbackAudioRef.current) {
+        ringbackAudioRef.current.pause()
+        ringbackAudioRef.current.currentTime = 0
+      }
+
       // Clear ringing timeout if active
       if (ringingTimeout) {
         clearTimeout(ringingTimeout)
@@ -176,17 +240,19 @@ function Dashboard() {
         return <Call
           onNavigateToInvoices={navigateToInvoices}
           onNavigateToSupport={() => setActiveModule('Support')}
-          onCallStateChange={({ phoneNumber: phone, startTime, status, duration }) => {
-            if (phone !== undefined) setPhoneNumber(phone)
-            if (startTime !== undefined) setCallStartTime(startTime)
+          onCallStateChange={({ status }) => {
             if (status !== undefined) setCallStatus(status)
-            if (duration !== undefined) setCallDuration(duration)
           }}
           onShowModal={() => {
             setIsModalVisible(true)
             setIsModalMinimized(false)
           }}
           isModalVisible={isModalVisible}
+          soundDisabled={soundDisabled}
+          onSoundToggle={handleSoundToggle}
+          callDuration={callDuration}
+          phoneNumber={phoneNumber}
+          onPhoneNumberChange={setPhoneNumber}
         />
       case 'Balance':
         return <BalanceModule onNavigateToSupport={() => setActiveModule('Support')} />
@@ -251,6 +317,14 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-black">
+      {/* Global Ringback Audio Element */}
+      <audio
+        ref={ringbackAudioRef}
+        src="/ringback.mp3"
+        preload="auto"
+        style={{ display: 'none' }}
+      />
+
       {/* Background Overlay */}
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-[#0e1b4f] via-[#0b0f23] to-black opacity-90"></div>
       <div className="pointer-events-none fixed -top-48 -left-24 h-[40rem] w-[40rem] rounded-full bg-gradient-to-tr from-[#0A43FF]/30 to-transparent blur-3xl"></div>

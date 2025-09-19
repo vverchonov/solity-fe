@@ -71,26 +71,20 @@ const getRandomCallerID = () => {
   return CALLER_ID_NUMBERS[randomIndex]
 }
 
-function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, onShowModal, isModalVisible }) {
+function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, onShowModal, isModalVisible, soundDisabled, onSoundToggle, callDuration, phoneNumber, onPhoneNumberChange }) {
   // Get initial random caller ID
   const initialCallerID = getRandomCallerID()
 
-  const [phoneNumber, setPhoneNumber] = useState('')
   const [phoneNumberError, setPhoneNumberError] = useState(null)
   const [callerID, setCallerID] = useState(initialCallerID)
   const [editableCallerID, setEditableCallerID] = useState(initialCallerID)
   const [callerIDError, setCallerIDError] = useState(null)
   const [isUpdatingCallerID, setIsUpdatingCallerID] = useState(false)
-  const [soundDisabled, setSoundDisabled] = useState(false)
-  const [callStartTime, setCallStartTime] = useState(null)
-  const [callDuration, setCallDuration] = useState(0)
   const [callStatus, setCallStatus] = useState('ready') // 'ready', 'ringing', 'in-call', 'ended'
   const [rateInfo, setRateInfo] = useState(null)
   const [isCheckingRate, setIsCheckingRate] = useState(false)
   const [rateError, setRateError] = useState(null)
 
-  // Audio ref for ringback sound
-  const ringbackAudioRef = useRef(null)
 
   // Use LogsProvider for displaying wallet interaction logs
   const { logs, clearLogs } = useLogs()
@@ -178,16 +172,11 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
     }
 
     if (callState.callStatus === 'in-call' && callStatus !== 'in-call') {
-      if (!callStartTime) {
-        setCallStartTime(Date.now())
-      }
       setCallStatus('in-call')
     } else if (callState.callStatus === 'calling' && callStatus !== 'ringing' && callStatus !== 'in-call') {
       // When CallProvider reports 'calling', sync our local status to 'ringing'
       setCallStatus('ringing')
     } else if (callState.callStatus === 'idle' && callStatus !== 'ready' && callStatus !== 'ended') {
-      setCallStartTime(null)
-      setCallDuration(0)
       if (callStatus === 'in-call' || callStatus === 'ringing') {
         setCallStatus('ended')
         setTimeout(() => setCallStatus('ready'), 5000)
@@ -195,26 +184,17 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
         setCallStatus('ready')
       }
     }
-  }, [callState.callStatus, callStartTime, callStatus])
+  }, [callState.callStatus, callStatus])
 
+
+  // Sync caller ID with TeleProvider credentials only on initial load
+  // Don't override user's manually selected caller ID
+  const hasInitializedCallerID = useRef(false)
   useEffect(() => {
-    let interval = null
-    if (isInCall && callStartTime) {
-      interval = setInterval(() => {
-        setCallDuration(Math.floor((Date.now() - callStartTime) / 1000))
-      }, 1000)
-    } else {
-      setCallDuration(0)
-    }
-    return () => clearInterval(interval)
-  }, [isInCall, callStartTime])
-
-
-  // Sync caller ID with TeleProvider credentials
-  useEffect(() => {
-    if (credentials && credentials.callerID) {
+    if (credentials && credentials.callerID && !hasInitializedCallerID.current) {
       setCallerID(credentials.callerID)
       setEditableCallerID(credentials.callerID)
+      hasInitializedCallerID.current = true
     }
   }, [credentials])
 
@@ -250,13 +230,10 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
   useEffect(() => {
     if (onCallStateChange) {
       onCallStateChange({
-        phoneNumber: phoneNumber,
-        startTime: callStartTime,
-        status: callStatus,
-        duration: callDuration
+        status: callStatus
       })
     }
-  }, [phoneNumber, callStartTime, callStatus, callDuration, onCallStateChange])
+  }, [callStatus, onCallStateChange])
 
   // Reset rate info when phone number actually changes
   const previousPhoneNumberRef = useRef(phoneNumber)
@@ -268,42 +245,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
     }
   }, [phoneNumber])
 
-  // Handle ringback audio playback
-  useEffect(() => {
-    const audio = ringbackAudioRef.current
-    if (!audio || soundDisabled) return
-
-    const isRinging = callStatus === 'ringing' || callState.callStatus === 'calling'
-    const isCallConnectedOrEnded = callStatus === 'in-call' || callState.callStatus === 'in-call' ||
-      callStatus === 'ended' || callStatus === 'ready' ||
-      callState.callStatus === 'idle'
-
-    if (isRinging && !isCallConnectedOrEnded) {
-      // Start playing ringback sound
-      audio.volume = 0.3 // 30% volume
-      audio.loop = true
-      audio.currentTime = 0
-
-      const playPromise = audio.play()
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.log('Failed to play ringback audio:', error)
-        })
-      }
-    } else {
-      // Stop playing ringback sound
-      audio.pause()
-      audio.currentTime = 0
-    }
-
-    // Cleanup function to stop audio when component unmounts
-    return () => {
-      if (audio) {
-        audio.pause()
-        audio.currentTime = 0
-      }
-    }
-  }, [callStatus, callState.callStatus, soundDisabled])
 
   const formatCallDuration = (seconds) => {
     const minutes = Math.floor(seconds / 60)
@@ -334,7 +275,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
 
   const handleNumberClick = (num) => {
     const newPhoneNumber = phoneNumber + num
-    setPhoneNumber(newPhoneNumber)
+    onPhoneNumberChange(newPhoneNumber)
     validatePhoneNumber(newPhoneNumber, setPhoneNumberError)
   }
 
@@ -344,9 +285,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
   }
 
 
-  const handleSoundToggle = () => {
-    setSoundDisabled(!soundDisabled)
-  }
 
   const handleCheckRate = async () => {
     if (!phoneNumber.trim()) {
@@ -377,18 +315,15 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
     if (currentPhoneNumber) {
       // Ensure the phone number state is up to date for the modal
       if (phoneNumber !== currentPhoneNumber) {
-        setPhoneNumber(currentPhoneNumber)
+        onPhoneNumberChange(currentPhoneNumber)
       }
 
-      // Set both status and start time atomically to minimize re-renders
-      setCallStatus('creating-call') // Show "creating call" status during API requests
-      setCallStartTime(Date.now())
+      // Set status to show "creating call" during API requests
+      setCallStatus('creating-call')
 
-      // Immediately notify parent with current phone number to ensure modal shows correct number
+      // Immediately notify parent with call status
       if (onCallStateChange) {
         onCallStateChange({
-          phoneNumber: currentPhoneNumber,
-          startTime: Date.now(),
           status: 'creating-call'
         })
       }
@@ -438,20 +373,11 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
   }
 
   const handleEndCall = async () => {
-    // Stop ringback audio immediately when ending call
-    if (ringbackAudioRef.current) {
-      ringbackAudioRef.current.pause()
-      ringbackAudioRef.current.currentTime = 0
-    }
-
     try {
       await hangupCall()
 
       // Show "Call Ended" status
       setCallStatus('ended')
-      setCallStartTime(null)
-      setCallDuration(0)
-      setSoundDisabled(false)
 
       // Return to "Ready" after 5 seconds
       setTimeout(() => {
@@ -486,13 +412,6 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
 
   return (
     <div className="flex flex-col lg:grid lg:grid-cols-12 lg:grid-rows-2 gap-6 h-full">
-      {/* Ringback Audio Element */}
-      <audio
-        ref={ringbackAudioRef}
-        src="/ringback.mp3"
-        preload="auto"
-        style={{ display: 'none' }}
-      />
       {/* Call Card - Top (or full width on mobile) */}
       <div className={`lg:col-span-8 card p-4 flex justify-center relative ${isUserInactive() ? 'overflow-hidden' : ''}`}>
         {/* Always show the call interface */}
@@ -578,7 +497,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
                     onChange={(e) => {
                       // Remove all non-numeric characters
                       const sanitized = e.target.value.replace(/[^\d]/g, '')
-                      setPhoneNumber(sanitized)
+                      onPhoneNumberChange(sanitized)
                       validatePhoneNumber(sanitized, setPhoneNumberError)
                     }}
                     placeholder={t('call.phoneNumberPlaceholder')}
@@ -649,7 +568,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
                 </button>
 
                 <button
-                  onClick={handleSoundToggle}
+                  onClick={onSoundToggle}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${soundDisabled
                     ? 'bg-yellow-500/20 border border-yellow-400/30 text-yellow-100'
                     : 'bg-white/10 hover:bg-white/15 text-white border border-white/10'

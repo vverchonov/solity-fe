@@ -100,13 +100,14 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
         </button>
 
         <div className="mt-8">
-          <div className="text-sm text-white/60 mb-2">
+
+          {/* <div className="text-sm text-white/60 mb-2">
             {callStatus === 'ringing' ? t('status.ringing') :
               callStatus === 'calling' ? t('status.connecting') :
                 callStatus === 'in-call' ? t('status.inCall') :
                   callStatus === 'connecting' ? t('status.connecting') :
                     t('status.inCall')}
-          </div>
+          </div> */}
           <div className="text-2xl font-medium text-white mb-2">{phoneNumber}</div>
           <div className="text-lg text-white/70">
             {formatDuration(callDuration)}
