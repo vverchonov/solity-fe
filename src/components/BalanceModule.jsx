@@ -344,20 +344,15 @@ function BalanceModule({ onNavigateToSupport }) {
   const handleRefreshBalance = async () => {
     setIsRefreshingBalance(true)
     try {
-      const result = await paymentsAPI.getBalance()
+      // Use BalanceProvider's refresh method (avoids duplicate API call)
+      await refreshBalance()
+      logBalanceRefresh(true)
 
-      if (result.success) {
-        // The BalanceProvider will automatically update when we call refreshBalance
-        refreshBalance()
-        logBalanceRefresh(true)
-        // Also refresh invoices and journal
-        await Promise.all([
-          refreshInvoices(),
-          fetchJournal()
-        ])
-      } else {
-        logBalanceRefresh(false, result.error)
-      }
+      // Also refresh invoices and journal
+      await Promise.all([
+        refreshInvoices(),
+        fetchJournal()
+      ])
     } catch (error) {
       logBalanceRefresh(false, error.message)
     } finally {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../contexts/WalletProvider'
 import { useBalance } from '../contexts/BalanceProvider'
@@ -265,16 +265,13 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const handleRefreshBalance = async () => {
     setIsRefreshingBalance(true)
     try {
-      const result = await paymentsAPI.getBalance()
+      // Use BalanceProvider's refresh method (avoids duplicate API call)
+      await refreshBalance()
 
-      if (result.success) {
-        // The BalanceProvider will automatically update when we call refreshBalance
-        refreshBalance()
-        // Also refresh invoices
-        await refreshInvoices()
-      } else {
-      }
+      // Also refresh invoices
+      await refreshInvoices()
     } catch (error) {
+      // Error is handled by BalanceProvider
     } finally {
       setIsRefreshingBalance(false)
     }
