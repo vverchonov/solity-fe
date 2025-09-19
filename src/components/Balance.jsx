@@ -300,12 +300,20 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   useEffect(() => {
     if (!shouldDisableTopUp) return
 
-    const pollInterval = setInterval(() => {
-      console.log('Polling for invoice status updates...')
-      refreshInvoices()
-    }, 15000) // 15 seconds
+    let pollInterval
 
-    return () => clearInterval(pollInterval)
+    // Start polling after initial delay to avoid immediate trigger on refresh
+    const initialDelay = setTimeout(() => {
+      pollInterval = setInterval(() => {
+        console.log('Polling for invoice status updates...')
+        refreshInvoices()
+      }, 15000) // 15 seconds
+    }, 1000) // 1 second delay before starting polling
+
+    return () => {
+      clearTimeout(initialDelay)
+      if (pollInterval) clearInterval(pollInterval)
+    }
   }, [shouldDisableTopUp, refreshInvoices])
 
   // Helper functions for invoice display
