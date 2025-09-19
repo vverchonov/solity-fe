@@ -299,6 +299,18 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     return invoices.some(invoice => invoice.status === 'pending' || invoice.status === 'processing')
   }, [invoices])
 
+  // Poll invoices every 15 seconds when first invoice is pending or processing
+  useEffect(() => {
+    if (!shouldDisableTopUp) return
+
+    const pollInterval = setInterval(() => {
+      console.log('Polling for invoice status updates...')
+      refreshInvoices()
+    }, 15000) // 15 seconds
+
+    return () => clearInterval(pollInterval)
+  }, [shouldDisableTopUp, refreshInvoices])
+
   // Helper functions for invoice display
   const formatInvoiceAmount = (lamports) => {
     return (lamports / 1e9).toFixed(4) + ' SOL'
