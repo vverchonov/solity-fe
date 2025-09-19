@@ -431,7 +431,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
               step="0.01"
               min="0"
               disabled={!isWalletConnected || shouldDisableTopUp}
-              className={`flex-1 border rounded-xl px-3 py-2 text-sm transition-all ${isWalletConnected && !shouldDisableTopUp
+              className={`flex-1 min-w-[80px] border rounded-xl px-3 py-2 text-sm transition-all ${isWalletConnected && !shouldDisableTopUp
                 ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10'
                 : 'bg-gray-600 border-gray-600 text-gray-400 placeholder-gray-500 cursor-not-allowed'
                 }`}
@@ -439,7 +439,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
             <button
               onClick={handleAddCustomAmount}
               disabled={!isWalletConnected || !customAmount || parseFloat(customAmount) <= 0 || shouldDisableTopUp}
-              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isWalletConnected && customAmount && parseFloat(customAmount) > 0 && !shouldDisableTopUp
+              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex-1 max-w-[140px] ${isWalletConnected && customAmount && parseFloat(customAmount) > 0 && !shouldDisableTopUp
                 ? 'bg-white hover:bg-gray-100 text-gray-900'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 }`}
