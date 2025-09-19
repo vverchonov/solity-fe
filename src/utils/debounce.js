@@ -33,7 +33,6 @@ class APIDebouncer {
     // Check context-specific cache first
     const contextCall = this.lastCalls.get(fullKey)
     if (contextCall && (now - contextCall.timestamp) < this.cooldownMs) {
-      console.log(`⚡ Using cached result for: "${fullKey}" (${Math.round((now - contextCall.timestamp) / 1000)}s ago)`)
       return contextCall.result
     }
 
@@ -41,7 +40,6 @@ class APIDebouncer {
     if (allowCrossContext && context !== 'global') {
       const globalCall = this.lastCalls.get(globalKey)
       if (globalCall && (now - globalCall.timestamp) < this.cooldownMs) {
-        console.log(`🔄 Using global cache for: "${fullKey}" (${Math.round((now - globalCall.timestamp) / 1000)}s ago)`)
         // Update context cache with global result
         this.lastCalls.set(fullKey, { timestamp: now, result: globalCall.result })
         return globalCall.result
@@ -49,7 +47,6 @@ class APIDebouncer {
     }
 
     // Make the API call
-    console.log(`🚀 Making API call: "${fullKey}"`)
     try {
       const result = await apiCall()
       this.lastCalls.set(fullKey, { timestamp: now, result })
@@ -57,11 +54,9 @@ class APIDebouncer {
       if (context !== 'global') {
         this.lastCalls.set(globalKey, { timestamp: now, result })
       }
-      console.log(`✅ API call completed: "${fullKey}"`)
       return result
     } catch (error) {
       // Don't cache errors
-      console.log(`❌ API call failed: "${fullKey}"`, error)
       throw error
     }
   }
@@ -85,7 +80,6 @@ class APIDebouncer {
 
   // Clear all cached calls
   clearAll() {
-    console.log(`🧹 Clearing all cache (${this.lastCalls.size} entries)`)
     this.lastCalls.clear()
   }
 

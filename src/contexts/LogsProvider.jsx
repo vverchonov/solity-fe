@@ -168,6 +168,15 @@ export const LogsProvider = ({ children }) => {
     }
   }
 
+  // Invoice refresh logging
+  const logInvoiceRefresh = (success, error = null) => {
+    if (success) {
+      addLog('success', 'Invoices refreshed successfully')
+    } else {
+      addLog('error', 'Failed to refresh invoices', { error })
+    }
+  }
+
   // Call-related logging methods
   const logCallInitiation = (phoneNumber, callerID) => {
     addLog('info', `Initiating call to ${phoneNumber}`, { phoneNumber, callerID })
@@ -279,6 +288,9 @@ export const LogsProvider = ({ children }) => {
     // Balance logging methods
     logBalanceUpdate,
     logBalanceRefresh,
+
+    // Invoice logging methods
+    logInvoiceRefresh,
 
     // Call logging methods
     logCallInitiation,

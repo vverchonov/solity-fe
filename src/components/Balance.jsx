@@ -45,7 +45,9 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     logTransactionRejected,
     logTransactionError,
     logInvoiceStatusUpdate,
-    logInvoiceCancel
+    logInvoiceCancel,
+    logBalanceRefresh,
+    logInvoiceRefresh
   } = useLogs()
 
   const quickAmounts = [0.1, 0.5, 1, 2]
@@ -270,11 +272,14 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
 
       // Use BalanceProvider's refresh method
       await refreshBalance()
+      logBalanceRefresh(true)
 
       // Also refresh invoices
       await refreshInvoices()
+      logInvoiceRefresh(true)
     } catch (error) {
-      // Error is handled by BalanceProvider
+      logBalanceRefresh(false, error.message)
+      logInvoiceRefresh(false, error.message)
     } finally {
       setIsRefreshingBalance(false)
     }
