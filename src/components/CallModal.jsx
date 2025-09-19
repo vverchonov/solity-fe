@@ -55,8 +55,9 @@ export function CallModal({ isVisible, phoneNumber, callDuration, isMuted, sound
 
   // Clear pressed numbers when call ends
   useEffect(() => {
-    if (callStatus === 'idle') {
+    if (callStatus === 'idle' || callStatus === 'ended' || callStatus === 'ready') {
       setPressedNumbers('')
+      setShowNumpad(false) // Also hide numpad when call ends
     }
   }, [callStatus])
 
