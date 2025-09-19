@@ -24,6 +24,10 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
   const [rateInfo, setRateInfo] = useState(null)
   const [isCheckingRate, setIsCheckingRate] = useState(false)
   const [rateError, setRateError] = useState(null)
+
+  // Audio ref for ringback sound
+  const ringbackAudioRef = useRef(null)
+
   // Use LogsProvider for displaying wallet interaction logs
   const { logs, clearLogs } = useLogs()
 
@@ -171,6 +175,43 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
     }
   }, [phoneNumber])
 
+  // Handle ringback audio playback
+  useEffect(() => {
+    const audio = ringbackAudioRef.current
+    if (!audio || soundDisabled) return
+
+    const isRinging = callStatus === 'ringing' || callState.callStatus === 'calling'
+    const isCallConnectedOrEnded = callStatus === 'in-call' || callState.callStatus === 'in-call' ||
+                                   callStatus === 'ended' || callStatus === 'ready' ||
+                                   callState.callStatus === 'idle'
+
+    if (isRinging && !isCallConnectedOrEnded) {
+      // Start playing ringback sound
+      audio.volume = 0.3 // 30% volume
+      audio.loop = true
+      audio.currentTime = 0
+
+      const playPromise = audio.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log('Failed to play ringback audio:', error)
+        })
+      }
+    } else {
+      // Stop playing ringback sound
+      audio.pause()
+      audio.currentTime = 0
+    }
+
+    // Cleanup function to stop audio when component unmounts
+    return () => {
+      if (audio) {
+        audio.pause()
+        audio.currentTime = 0
+      }
+    }
+  }, [callStatus, callState.callStatus, soundDisabled])
+
   const formatCallDuration = (seconds) => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
@@ -289,6 +330,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
 
         // Step 2: Get fresh credentials
         const credentialsResponse = await apiClient.get('/tele/credentials')
+        console.log('here');
 
         if (credentialsResponse.status !== 200) {
           throw new Error('Failed to get credentials')
@@ -311,6 +353,11 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
   }
 
   const handleEndCall = async () => {
+    // Stop ringback audio immediately when ending call
+    if (ringbackAudioRef.current) {
+      ringbackAudioRef.current.pause()
+      ringbackAudioRef.current.currentTime = 0
+    }
 
     try {
       await hangupCall()
@@ -354,6 +401,13 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
 
   return (
     <div className="flex flex-col lg:grid lg:grid-cols-12 lg:grid-rows-2 gap-6 h-full">
+      {/* Ringback Audio Element */}
+      <audio
+        ref={ringbackAudioRef}
+        src="/ringback.mp3"
+        preload="auto"
+        style={{ display: 'none' }}
+      />
       {/* Call Card - Top (or full width on mobile) */}
       <div className={`lg:col-span-8 card p-4 flex justify-center relative ${isUserInactive() ? 'overflow-hidden' : ''}`}>
         {/* Always show the call interface */}

@@ -222,7 +222,7 @@
     "eta": "ETA"
   },
   "balance": {
-    "title": "Balance",
+    "title": "Solity Balance",
     "onChainSol": "on-chain • SOL",
     "accountActive": "Account active — ready for calls",
     "lowBalance": "Low balance — please top up before a call.",
