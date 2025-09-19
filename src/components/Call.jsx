@@ -7,8 +7,8 @@ import { useTele } from '../contexts/TeleProvider'
 import { useI18n } from '../contexts/I18nProvider'
 import apiClient from '../lib/axios'
 
-// Phone validation constants for US/Canada
-const PHONE_REGEX = /^1?\d{10}$/
+// Phone validation constants for international numbers
+const PHONE_REGEX = /^\d{7,15}$/
 
 // Available caller ID numbers
 const CALLER_ID_NUMBERS = [
@@ -107,53 +107,37 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
   const { user, isUserInactive } = useUser()
   const { t } = useI18n()
 
-  // Validation function for phone numbers using schema validation
+  // Validation function for international phone numbers
   const validatePhoneNumber = (phoneStr, setError) => {
     // Extract only digits
     const digitsOnly = phoneStr.replace(/[^\d]/g, '')
 
-    // Check if number starts with 1 (US/Canada only)
-    if (digitsOnly.length > 0 && !digitsOnly.startsWith('1')) {
-      setError('Phone number must start with 1 (US/Canada only)')
+    // Check minimum length (at least 7 digits for shortest international numbers)
+    if (digitsOnly.length < 7) {
+      setError('Phone number must be at least 7 digits long')
       return false
     }
 
-    // Check length (10-11 digits for US/Canada: 1 + 10 digits or 10 digits)
-    if (digitsOnly.length < 10 || digitsOnly.length > 11) {
-      setError('Phone number must be 10-11 digits long')
+    // Check maximum length (15 digits is ITU-T E.164 standard)
+    if (digitsOnly.length > 15) {
+      setError('Phone number cannot exceed 15 digits')
       return false
     }
 
-    // For 10-digit numbers, ensure they're valid US format (area code can't start with 0 or 1)
-    if (digitsOnly.length === 10) {
-      const areaCode = digitsOnly.substring(0, 3)
-      if (areaCode.startsWith('0') || areaCode.startsWith('1')) {
-        setError('Invalid area code (cannot start with 0 or 1)')
-        return false
-      }
-    }
-
-    // For 11-digit numbers, ensure they start with 1 and have valid area code
-    if (digitsOnly.length === 11) {
-      if (!digitsOnly.startsWith('1')) {
-        setError('11-digit numbers must start with 1')
-        return false
-      }
-      const areaCode = digitsOnly.substring(1, 4)
-      if (areaCode.startsWith('0') || areaCode.startsWith('1')) {
-        setError('Invalid area code (cannot start with 0 or 1)')
-        return false
-      }
+    // Basic check - must contain only digits and be non-empty
+    if (!PHONE_REGEX.test(digitsOnly)) {
+      setError('Phone number must contain only digits')
+      return false
     }
 
     setError(null)
     return true
   }
 
-  // Helper function to check if a number starts with 1
-  const startsWithOne = (phoneStr) => {
+  // Helper function to check if phone number is valid
+  const isValidPhoneNumber = (phoneStr) => {
     const digitsOnly = phoneStr.replace(/[^\d]/g, '')
-    return digitsOnly.length > 0 && digitsOnly.startsWith('1')
+    return digitsOnly.length >= 7 && digitsOnly.length <= 15
   }
 
   // Derived state from CallProvider
@@ -507,10 +491,10 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
                 </div>
                 <button
                   onClick={isCallActive ? handleEndCall : handleStartCall}
-                  disabled={callStatus === 'ended' || (!isCallActive && (!phoneNumber.trim() || phoneNumberError || callerIDError || !startsWithOne(phoneNumber) || !startsWithOne(editableCallerID)))}
+                  disabled={callStatus === 'ended' || (!isCallActive && (!phoneNumber.trim() || phoneNumberError || callerIDError || !isValidPhoneNumber(phoneNumber) || !isValidPhoneNumber(editableCallerID)))}
                   className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] border ${isCallActive
                     ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-600/30 hover:border-red-600/50'
-                    : callStatus === 'ended' || !phoneNumber.trim() || phoneNumberError || callerIDError || !startsWithOne(phoneNumber) || !startsWithOne(editableCallerID)
+                    : callStatus === 'ended' || !phoneNumber.trim() || phoneNumberError || callerIDError || !isValidPhoneNumber(phoneNumber) || !isValidPhoneNumber(editableCallerID)
                       ? 'bg-gray-600/20 text-gray-500 border-gray-600/30 cursor-not-allowed'
                       : 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-600/30 hover:border-green-600/50'
                     }`}
