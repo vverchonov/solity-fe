@@ -621,7 +621,7 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
                 {t('call.noLogs')}
               </div>
             ) : (
-              logs.map((log) => (
+              logs.slice().reverse().map((log) => (
                 <div
                   key={log.id}
                   className={
