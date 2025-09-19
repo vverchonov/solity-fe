@@ -4,6 +4,7 @@ import { solanaService } from '../services/solana'
 import { useUser } from './UserContext'
 import { useWallet } from './WalletProvider'
 import { useInvoices } from './InvoicesProvider'
+import { apiDebouncer } from '../utils/debounce'
 
 const BalanceContext = createContext()
 
@@ -30,7 +31,7 @@ export const BalanceProvider = ({ children }) => {
   const [activeInvoice, setActiveInvoice] = useState(null)
   const [isTopUpLoading, setIsTopUpLoading] = useState(false)
 
-  // Fetch balance from API
+  // Fetch balance from API (debounced)
   const fetchBalance = async () => {
     // Don't fetch if no user is authenticated
     if (!user) {
@@ -41,7 +42,9 @@ export const BalanceProvider = ({ children }) => {
     setError(null)
 
     try {
-      const result = await paymentsAPI.getBalance()
+      const result = await apiDebouncer.debounce('getBalance', async () => {
+        return await paymentsAPI.getBalance()
+      })
 
       if (result.success) {
         setBalance(result.data.balances)

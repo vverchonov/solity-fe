@@ -9,6 +9,7 @@ import { useI18n } from '../contexts/I18nProvider'
 import { paymentsAPI } from '../services/payments'
 import { solanaService } from '../services/solana'
 import { authAPI } from '../services/auth'
+import { apiDebouncer } from '../utils/debounce'
 
 function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const [customAmount, setCustomAmount] = useState('')
@@ -106,22 +107,22 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
         if (completeResult.success) {
           logInvoiceStatusUpdate(invoiceId, 'pending', 'processing')
 
-          // Refetch invoices immediately after successful completion
-          await refreshInvoices()
+          // Clear API debounce cache to allow fresh data after transaction
+          apiDebouncer.clearAll()
+
+          // Refetch invoices and balance immediately after successful completion
+          await Promise.all([
+            refreshInvoices(),
+            refreshBalance()
+          ])
         } else {
         }
 
         // Show processing modal
         setShowProcessingModal(true)
 
-        // Refresh balance immediately after showing modal
-        handleRefreshBalance()
-
-        // Also refresh invoices after successful payment (additional refresh)
+        // Reconnect wallet after successful transaction to reset session
         setTimeout(async () => {
-          await refreshInvoices()
-
-          // Reconnect wallet after successful transaction to reset session
           try {
             await reconnectWallet()
           } catch (error) {
@@ -169,15 +170,14 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     if (result && result.success) {
       logInvoiceCancel(invoiceId, true)
 
+      // Clear debounce cache to allow immediate refresh after cancellation
+      apiDebouncer.clearAll()
+
       // Refresh both invoices and balance to update all state and re-enable buttons
       await Promise.all([
         refreshInvoices(),
         refreshBalance()
       ])
-
-      // Force a small delay to ensure UI updates properly
-      setTimeout(() => {
-      }, 100)
     } else {
       logInvoiceCancel(invoiceId, false)
     }
@@ -227,22 +227,22 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
         if (completeResult.success) {
           logInvoiceStatusUpdate(invoiceId, 'pending', 'processing')
 
-          // Refetch invoices immediately after successful completion
-          await refreshInvoices()
+          // Clear API debounce cache to allow fresh data after transaction
+          apiDebouncer.clearAll()
+
+          // Refetch invoices and balance immediately after successful completion
+          await Promise.all([
+            refreshInvoices(),
+            refreshBalance()
+          ])
         } else {
         }
 
         // Show processing modal
         setShowProcessingModal(true)
 
-        // Refresh balance immediately after showing modal
-        handleRefreshBalance()
-
-        // Also refresh invoices after successful payment (additional refresh)
+        // Reconnect wallet after successful transaction to reset session
         setTimeout(async () => {
-          await refreshInvoices()
-
-          // Reconnect wallet after successful transaction to reset session
           try {
             await reconnectWallet()
           } catch (error) {
@@ -296,24 +296,16 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     return invoices.some(invoice => invoice.status === 'pending' || invoice.status === 'processing')
   }, [invoices])
 
-  // Poll invoices every 15 seconds when first invoice is pending or processing
+  // Simplified polling - only poll every 30 seconds when needed, no cascading
   useEffect(() => {
     if (!shouldDisableTopUp) return
 
-    let pollInterval
+    const pollInterval = setInterval(() => {
+      console.log('Polling for invoice status updates...')
+      refreshInvoices()
+    }, 30000) // 30 seconds (longer interval, debouncer will handle duplicates)
 
-    // Start polling after initial delay to avoid immediate trigger on refresh
-    const initialDelay = setTimeout(() => {
-      pollInterval = setInterval(() => {
-        console.log('Polling for invoice status updates...')
-        refreshInvoices()
-      }, 15000) // 15 seconds
-    }, 1000) // 1 second delay before starting polling
-
-    return () => {
-      clearTimeout(initialDelay)
-      if (pollInterval) clearInterval(pollInterval)
-    }
+    return () => clearInterval(pollInterval)
   }, [shouldDisableTopUp, refreshInvoices])
 
   // Helper functions for invoice display

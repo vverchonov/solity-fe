@@ -11,6 +11,7 @@ import { paymentsAPI } from '../services/payments'
 import { solanaService } from '../services/solana'
 import { authAPI } from '../services/auth'
 import apiClient from '../lib/axios'
+import { apiDebouncer } from '../utils/debounce'
 
 function BalanceModule({ onNavigateToSupport }) {
   const [topUpAmount, setTopUpAmount] = useState('')
@@ -107,9 +108,13 @@ function BalanceModule({ onNavigateToSupport }) {
         if (completeResult.success) {
           logInvoiceStatusUpdate(invoiceId, 'pending', 'processing')
 
-          // Refetch invoices and journal immediately after successful completion
+          // Clear API debounce cache to allow fresh data after transaction
+          apiDebouncer.clearAll()
+
+          // Refetch invoices, balance and journal immediately after successful completion
           await Promise.all([
             refreshInvoices(),
+            refreshBalance(),
             fetchJournal(0, false)
           ])
         } else {
@@ -118,17 +123,8 @@ function BalanceModule({ onNavigateToSupport }) {
         // Show processing modal
         setShowProcessingModal(true)
 
-        // Refresh balance immediately after showing modal
-        handleRefreshBalance()
-
-        // Also refresh invoices and journal after successful payment (additional refresh)
+        // Reconnect wallet after successful transaction to reset session
         setTimeout(async () => {
-          await Promise.all([
-            refreshInvoices(),
-            fetchJournal(0, false)
-          ])
-
-          // Reconnect wallet after successful transaction to reset session
           try {
             await reconnectWallet()
           } catch (error) {
@@ -258,9 +254,13 @@ function BalanceModule({ onNavigateToSupport }) {
         if (completeResult.success) {
           logInvoiceStatusUpdate(invoiceId, 'pending', 'processing')
 
-          // Refetch invoices and journal immediately after successful completion
+          // Clear API debounce cache to allow fresh data after transaction
+          apiDebouncer.clearAll()
+
+          // Refetch invoices, balance and journal immediately after successful completion
           await Promise.all([
             refreshInvoices(),
+            refreshBalance(),
             fetchJournal(0, false)
           ])
         } else {
@@ -269,17 +269,8 @@ function BalanceModule({ onNavigateToSupport }) {
         // Show processing modal
         setShowProcessingModal(true)
 
-        // Refresh balance immediately after showing modal
-        handleRefreshBalance()
-
-        // Also refresh invoices and journal after successful payment
+        // Reconnect wallet after successful transaction to reset session
         setTimeout(async () => {
-          await Promise.all([
-            refreshInvoices(),
-            fetchJournal(0, false)
-          ])
-
-          // Reconnect wallet after successful transaction to reset session
           try {
             await reconnectWallet()
           } catch (error) {
@@ -398,14 +389,14 @@ function BalanceModule({ onNavigateToSupport }) {
     return result
   }, [invoices, isWalletConnected, isTopUpLoading, hasActiveInvoice])
 
-  // Poll invoices every 15 seconds when first invoice is pending or processing
+  // Simplified polling - only poll every 30 seconds when needed, no cascading
   useEffect(() => {
     if (!shouldDisableTopUp) return
 
     const pollInterval = setInterval(() => {
       console.log('Polling for invoice status updates...')
       refreshInvoices()
-    }, 15000) // 15 seconds
+    }, 30000) // 30 seconds (longer interval, debouncer will handle duplicates)
 
     return () => clearInterval(pollInterval)
   }, [shouldDisableTopUp, refreshInvoices])

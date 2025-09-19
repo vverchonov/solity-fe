@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { paymentsAPI } from '../services/payments'
 import { useUser } from './UserContext'
+import { apiDebouncer } from '../utils/debounce'
 
 const InvoicesContext = createContext()
 
@@ -21,7 +22,7 @@ export const InvoicesProvider = ({ children }) => {
   const [hasMore, setHasMore] = useState(true)
   const [currentOffset, setCurrentOffset] = useState(0)
 
-  // Fetch invoices from API
+  // Fetch invoices from API (debounced)
   const fetchInvoices = useCallback(async (offset = 0, limit = 100, reset = false) => {
     if (!user) {
       return
@@ -31,7 +32,9 @@ export const InvoicesProvider = ({ children }) => {
     setError(null)
 
     try {
-      const result = await paymentsAPI.getInvoices(offset, limit)
+      const result = await apiDebouncer.debounce(`getInvoices-${offset}-${limit}`, async () => {
+        return await paymentsAPI.getInvoices(offset, limit)
+      })
 
       if (result.success) {
 
