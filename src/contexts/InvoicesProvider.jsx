@@ -68,13 +68,12 @@ export const InvoicesProvider = ({ children }) => {
     }
   }, [user, currentOffset])
 
-  // Initialize invoices when user is available
+  // Initialize invoices when user is available (only on user change)
   useEffect(() => {
-    const initializeInvoices = () => {
+    const initializeInvoices = async () => {
       if (!user) {
         return
       }
-
 
       // Try to get cached invoices first
       const cachedInvoices = sessionStorage.getItem('userInvoices')
@@ -88,12 +87,26 @@ export const InvoicesProvider = ({ children }) => {
         }
       }
 
-      // Always fetch fresh invoices
-      fetchInvoices(0, 100, true)
+      // Always fetch fresh invoices (but only when user changes, not on every render)
+      try {
+        const result = await apiDebouncer.debounce(`getInvoices-0-100`, async () => {
+          return await paymentsAPI.getInvoices(0, 100)
+        })
+
+        if (result.success) {
+          const newInvoices = result.data.invoices || []
+          setInvoices(newInvoices)
+          setCurrentOffset(newInvoices.length)
+          setHasMore(newInvoices.length < (result.data.total || 0))
+          sessionStorage.setItem('userInvoices', JSON.stringify(newInvoices))
+        }
+      } catch (error) {
+        setError('Failed to fetch invoices')
+      }
     }
 
     initializeInvoices()
-  }, [user, fetchInvoices])
+  }, [user]) // Only depend on user, not fetchInvoices
 
   // Load more invoices (pagination)
   const loadMoreInvoices = async () => {
@@ -109,8 +122,7 @@ export const InvoicesProvider = ({ children }) => {
   }
 
   // Invalidate invoices cache - call this after prepare invoice success
-  const invalidateInvoices = () => {
-
+  const invalidateInvoices = async () => {
     // Clear cached data
     sessionStorage.removeItem('userInvoices')
 
@@ -119,7 +131,7 @@ export const InvoicesProvider = ({ children }) => {
     setHasMore(true)
 
     // Refresh invoices from server
-    refreshInvoices()
+    await refreshInvoices()
   }
 
   // Get invoice by ID (debounced)

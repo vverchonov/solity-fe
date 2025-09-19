@@ -401,7 +401,6 @@ function BalanceModule({ onNavigateToSupport }) {
     if (!shouldDisableTopUp) return
 
     const pollInterval = setInterval(() => {
-      console.log('Polling for invoice status updates...')
       refreshInvoices()
     }, 30000) // 30 seconds (longer interval, debouncer will handle duplicates)
 

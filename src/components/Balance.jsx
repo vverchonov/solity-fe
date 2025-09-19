@@ -266,8 +266,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     setIsRefreshingBalance(true)
     try {
       // Clear cache to ensure fresh data when user manually refreshes
-      apiDebouncer.clearKey('getBalance')
-      apiDebouncer.clearKey('getInvoices-0-100')
+      apiDebouncer.clearAll()
 
       // Use BalanceProvider's refresh method
       await refreshBalance()
@@ -305,7 +304,6 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     if (!shouldDisableTopUp) return
 
     const pollInterval = setInterval(() => {
-      console.log('Polling for invoice status updates...')
       refreshInvoices()
     }, 30000) // 30 seconds (longer interval, debouncer will handle duplicates)
 

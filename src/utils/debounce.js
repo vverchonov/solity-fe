@@ -19,7 +19,6 @@ class APIDebouncer {
 
     // If forceRefresh is true, skip debouncing entirely
     if (forceRefresh) {
-      console.log(`Force refresh API call: "${fullKey}"`)
       try {
         const result = await apiCall()
         this.lastCalls.set(fullKey, { timestamp: now, result })
@@ -27,7 +26,6 @@ class APIDebouncer {
         this.lastCalls.set(globalKey, { timestamp: now, result })
         return result
       } catch (error) {
-        console.error(`API call "${fullKey}" failed:`, error)
         throw error
       }
     }
@@ -35,7 +33,7 @@ class APIDebouncer {
     // Check context-specific cache first
     const contextCall = this.lastCalls.get(fullKey)
     if (contextCall && (now - contextCall.timestamp) < this.cooldownMs) {
-      console.log(`API call "${fullKey}" skipped - called ${Math.round((now - contextCall.timestamp) / 1000)}s ago (context cache)`)
+      console.log(`⚡ Using cached result for: "${fullKey}" (${Math.round((now - contextCall.timestamp) / 1000)}s ago)`)
       return contextCall.result
     }
 
@@ -43,7 +41,7 @@ class APIDebouncer {
     if (allowCrossContext && context !== 'global') {
       const globalCall = this.lastCalls.get(globalKey)
       if (globalCall && (now - globalCall.timestamp) < this.cooldownMs) {
-        console.log(`API call "${fullKey}" skipped - called ${Math.round((now - globalCall.timestamp) / 1000)}s ago (global cache)`)
+        console.log(`🔄 Using global cache for: "${fullKey}" (${Math.round((now - globalCall.timestamp) / 1000)}s ago)`)
         // Update context cache with global result
         this.lastCalls.set(fullKey, { timestamp: now, result: globalCall.result })
         return globalCall.result
@@ -51,7 +49,7 @@ class APIDebouncer {
     }
 
     // Make the API call
-    console.log(`Making API call: "${fullKey}"`)
+    console.log(`🚀 Making API call: "${fullKey}"`)
     try {
       const result = await apiCall()
       this.lastCalls.set(fullKey, { timestamp: now, result })
@@ -59,10 +57,11 @@ class APIDebouncer {
       if (context !== 'global') {
         this.lastCalls.set(globalKey, { timestamp: now, result })
       }
+      console.log(`✅ API call completed: "${fullKey}"`)
       return result
     } catch (error) {
       // Don't cache errors
-      console.error(`API call "${fullKey}" failed:`, error)
+      console.log(`❌ API call failed: "${fullKey}"`, error)
       throw error
     }
   }
@@ -72,7 +71,6 @@ class APIDebouncer {
     if (context) {
       const fullKey = `${context}:${key}`
       this.lastCalls.delete(fullKey)
-      console.log(`Cleared debounce cache for: "${fullKey}"`)
     } else {
       // Clear all variations of this key
       const keysToDelete = []
@@ -82,14 +80,13 @@ class APIDebouncer {
         }
       }
       keysToDelete.forEach(k => this.lastCalls.delete(k))
-      console.log(`Cleared debounce cache for all contexts of: "${key}" (${keysToDelete.length} entries)`)
     }
   }
 
   // Clear all cached calls
   clearAll() {
+    console.log(`🧹 Clearing all cache (${this.lastCalls.size} entries)`)
     this.lastCalls.clear()
-    console.log('Cleared all debounce cache')
   }
 
   // Clear all cache for a specific context
@@ -101,7 +98,6 @@ class APIDebouncer {
       }
     }
     keysToDelete.forEach(k => this.lastCalls.delete(k))
-    console.log(`Cleared debounce cache for context: "${context}" (${keysToDelete.length} entries)`)
   }
 }
 
