@@ -160,10 +160,11 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
       onCallStateChange({
         phoneNumber: phoneNumber,
         startTime: callStartTime,
-        status: callStatus
+        status: callStatus,
+        duration: callDuration
       })
     }
-  }, [phoneNumber, callStartTime, callStatus, onCallStateChange])
+  }, [phoneNumber, callStartTime, callStatus, callDuration, onCallStateChange])
 
   // Reset rate info when phone number actually changes
   const previousPhoneNumberRef = useRef(phoneNumber)

@@ -42,18 +42,7 @@ function Dashboard() {
   const isCallActive = callState.callStatus === 'in-call' || callState.callStatus === 'calling' || callStatus === 'ringing' || callStatus === 'preparing' || callStatus === 'creating-call' || callStatus === 'pending'
   const isMuted = callState.isMuted
 
-  // Call duration effect
-  useEffect(() => {
-    let interval = null
-    if (isInCall && callStartTime) {
-      interval = setInterval(() => {
-        setCallDuration(Math.floor((Date.now() - callStartTime) / 1000))
-      }, 1000)
-    } else {
-      setCallDuration(0)
-    }
-    return () => clearInterval(interval)
-  }, [isInCall, callStartTime])
+  // Call duration is now managed by the Call component and passed via onCallStateChange
 
   // Sync with CallProvider state changes
   useEffect(() => {
@@ -187,10 +176,11 @@ function Dashboard() {
         return <Call
           onNavigateToInvoices={navigateToInvoices}
           onNavigateToSupport={() => setActiveModule('Support')}
-          onCallStateChange={({ phoneNumber: phone, startTime, status }) => {
+          onCallStateChange={({ phoneNumber: phone, startTime, status, duration }) => {
             if (phone !== undefined) setPhoneNumber(phone)
             if (startTime !== undefined) setCallStartTime(startTime)
             if (status !== undefined) setCallStatus(status)
+            if (duration !== undefined) setCallDuration(duration)
           }}
           onShowModal={() => {
             setIsModalVisible(true)
