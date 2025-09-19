@@ -181,8 +181,8 @@ function Scaling() {
       </div>
 
       {/* Roadmap Card */}
+      {/*
       <div className="card p-6">
-        {/* Roadmap Header */}
         <div className="flex items-center gap-2 mb-6">
           <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -192,11 +192,9 @@ function Scaling() {
           </h3>
         </div>
 
-        {/* 4 Phase Cards Grid - Responsive: 1 column on mobile, 2 on tablet+ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {roadmapPhases.map((phase, index) => (
             <div key={index} className="bg-white/5 border border-white/10 rounded-xl p-4">
-              {/* Phase Header */}
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
                 <div className="flex-1">
                   <h4 className="text-lg font-semibold text-white mb-1">
@@ -211,7 +209,6 @@ function Scaling() {
                 </span>
               </div>
 
-              {/* Progress Bar */}
               <div className="w-full bg-white/10 rounded-full h-2 mb-4">
                 <div
                   className="bg-white/60 h-2 rounded-full transition-all duration-300"
@@ -219,7 +216,6 @@ function Scaling() {
                 ></div>
               </div>
 
-              {/* Features List */}
               <ul className="space-y-2">
                 {t(`scaling.phases.${phase.phaseKey}.features`, { returnObjects: true }).map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start gap-2">
@@ -234,7 +230,8 @@ function Scaling() {
           ))}
         </div>
       </div>
-    </div>
+      */}
+    </div >
   )
 }
 
