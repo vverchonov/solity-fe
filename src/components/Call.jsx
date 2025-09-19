@@ -182,8 +182,8 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
 
     const isRinging = callStatus === 'ringing' || callState.callStatus === 'calling'
     const isCallConnectedOrEnded = callStatus === 'in-call' || callState.callStatus === 'in-call' ||
-                                   callStatus === 'ended' || callStatus === 'ready' ||
-                                   callState.callStatus === 'idle'
+      callStatus === 'ended' || callStatus === 'ready' ||
+      callState.callStatus === 'idle'
 
     if (isRinging && !isCallConnectedOrEnded) {
       // Start playing ringback sound
