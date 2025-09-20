@@ -21,6 +21,7 @@
     "about": "소개",
     "esim": "이심",
     "support": "지원",
+    "howToUse": "사용 방법",
     "settings": "설정",
     "logout": "로그아웃",
     "language": "언어",
@@ -336,5 +337,71 @@
     "recaptchaUnavailable": "reCAPTCHA를 사용할 수 없습니다. 다시 시도해 주세요.",
     "recaptchaFailed": "reCAPTCHA 인증에 실패했습니다. 다시 시도해 주세요.",
     "recaptchaRequired": "reCAPTCHA 인증을 완료해 주세요."
+  },
+  "howToUse": {
+    "title": "사용 방법",
+    "instructions": "안내",
+    "description": "SOL을 입금하고 통화를 하려면 다음 단계를 따르세요. 아래 기기 토글을 사용하세요. 이미지는 작은 미리보기입니다—클릭하여 확대하세요.",
+    "chooseDevice": "기기를 선택하세요:",
+    "pc": "PC",
+    "phone": "휴대폰",
+    "gettingStarted": "시작하기",
+    "faq": "자주 묻는 질문",
+    "expand": "확장",
+    "collapse": "접기",
+    "stepAlt": "단계",
+    "videoFallback": "브라우저가 HTML 비디오를 지원하지 않습니다. 대신",
+    "linkToVideo": "비디오 링크",
+    "instead": "를 이용하세요.",
+    "pcSteps": {
+      "step1": {
+        "title": "잔액 (또는 통화) 페이지로 이동",
+        "description": "**잔액 및 통화 페이지**에서 통화를 시작하기 위해 내부 잔액을 충전할 수 있습니다."
+      },
+      "step2": {
+        "title": "팬텀 지갑 연결",
+        "description": "**지갑 연결 버튼**을 클릭하고 팬텀 지갑 확장 프로그램에서 연결을 승인하세요."
+      },
+      "step3": {
+        "title": "SOL 금액 입력 및 거래 확인",
+        "description": "- 사용자 정의 **SOL 금액 입력 (최소 0.1)**\n- **추가 버튼 누르기**\n- 팬텀 지갑에서 거래 내역을 검토하고 **확인을 클릭**하여 입금을 완료하세요.\n\n**거래는 일반적으로 ~30초 동안 처리되지만 최대 10분까지 걸릴 수 있습니다**"
+      },
+      "step4": {
+        "title": "모든 준비 완료 🎉",
+        "description": "**확인 후 크레딧이 나타납니다.** 필요시 새로고침하세요.\n\n상태가 **처리 중**에서 **결제 완료**로 변경되고 잔액이 업데이트됩니다."
+      },
+      "step5": {
+        "title": "통화하기",
+        "description": "- **통화 탭으로 이동**\n- **발신자 번호 설정** (선택사항)\n- **전화번호 입력** 통화하고 싶은"
+      }
+    },
+    "phoneSteps": {
+      "step1": {
+        "title": "비디오 튜토리얼 따라하기",
+        "description": "휴대폰에서 SOL을 입금하고 통화하는 방법에 대한 단계별 비디오 가이드를 시청하세요."
+      }
+    },
+    "faqItems": {
+      "activateAccount": {
+        "question": "계정을 활성화하는 방법은?",
+        "answer": "첫 번째 충전으로 계정이 활성화됩니다. 한 번만 하면 됩니다."
+      },
+      "supportedTokens": {
+        "question": "입금에 지원되는 토큰은?",
+        "answer": "솔라나 메인넷의 <strong class=\"text-white\">SOL</strong>만 허용됩니다. 다른 자산을 보내면 손실이 발생할 수 있습니다."
+      },
+      "creditsAppear": {
+        "question": "크레딧이 얼마나 빨리 나타나나요?",
+        "answer": "보통 확인 후 1분 이내입니다. 시간이 더 걸리면 잔액 탭을 새로고침하고 거래 상태를 확인하세요."
+      },
+      "storeLogs": {
+        "question": "통화 기록을 저장하나요?",
+        "answer": "아니요. 세션은 임시적이며, 사용량 정산에 필요한 계량 데이터만 기록됩니다."
+      },
+      "withdrawCredits": {
+        "question": "사용하지 않은 크레딧을 출금할 수 있나요?",
+        "answer": "네. 잔액 탭의 출금 기능을 사용하여 남은 SOL을 지갑으로 다시 보낼 수 있습니다."
+      }
+    }
   }
 }

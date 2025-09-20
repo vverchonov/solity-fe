@@ -21,6 +21,7 @@
     "about": "关于",
     "esim": "电子卡",
     "support": "支持",
+    "howToUse": "使用方法",
     "settings": "设置",
     "logout": "退出登录",
     "language": "语言",
@@ -336,5 +337,71 @@
     "recaptchaUnavailable": "reCAPTCHA不可用。请重试。",
     "recaptchaFailed": "reCAPTCHA验证失败。请重试。",
     "recaptchaRequired": "请完成reCAPTCHA验证。"
+  },
+  "howToUse": {
+    "title": "使用方法",
+    "instructions": "说明",
+    "description": "按照这些步骤充值SOL并拨打电话。使用下面的设备切换。图片是小预览——点击放大。",
+    "chooseDevice": "选择您的设备：",
+    "pc": "电脑",
+    "phone": "手机",
+    "gettingStarted": "开始使用",
+    "faq": "常见问题",
+    "expand": "展开",
+    "collapse": "收起",
+    "stepAlt": "步骤",
+    "videoFallback": "您的浏览器不支持HTML视频。这里有一个",
+    "linkToVideo": "视频链接",
+    "instead": "作为替代。",
+    "pcSteps": {
+      "step1": {
+        "title": "前往余额（或通话）页面",
+        "description": "在**余额和通话页面**中，您可以为内部余额充值以开始拨打电话。"
+      },
+      "step2": {
+        "title": "连接Phantom钱包",
+        "description": "点击**连接钱包按钮**并在您的Phantom钱包扩展程序中批准连接。"
+      },
+      "step3": {
+        "title": "输入SOL金额并确认交易",
+        "description": "- 输入自定义**SOL金额（最低0.1）**\n- **按添加按钮**\n- 在Phantom钱包中查看交易详情并**点击确认**完成充值。\n\n**交易通常需要约30秒处理，但最多可能需要10分钟**"
+      },
+      "step4": {
+        "title": "一切准备就绪 🎉",
+        "description": "**确认后积分将出现。** 如需要请刷新。\n\n状态将从**处理中**变为**已支付**，余额将被更新。"
+      },
+      "step5": {
+        "title": "拨打电话",
+        "description": "- **前往通话选项卡**\n- **设置主叫号码**（可选）\n- **输入要拨打的电话号码**"
+      }
+    },
+    "phoneSteps": {
+      "step1": {
+        "title": "观看视频教程",
+        "description": "观看这个逐步视频指南，了解如何在手机上充值SOL和拨打电话。"
+      }
+    },
+    "faqItems": {
+      "activateAccount": {
+        "question": "如何激活账户？",
+        "answer": "首次充值将激活您的账户。您只需要做一次。"
+      },
+      "supportedTokens": {
+        "question": "支持哪些代币进行充值？",
+        "answer": "仅接受Solana主网上的<strong class=\"text-white\">SOL</strong>。发送其他资产可能导致损失。"
+      },
+      "creditsAppear": {
+        "question": "积分多快会出现？",
+        "answer": "通常在确认后一分钟内。如果时间更长，请刷新余额选项卡并查看您的交易状态。"
+      },
+      "storeLogs": {
+        "question": "您会存储通话记录吗？",
+        "answer": "不会。会话是临时的；只记录结算使用量所需的计量数据。"
+      },
+      "withdrawCredits": {
+        "question": "我可以提取未使用的积分吗？",
+        "answer": "可以。使用余额选项卡中的提取功能将剩余的SOL发送回您的钱包。"
+      }
+    }
   }
 }

@@ -111,7 +111,7 @@ function Support() {
             onClick={handleCopyLogs}
             className="bg-white hover:bg-gray-100 text-gray-900 px-8 py-3 rounded-xl font-semibold transition-all whitespace-nowrap min-h-[48px] touch-manipulation w-full sm:w-auto"
           >
-{t('support.copySessionLogs')}
+            {t('support.copySessionLogs')}
           </button>
         </div>
       </div>

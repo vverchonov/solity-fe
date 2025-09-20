@@ -4,6 +4,7 @@ import Call from './Call'
 import Support from './Support'
 import BalanceModule from './BalanceModule'
 import Scaling from './Scaling'
+import HowToUse from './HowToUse'
 import { CallModal } from './CallModal'
 import LanguageToggle from './LanguageToggle'
 import { useHealth } from '../contexts/HealthProvider'
@@ -37,6 +38,7 @@ function Dashboard() {
     { key: 'Balance', label: t('navigation.balance') },
     { key: 'About', label: t('navigation.about') },
     { key: 'E-SIM', label: t('navigation.esim') },
+    { key: 'HowToUse', label: t('navigation.howToUse') },
     { key: 'Support', label: t('navigation.support') }
   ]
 
@@ -298,6 +300,8 @@ function Dashboard() {
         )
       case 'Support':
         return <Support />
+      case 'HowToUse':
+        return <HowToUse />
       default:
         return (
           <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">

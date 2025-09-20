@@ -21,6 +21,7 @@
     "about": "About",
     "esim": "E-SIM",
     "support": "Support",
+    "howToUse": "How to use",
     "settings": "Settings",
     "logout": "Log Out",
     "language": "Language",
@@ -336,5 +337,71 @@
     "recaptchaUnavailable": "reCAPTCHA not available. Please try again.",
     "recaptchaFailed": "reCAPTCHA verification failed. Please try again.",
     "recaptchaRequired": "Please complete the reCAPTCHA verification."
+  },
+  "howToUse": {
+    "title": "How to Use",
+    "instructions": "Instructions",
+    "description": "Follow these steps to deposit SOL and make a call. Use the device toggle below. Images are small previews—click to zoom.",
+    "chooseDevice": "Choose your device:",
+    "pc": "PC",
+    "phone": "Phone",
+    "gettingStarted": "Getting Started",
+    "faq": "Frequently Asked Questions",
+    "expand": "expand",
+    "collapse": "collapse",
+    "stepAlt": "Step",
+    "videoFallback": "Your browser doesn't support HTML video. Here is a",
+    "linkToVideo": "link to the video",
+    "instead": "instead.",
+    "pcSteps": {
+      "step1": {
+        "title": "Go to BALANCE (or CALL)",
+        "description": "In **Balance and Call pages** you can top up your internal balance to start making calls."
+      },
+      "step2": {
+        "title": "Connect Phantom Wallet",
+        "description": "Click the **connect wallet button** and approve the connection in your Phantom wallet extension."
+      },
+      "step3": {
+        "title": "Enter SOL amount and confirm transaction",
+        "description": "- Enter a custom **SOL amount (min 0.1)**\n- **Press Add button**\n- Review the transaction details in your Phantom wallet and **click confirm** to complete the deposit.\n\n**Transaction will be processing for ~30sec normally but can take up to 10min**"
+      },
+      "step4": {
+        "title": "You're all set 🎉",
+        "description": "**Credits appear after confirmation.** Refresh if needed.\n\nThe status will change from **processing** to **paid** and balance will be updated."
+      },
+      "step5": {
+        "title": "Making calls",
+        "description": "- **Go to the Call tab**\n- **Set Caller ID** (optional)\n- **Enter the phone number** you want to call"
+      }
+    },
+    "phoneSteps": {
+      "step1": {
+        "title": "Follow the video tutorial",
+        "description": "Watch this step-by-step video guide to deposit SOL and make calls on your phone."
+      }
+    },
+    "faqItems": {
+      "activateAccount": {
+        "question": "How to activate account?",
+        "answer": "The first top up will activate your account. You need to do it only once."
+      },
+      "supportedTokens": {
+        "question": "Which tokens are supported for deposits?",
+        "answer": "Only <strong className=\"text-white\">SOL</strong> on the Solana mainnet is accepted. Sending other assets may result in loss."
+      },
+      "creditsAppear": {
+        "question": "How fast do credits appear?",
+        "answer": "Usually within a minute after confirmation. If it takes longer, refresh the Balance tab and check your transaction status."
+      },
+      "storeLogs": {
+        "question": "Do you store call logs?",
+        "answer": "No. Sessions are ephemeral; only metering data necessary to settle usage is recorded."
+      },
+      "withdrawCredits": {
+        "question": "Can I withdraw unused credits?",
+        "answer": "Yes. Use the withdraw action from the Balance tab to send remaining SOL back to your wallet."
+      }
+    }
   }
 }
