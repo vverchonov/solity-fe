@@ -569,8 +569,8 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* Mobile Main Content - Shows on screens < 650px */}
-          <div className="max-[649px]:block hidden">
+          {/* Mobile Main Content - Shows on screens <= 868px */}
+          <div className="max-[868px]:block hidden">
             {renderModule()}
           </div>
         </div>
