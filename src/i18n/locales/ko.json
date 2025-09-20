@@ -37,7 +37,7 @@
     "phoneNumberPlaceholder": "예: 82 10 1234 5678",
     "callerIDPlaceholder": "예: 82 10 1234 5678",
     "validatingCallerID": "발신자 번호 확인 중...",
-    "callerIDError": "발신자 번호는 7-15자리 숫자여야 합니다",
+    "callerIDError": "발신자 번호는 숫자만 포함해야 합니다",
     "callDuration": "통화 시간",
     "mute": "음소거",
     "unmute": "음소거 해제",

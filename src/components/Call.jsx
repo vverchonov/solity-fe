@@ -9,8 +9,8 @@ import { useI18n } from '../contexts/I18nProvider'
 import apiClient from '../lib/axios'
 import { apiDebouncer } from '../utils/debounce'
 
-// Phone validation constants for international numbers
-const PHONE_REGEX = /^\d{7,15}$/
+// Phone validation constants - for testing branch: allow any number of digits
+const PHONE_REGEX = /^\d+$/
 
 // Available caller ID numbers
 const CALLER_ID_NUMBERS = [
@@ -118,20 +118,15 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
     // Extract only digits
     const digitsOnly = phoneStr.replace(/[^\d]/g, '')
 
-    // Check minimum length (at least 7 digits for shortest international numbers)
-    if (digitsOnly.length < 7) {
-      setError('Phone number must be at least 7 digits long')
-      return false
-    }
-
-    // Check maximum length (15 digits is ITU-T E.164 standard)
-    if (digitsOnly.length > 15) {
-      setError('Phone number cannot exceed 15 digits')
-      return false
-    }
-
+    // For testing branch: Allow any number of digits (no min/max restrictions)
     // Basic check - must contain only digits and be non-empty
-    if (!PHONE_REGEX.test(digitsOnly)) {
+    if (digitsOnly.length === 0) {
+      setError('Phone number cannot be empty')
+      return false
+    }
+
+    // Check if it contains only digits
+    if (!/^\d+$/.test(digitsOnly)) {
       setError('Phone number must contain only digits')
       return false
     }
@@ -143,7 +138,8 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
   // Helper function to check if phone number is valid
   const isValidPhoneNumber = (phoneStr) => {
     const digitsOnly = phoneStr.replace(/[^\d]/g, '')
-    return digitsOnly.length >= 7 && digitsOnly.length <= 15
+    // For testing branch: Allow any number of digits (just check it's not empty and contains only digits)
+    return digitsOnly.length > 0 && /^\d+$/.test(digitsOnly)
   }
 
   // Derived state from CallProvider

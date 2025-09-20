@@ -37,7 +37,7 @@
     "phoneNumberPlaceholder": "例如：86 138 0013 8000",
     "callerIDPlaceholder": "例如：86 138 0013 8000",
     "validatingCallerID": "验证主叫号码中...",
-    "callerIDError": "主叫号码必须是7-15位数字",
+    "callerIDError": "主叫号码必须只包含数字",
     "callDuration": "通话时长",
     "mute": "静音",
     "unmute": "取消静音",

@@ -37,7 +37,7 @@
     "phoneNumberPlaceholder": "e.g. 1 800 207 9460",
     "callerIDPlaceholder": "e.g. 1 555 0123",
     "validatingCallerID": "Validating caller ID...",
-    "callerIDError": "Caller ID must be 7-15 digits",
+    "callerIDError": "Caller ID must contain only digits",
     "callDuration": "Call duration",
     "mute": "Mute",
     "unmute": "Unmute",
