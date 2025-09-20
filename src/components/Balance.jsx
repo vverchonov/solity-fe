@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../contexts/WalletProvider'
 import { useBalance } from '../contexts/BalanceProvider'
@@ -15,6 +15,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const [customAmount, setCustomAmount] = useState('')
   const [showProcessingModal, setShowProcessingModal] = useState(false)
   const [isRefreshingBalance, setIsRefreshingBalance] = useState(false)
+  const [walletSolBalance, setWalletSolBalance] = useState(0)
   const navigate = useNavigate()
   const { user, clearUser } = useUser()
   const { t } = useI18n()
@@ -51,6 +52,25 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   } = useLogs()
 
   const quickAmounts = [0.1, 0.5, 1, 2]
+
+  // Function to refresh wallet SOL balance
+  const refreshWalletBalance = useCallback(async () => {
+    if (!isWalletConnected || !walletAddress) {
+      setWalletSolBalance(0)
+      return
+    }
+
+    try {
+      const balanceResult = await solanaService.getWalletBalance(walletAddress)
+      if (balanceResult.success) {
+        setWalletSolBalance(balanceResult.balance)
+      } else {
+        setWalletSolBalance(0)
+      }
+    } catch (error) {
+      setWalletSolBalance(0)
+    }
+  }, [isWalletConnected, walletAddress])
 
   const handleAddBalance = async (amount) => {
     if (!isWalletConnected) {
@@ -304,6 +324,31 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     return invoices.some(invoice => invoice.status === 'pending' || invoice.status === 'processing')
   }, [invoices])
 
+  // Check if wallet has insufficient balance for add funds
+  const hasInsufficientWalletBalance = useMemo(() => {
+    if (!isWalletConnected || !customAmount || parseFloat(customAmount) <= 0) {
+      return false
+    }
+    const requiredAmount = parseFloat(customAmount)
+    const feeBuffer = 0.001 // Transaction fee buffer
+    return walletSolBalance < (requiredAmount + feeBuffer)
+  }, [isWalletConnected, customAmount, walletSolBalance])
+
+  // Check if wallet has insufficient balance for paying invoice
+  const hasInsufficientBalanceForInvoice = useMemo(() => {
+    if (!firstPendingInvoice || !isWalletConnected) {
+      return false
+    }
+    const requiredSol = firstPendingInvoice.lamports / 1e9 // Convert lamports to SOL
+    const feeBuffer = 0.001 // Transaction fee buffer
+    return walletSolBalance < (requiredSol + feeBuffer)
+  }, [firstPendingInvoice, isWalletConnected, walletSolBalance])
+
+  // Refresh wallet balance when wallet connects/disconnects
+  useEffect(() => {
+    refreshWalletBalance()
+  }, [isWalletConnected, walletAddress, refreshWalletBalance])
+
   // Simplified polling - only poll every 30 seconds when needed, no cascading
   useEffect(() => {
     if (!shouldDisableTopUp) return
@@ -322,6 +367,9 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
 
   // Get appropriate button text based on current state
   const getTopUpButtonText = () => {
+    if (hasInsufficientWalletBalance) {
+      return t('balance.insufficientWalletBalance') || 'Insufficient SOL'
+    }
     if (shouldDisableTopUp) {
       const pendingInvoice = invoices.find(invoice => invoice.status === 'pending')
       const processingInvoice = invoices.find(invoice => invoice.status === 'processing')
@@ -407,7 +455,13 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
             <input
               type="number"
               value={customAmount}
-              onChange={(e) => setCustomAmount(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value
+                // Allow empty value or valid numbers up to 5
+                if (value === '' || (parseFloat(value) <= 5 && !isNaN(parseFloat(value)))) {
+                  setCustomAmount(value)
+                }
+              }}
               onKeyDown={(e) => {
                 // Allow: navigation keys, delete, backspace, tab, escape, enter
                 const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
@@ -430,6 +484,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
               placeholder={t('balance.enterSolAmount')}
               step="0.01"
               min="0"
+              max="5"
               disabled={!isWalletConnected || shouldDisableTopUp}
               className={`flex-1 min-w-[80px] border rounded-xl px-3 py-2 text-sm transition-all ${isWalletConnected && !shouldDisableTopUp
                 ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10'
@@ -438,8 +493,8 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
             />
             <button
               onClick={handleAddCustomAmount}
-              disabled={!isWalletConnected || !customAmount || parseFloat(customAmount) <= 0 || shouldDisableTopUp}
-              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex-1 max-w-[140px] ${isWalletConnected && customAmount && parseFloat(customAmount) > 0 && !shouldDisableTopUp
+              disabled={!isWalletConnected || !customAmount || parseFloat(customAmount) <= 0 || shouldDisableTopUp || hasInsufficientWalletBalance}
+              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex-1 max-w-[140px] ${isWalletConnected && customAmount && parseFloat(customAmount) > 0 && !shouldDisableTopUp && !hasInsufficientWalletBalance
                 ? 'bg-white hover:bg-gray-100 text-gray-900'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 }`}
@@ -468,13 +523,14 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
               </button>
               <button
                 onClick={() => handlePayInvoice(firstPendingInvoice.id)}
-                disabled={!isWalletConnected}
-                className={`flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all ${isWalletConnected
+                disabled={!isWalletConnected || hasInsufficientBalanceForInvoice}
+                className={`flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all ${isWalletConnected && !hasInsufficientBalanceForInvoice
                   ? 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-600/30 hover:border-green-600/50'
                   : 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
                   }`}
+                title={hasInsufficientBalanceForInvoice ? 'Insufficient SOL in wallet' : ''}
               >
-                {t('balance.payInvoice')}
+                {hasInsufficientBalanceForInvoice ? 'Insufficient SOL' : t('balance.payInvoice')}
               </button>
             </div>
           </div>

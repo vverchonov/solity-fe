@@ -174,6 +174,50 @@ export const solanaService = {
   // Helper function to format SOL to lamports
   solToLamports: (sol) => {
     return Math.round(sol * 1000000000);
+  },
+
+  // Get wallet balance in SOL
+  getWalletBalance: async (walletAddress) => {
+    try {
+      const publicKey = new PublicKey(walletAddress);
+      const balance = await connection.getBalance(publicKey);
+      return {
+        success: true,
+        balance: balance / 1000000000 // Convert lamports to SOL
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Failed to get wallet balance'
+      };
+    }
+  },
+
+  // Check if wallet has sufficient balance for transaction
+  hasSufficientBalance: async (walletAddress, requiredSol) => {
+    try {
+      const balanceResult = await solanaService.getWalletBalance(walletAddress);
+      if (!balanceResult.success) {
+        return { success: false, error: balanceResult.error };
+      }
+
+      // Add some buffer for transaction fees (0.001 SOL)
+      const feeBuffer = 0.001;
+      const totalRequired = requiredSol + feeBuffer;
+
+      return {
+        success: true,
+        hasSufficient: balanceResult.balance >= totalRequired,
+        currentBalance: balanceResult.balance,
+        requiredBalance: totalRequired,
+        shortfall: Math.max(0, totalRequired - balanceResult.balance)
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Failed to check balance'
+      };
+    }
   }
 };
 

@@ -59,7 +59,8 @@
     "enterPhoneFirst": "먼저 전화번호를 입력해 주세요",
     "rateCheckFailed": "요금 확인에 실패했습니다",
     "showCallModal": "통화 모달 표시",
-    "show": "표시"
+    "show": "표시",
+    "insufficientBalance": "잔액 부족"
   },
   "status": {
     "idle": "대기",
@@ -291,7 +292,8 @@
     "filteredFrom": "전체 {total}개에서 필터링됨",
     "invoiceId": "인보이스 ID",
     "paidAt": "결제 시간",
-    "paymentProcessingMessage": "귀하의 {amount} 결제가 처리 중입니다. 처리 완료까지(최대 10분) 충전 버튼이 비활성화됩니다."
+    "paymentProcessingMessage": "귀하의 {amount} 결제가 처리 중입니다. 처리 완료까지(최대 10분) 충전 버튼이 비활성화됩니다.",
+    "insufficientWalletBalance": "SOL 부족"
   },
   "login": {
     "loading": "로딩 중...",
@@ -400,7 +402,7 @@
       },
       "withdrawCredits": {
         "question": "사용하지 않은 크레딧을 출금할 수 있나요?",
-        "answer": "네. 잔액 탭의 출금 기능을 사용하여 남은 SOL을 지갑으로 다시 보낼 수 있습니다."
+        "answer": "네. 출금 요청을 처리하려면 지원 섹션을 통해 고객 지원팀에 문의하세요."
       }
     }
   }

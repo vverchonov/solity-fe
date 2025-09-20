@@ -59,7 +59,8 @@
     "enterPhoneFirst": "请先输入电话号码",
     "rateCheckFailed": "查询费率失败",
     "showCallModal": "显示通话窗口",
-    "show": "显示"
+    "show": "显示",
+    "insufficientBalance": "余额不足"
   },
   "status": {
     "idle": "空闲",
@@ -291,7 +292,8 @@
     "filteredFrom": "从 {total} 个总数中筛选",
     "invoiceId": "发票ID",
     "paidAt": "支付时间",
-    "paymentProcessingMessage": "您的 {amount} 付款正在处理中。处理完成前（最多10分钟）充值按钮将被禁用。"
+    "paymentProcessingMessage": "您的 {amount} 付款正在处理中。处理完成前（最多10分钟）充值按钮将被禁用。",
+    "insufficientWalletBalance": "SOL不足"
   },
   "login": {
     "loading": "加载中...",
@@ -400,7 +402,7 @@
       },
       "withdrawCredits": {
         "question": "我可以提取未使用的积分吗？",
-        "answer": "可以。使用余额选项卡中的提取功能将剩余的SOL发送回您的钱包。"
+        "answer": "可以。请通过支持部分联系我们的客户支持团队来处理您的提现请求。"
       }
     }
   }

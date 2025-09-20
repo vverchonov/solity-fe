@@ -59,7 +59,8 @@
     "enterPhoneFirst": "Please enter a phone number first",
     "rateCheckFailed": "Failed to check rate",
     "showCallModal": "Show call modal",
-    "show": "Show"
+    "show": "Show",
+    "insufficientBalance": "Insufficient Balance"
   },
   "status": {
     "idle": "Idle",
@@ -291,7 +292,8 @@
     "filteredFrom": "filtered from {total} total",
     "invoiceId": "Invoice ID",
     "paidAt": "Paid At",
-    "paymentProcessingMessage": "Your {amount} payment is being processed. Top-up buttons are disabled until processing completes (up to 10 minutes)."
+    "paymentProcessingMessage": "Your {amount} payment is being processed. Top-up buttons are disabled until processing completes (up to 10 minutes).",
+    "insufficientWalletBalance": "Insufficient SOL"
   },
   "login": {
     "loading": "Loading...",
@@ -400,7 +402,7 @@
       },
       "withdrawCredits": {
         "question": "Can I withdraw unused credits?",
-        "answer": "Yes. Use the withdraw action from the Balance tab to send remaining SOL back to your wallet."
+        "answer": "Yes. Please contact our customer support team via the Support section to process your withdrawal request."
       }
     }
   }

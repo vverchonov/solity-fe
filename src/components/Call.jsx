@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import Balance from './Balance'
 import { useCall } from '../contexts/CallProvider'
 import { useUser } from '../contexts/UserContext'
+import { useBalance } from '../contexts/BalanceProvider'
 import { useLogs } from '../contexts/LogsProvider'
 import { useTele } from '../contexts/TeleProvider'
 import { useI18n } from '../contexts/I18nProvider'
@@ -106,6 +107,10 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
 
   // Use UserProvider
   const { user, isUserInactive } = useUser()
+
+  // Use BalanceProvider to check internal balance
+  const { balance } = useBalance()
+
   const { t } = useI18n()
 
   // Validation function for international phone numbers
@@ -148,6 +153,11 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
     return activeStates.includes(callState.callStatus) || activeStates.includes(callStatus)
   }, [callState.callStatus, callStatus])
   const isMuted = callState.isMuted
+
+  // Check if internal balance is insufficient for calls (less than 0.01 SOL)
+  const hasInsufficientInternalBalance = useMemo(() => {
+    return balance && balance.solBalance < 0.01
+  }, [balance])
 
   // Sync with CallProvider state changes
   useEffect(() => {
@@ -494,15 +504,16 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
                 </div>
                 <button
                   onClick={isCallActive ? handleEndCall : handleStartCall}
-                  disabled={callStatus === 'ended' || (!isCallActive && (!phoneNumber.trim() || phoneNumberError || callerIDError || !isValidPhoneNumber(phoneNumber) || !isValidPhoneNumber(editableCallerID)))}
+                  disabled={callStatus === 'ended' || (!isCallActive && (!phoneNumber.trim() || phoneNumberError || callerIDError || !isValidPhoneNumber(phoneNumber) || !isValidPhoneNumber(editableCallerID) || hasInsufficientInternalBalance))}
                   className={`px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap sm:w-32 h-[50px] border ${isCallActive
                     ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-600/30 hover:border-red-600/50'
-                    : callStatus === 'ended' || !phoneNumber.trim() || phoneNumberError || callerIDError || !isValidPhoneNumber(phoneNumber) || !isValidPhoneNumber(editableCallerID)
+                    : callStatus === 'ended' || !phoneNumber.trim() || phoneNumberError || callerIDError || !isValidPhoneNumber(phoneNumber) || !isValidPhoneNumber(editableCallerID) || hasInsufficientInternalBalance
                       ? 'bg-gray-600/20 text-gray-500 border-gray-600/30 cursor-not-allowed'
                       : 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-600/30 hover:border-green-600/50'
                     }`}
+                  title={hasInsufficientInternalBalance && !isCallActive ? t('call.insufficientBalance') || 'Insufficient balance for calls' : ''}
                 >
-                  {isCallActive ? t('call.endCall') : t('call.startCall')}
+                  {isCallActive ? t('call.endCall') : hasInsufficientInternalBalance ? (t('call.insufficientBalance') || 'Insufficient Balance') : t('call.startCall')}
                 </button>
               </div>
 
