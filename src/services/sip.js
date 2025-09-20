@@ -270,10 +270,20 @@ export const sipUtils = {
     // Remove all non-digit characters
     const digits = phoneNumber.replace(/\D/g, '')
 
-    // Add country code if missing (default to US +1)
+    // US/Canada: 10 digits -> +1XXXXXXXXXX, 11 digits starting with 1 -> +1XXXXXXXXXX
     if (digits.length === 10) {
       return `+1${digits}`
     } else if (digits.length === 11 && digits.startsWith('1')) {
+      return `+${digits}`
+    }
+
+    // Germany: 11-13 digits starting with 49 -> +49XXXXXXXXXX
+    else if (digits.length >= 11 && digits.length <= 13 && digits.startsWith('49')) {
+      return `+${digits}`
+    }
+
+    // Ukraine: 12 digits starting with 380 -> +380XXXXXXXXX
+    else if (digits.length === 12 && digits.startsWith('380')) {
       return `+${digits}`
     }
 
@@ -289,11 +299,12 @@ export const sipUtils = {
 
   // Validate caller ID format
   isValidCallerID: (callerID) => {
-    // Should be in E.164 format or US format
-    const e164Regex = /^\+[1-9]\d{1,14}$/
-    const usFormatRegex = /^\+1[2-9]\d{2}[2-9]\d{2}\d{4}$/
+    // Should be in E.164 format for supported countries
+    const usCanadaRegex = /^\+1[2-9]\d{9}$/
+    const germanyRegex = /^\+49[1-9]\d{9,11}$/
+    const ukraineRegex = /^\+380[1-9]\d{8}$/
 
-    return e164Regex.test(callerID) || usFormatRegex.test(callerID)
+    return usCanadaRegex.test(callerID) || germanyRegex.test(callerID) || ukraineRegex.test(callerID)
   },
 
   // Parse SIP connection URL
