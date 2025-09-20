@@ -297,7 +297,7 @@ function Login() {
               <div className="pt-6 lg:pt-8 border-t border-white/10">
                 <div className="space-y-2 flex flex-col items-center lg:items-start">
                   <p className="text-white/50 text-xs lg:text-sm">{t('login.companyRegistration')}</p>
-                  <p className="text-white font-mono text-sm lg:text-lg">CA</p>
+                  <p className="text-white font-mono text-sm lg:text-lg">CA: HaUeYmoDCiF33Z7TaJSGb6hPBykFPuYNwBBVrWSrpump</p>
                   <div className="flex items-center gap-2 mt-3 lg:mt-4">
                     <div className="flex items-end gap-0.5">
                       <div className={`w-1 h-2 rounded-sm ${health.api ? 'bg-green-400' : 'bg-red-400'}`}></div>
