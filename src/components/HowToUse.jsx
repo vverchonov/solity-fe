@@ -155,8 +155,9 @@ function HowToUse() {
           <details className="group">
             <summary className="flex items-center justify-between cursor-pointer p-4 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg transition-all">
               <span className="text-white font-semibold">{t('howToUse.faqItems.activateAccount.question')}</span>
-              <span className="text-xs text-blue-200 group-open:hidden">{t('howToUse.expand')}</span>
-              <span className="text-xs text-blue-200 hidden group-open:inline">{t('howToUse.collapse')}</span>
+              <svg className="w-5 h-5 text-blue-200 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </summary>
             <div className="mt-2 p-4 bg-white/5 border border-white/10 rounded-lg">
               <p className="text-white/80 text-sm">
@@ -168,8 +169,9 @@ function HowToUse() {
           <details className="group">
             <summary className="flex items-center justify-between cursor-pointer p-4 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg transition-all">
               <span className="text-white font-semibold">{t('howToUse.faqItems.supportedTokens.question')}</span>
-              <span className="text-xs text-blue-200 group-open:hidden">{t('howToUse.expand')}</span>
-              <span className="text-xs text-blue-200 hidden group-open:inline">{t('howToUse.collapse')}</span>
+              <svg className="w-5 h-5 text-blue-200 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </summary>
             <div className="mt-2 p-4 bg-white/5 border border-white/10 rounded-lg">
               <p
@@ -184,8 +186,9 @@ function HowToUse() {
           <details className="group">
             <summary className="flex items-center justify-between cursor-pointer p-4 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg transition-all">
               <span className="text-white font-semibold">{t('howToUse.faqItems.creditsAppear.question')}</span>
-              <span className="text-xs text-blue-200 group-open:hidden">{t('howToUse.expand')}</span>
-              <span className="text-xs text-blue-200 hidden group-open:inline">{t('howToUse.collapse')}</span>
+              <svg className="w-5 h-5 text-blue-200 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </summary>
             <div className="mt-2 p-4 bg-white/5 border border-white/10 rounded-lg">
               <p className="text-white/80 text-sm">
@@ -197,8 +200,9 @@ function HowToUse() {
           <details className="group">
             <summary className="flex items-center justify-between cursor-pointer p-4 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg transition-all">
               <span className="text-white font-semibold">{t('howToUse.faqItems.storeLogs.question')}</span>
-              <span className="text-xs text-blue-200 group-open:hidden">{t('howToUse.expand')}</span>
-              <span className="text-xs text-blue-200 hidden group-open:inline">{t('howToUse.collapse')}</span>
+              <svg className="w-5 h-5 text-blue-200 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </summary>
             <div className="mt-2 p-4 bg-white/5 border border-white/10 rounded-lg">
               <p className="text-white/80 text-sm">
@@ -210,8 +214,9 @@ function HowToUse() {
           <details className="group">
             <summary className="flex items-center justify-between cursor-pointer p-4 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg transition-all">
               <span className="text-white font-semibold">{t('howToUse.faqItems.withdrawCredits.question')}</span>
-              <span className="text-xs text-blue-200 group-open:hidden">{t('howToUse.expand')}</span>
-              <span className="text-xs text-blue-200 hidden group-open:inline">{t('howToUse.collapse')}</span>
+              <svg className="w-5 h-5 text-blue-200 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </summary>
             <div className="mt-2 p-4 bg-white/5 border border-white/10 rounded-lg">
               <p className="text-white/80 text-sm">
