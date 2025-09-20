@@ -332,8 +332,8 @@ function Dashboard() {
       {/* Main Layout */}
       <div className="relative p-6">
         <div className="max-w-7xl mx-auto">
-          {/* Mobile Navigation Bar - Shows on screens < 650px */}
-          <div className="max-[649px]:block hidden mb-6 relative z-50">
+          {/* Mobile Navigation Bar - Shows on screens <= 868px */}
+          <div className="max-[868px]:block hidden mb-6 relative z-50">
             <div className="card p-3 overflow-visible">
               <div className="flex items-center gap-4">
                 {/* Logo */}
@@ -455,8 +455,8 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* Desktop Layout - Shows on screens >= 650px */}
-          <div className="min-[650px]:flex hidden gap-6">
+          {/* Desktop Layout - Shows on screens > 868px */}
+          <div className="min-[869px]:flex hidden gap-6">
             {/* Sidebar Column */}
             <div className="w-[200px] flex flex-col gap-6">
               {/* Logo Card */}
