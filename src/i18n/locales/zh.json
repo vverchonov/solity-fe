@@ -35,7 +35,7 @@
     "randomize": "随机化",
     "enterCallerID": "输入您的主叫号码（电话号码）",
     "phoneNumberPlaceholder": "例如：86 138 0013 8000",
-    "callerIDPlaceholder": "例如：1 555 0123, 49 30 12345678, 380 44 1234567",
+    "callerIDPlaceholder": "例如：+1 555 0123, +49 30 12345678, +380 44 1234567, +39 06 12345678, +34 91 1234567, +351 21 1234567",
     "validatingCallerID": "验证主叫号码中...",
     "callerIDError": "主叫号码必须是7-15位数字",
     "callDuration": "通话时长",

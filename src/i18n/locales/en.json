@@ -35,7 +35,7 @@
     "randomize": "Randomize",
     "enterCallerID": "Enter your caller ID(phone number)",
     "phoneNumberPlaceholder": "e.g. 1 800 207 9460",
-    "callerIDPlaceholder": "e.g. 1 555 0123, 49 30 12345678, 380 44 1234567",
+    "callerIDPlaceholder": "e.g. +1 555 0123, +49 30 12345678, +380 44 1234567, +39 06 12345678, +34 91 1234567, +351 21 1234567",
     "validatingCallerID": "Validating caller ID...",
     "callerIDError": "Caller ID must be 7-15 digits",
     "callDuration": "Call duration",
