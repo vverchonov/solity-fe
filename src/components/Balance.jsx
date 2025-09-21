@@ -420,14 +420,6 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
         {/* Invoice Action Buttons - Show if there's a pending invoice */}
         {firstPendingInvoice && (
           <div className="mb-4">
-            <div
-              className="text-xs text-white/60 text-center mb-3 cursor-pointer hover:text-white/80 transition-colors"
-              onClick={() => onNavigateToInvoices && onNavigateToInvoices()}
-              title="Click to view all invoices"
-            >
-              {t('balance.invoice')}: {formatInvoiceAmount(firstPendingInvoice.lamports)} • {t('balance.expires')} {formatDate(firstPendingInvoice.expiresAt)}
-            </div>
-
             {/* Payment Method Buttons */}
             <div className="space-y-2">
               {/* Helious Payment Button */}
@@ -486,6 +478,19 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
               <span className="text-blue-400 text-xs font-medium">
                 {t('balance.paymentProcessing')} {formatInvoiceAmount(latestProcessingInvoice.lamports)}
               </span>
+            </div>
+          </div>
+        )}
+
+        {/* Invoice Info - Show at bottom if there's a pending invoice */}
+        {firstPendingInvoice && (
+          <div className="mt-auto pt-3 border-t border-white/10">
+            <div
+              className="text-xs text-white/60 text-center cursor-pointer hover:text-white/80 transition-colors"
+              onClick={() => onNavigateToInvoices && onNavigateToInvoices()}
+              title="Click to view all invoices"
+            >
+              {t('balance.invoice')}: {formatInvoiceAmount(firstPendingInvoice.lamports)} • {t('balance.expires')} {formatDate(firstPendingInvoice.expiresAt)}
             </div>
           </div>
         )}
