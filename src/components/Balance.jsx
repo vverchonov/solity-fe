@@ -209,8 +209,8 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
       const invoiceData = invoiceResult.data.invoice || invoiceResult.data
 
       // Open Helio payment link using helioChargeURL field
-      if (invoiceData.helioChargeURL) {
-        window.open(invoiceData.helioChargeURL, '_blank')
+      if (invoiceData.helioCharge.link) {
+        window.open(invoiceData.helioCharge.link, '_blank')
       } else {
         console.error('No helioChargeURL found in invoice data')
       }
@@ -432,7 +432,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
                 onClick={() => handlePayWithHelio(firstPendingInvoice.id)}
                 className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 border border-orange-600/30 hover:border-orange-600/50 flex items-center justify-center gap-2"
               >
-                <span>Pay with Helio</span>
+                <span>Pay with </span>
                 <img src="/helio.png" alt="Helio" className="w-4 h-4" />
               </button>
 
@@ -446,11 +446,10 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
                   }
                 }}
                 disabled={isWalletConnected && hasInsufficientBalanceForInvoice}
-                className={`w-full py-3 px-4 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                  isWalletConnected && hasInsufficientBalanceForInvoice
-                    ? 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
-                    : 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-600/30 hover:border-purple-600/50'
-                }`}
+                className={`w-full py-3 px-4 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${isWalletConnected && hasInsufficientBalanceForInvoice
+                  ? 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
+                  : 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-600/30 hover:border-purple-600/50'
+                  }`}
                 title={hasInsufficientBalanceForInvoice ? 'Insufficient SOL in wallet' : ''}
               >
                 <span>
