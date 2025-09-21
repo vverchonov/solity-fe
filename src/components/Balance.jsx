@@ -1,14 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../contexts/WalletProvider'
 import { useBalance } from '../contexts/BalanceProvider'
 import { useInvoices } from '../contexts/InvoicesProvider'
 import { useLogs } from '../contexts/LogsProvider'
-import { useUser } from '../contexts/UserContext'
 import { useI18n } from '../contexts/I18nProvider'
 import { paymentsAPI } from '../services/payments'
 import { solanaService } from '../services/solana'
-import { authAPI } from '../services/auth'
 import { apiDebouncer } from '../utils/debounce'
 
 function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
@@ -16,23 +13,18 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const [showProcessingModal, setShowProcessingModal] = useState(false)
   const [isRefreshingBalance, setIsRefreshingBalance] = useState(false)
   const [walletSolBalance, setWalletSolBalance] = useState(0)
-  const navigate = useNavigate()
-  const { user, clearUser } = useUser()
+  const [isLoadingWalletBalance, setIsLoadingWalletBalance] = useState(false)
+  const [isAddingBalance, setIsAddingBalance] = useState(false)
   const { t } = useI18n()
-  const { isWalletConnected, walletAddress, isConnecting, connectWallet, disconnectWallet, reconnectWallet, walletProvider } = useWallet()
+  const { isWalletConnected, walletAddress, connectWallet, reconnectWallet } = useWallet()
   const {
-    balance,
     getFormattedSolBalance,
-    getFormattedUsdBalance,
     isUserActive,
     topUpBalance,
-    isTopUpLoading,
-    activeInvoice,
-    cancelInvoice,
-    hasActiveInvoice,
-    getInvoiceTimeRemaining,
     refreshBalance
   } = useBalance()
+
+
 
   // Use invoices provider to get pending invoices and cancel functionality
   const { invoices, getPendingInvoices, cancelInvoice: cancelInvoiceFromProvider, refreshInvoices } = useInvoices()
@@ -57,9 +49,11 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const refreshWalletBalance = useCallback(async () => {
     if (!isWalletConnected || !walletAddress) {
       setWalletSolBalance(0)
+      setIsLoadingWalletBalance(false)
       return
     }
 
+    setIsLoadingWalletBalance(true)
     try {
       const balanceResult = await solanaService.getWalletBalance(walletAddress)
       if (balanceResult.success) {
@@ -69,23 +63,26 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
       }
     } catch (error) {
       setWalletSolBalance(0)
+    } finally {
+      setIsLoadingWalletBalance(false)
     }
   }, [isWalletConnected, walletAddress])
 
   const handleAddBalance = async (amount) => {
-    if (!isWalletConnected) {
-      return
-    }
+    // Always allow preparing invoice, even without wallet connection
+    setIsAddingBalance(true)
+    try {
+      const result = await topUpBalance(amount)
 
-    const result = await topUpBalance(amount)
-
-    if (result.success) {
-      logInvoicePrepare(amount, true, result.data.invoice)
-      // Now pay the prepared invoice using the same flow as "Pay Invoice" button
-      await handlePayPreparedInvoice(result.data)
-    } else {
-      logInvoicePrepare(amount, false)
-      // Show error message
+      if (result.success) {
+        logInvoicePrepare(amount, true, result.data.invoice)
+        // Don't proceed with payment automatically - let user choose payment method
+      } else {
+        logInvoicePrepare(amount, false)
+        // Show error message
+      }
+    } finally {
+      setIsAddingBalance(false)
     }
   }
 
@@ -97,72 +94,6 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     }
   }
 
-  const handlePayPreparedInvoice = async (invoiceData) => {
-    const invoiceId = invoiceData.invoice || invoiceData.id
-    logTransactionStart(invoiceId, (invoiceData.lamports / 1e9))
-
-    try {
-      // Force wallet reconnection before transaction to ensure user signs both login and transaction manually
-      const reconnectResult = await reconnectWallet()
-      if (!reconnectResult.success) {
-        logTransactionError('Failed to reconnect wallet', invoiceId)
-        return
-      }
-
-      // Get fresh wallet provider after reconnection
-      const freshWalletProvider = window.phantom?.solana
-      if (!freshWalletProvider) {
-        logTransactionError('Wallet not available after reconnection', invoiceId)
-        return
-      }
-
-      // Execute Solana payment using the prepared invoice data
-      const paymentResult = await solanaService.executePayment(invoiceData, freshWalletProvider)
-
-      if (paymentResult.success) {
-        logTransactionSigned(paymentResult.signature, invoiceId)
-        logTransactionConfirmed(paymentResult.signature, invoiceId)
-
-        // Complete the invoice with the transaction signature
-        const completeResult = await paymentsAPI.completeInvoice(invoiceId, paymentResult.signature)
-
-        if (completeResult.success) {
-          logInvoiceStatusUpdate(invoiceId, 'pending', 'processing')
-
-          // Clear API debounce cache to allow fresh data after transaction
-          apiDebouncer.clearAll()
-
-          // Refetch invoices and balance immediately after successful completion
-          await Promise.all([
-            refreshInvoices(),
-            refreshBalance()
-          ])
-        } else {
-        }
-
-        // Show processing modal
-        setShowProcessingModal(true)
-
-        // Reconnect wallet after successful transaction to reset session
-        setTimeout(async () => {
-          try {
-            await reconnectWallet()
-          } catch (error) {
-            console.log('Post-transaction wallet reconnection failed:', error)
-          }
-        }, 1000)
-      } else {
-
-        if (paymentResult.userRejected) {
-          logTransactionRejected(invoiceId)
-        } else {
-          logTransactionError(paymentResult.error, invoiceId)
-        }
-      }
-    } catch (error) {
-      logTransactionError(error.message, invoiceId)
-    }
-  }
 
   const handleConnectWallet = async () => {
     const result = await connectWallet()
@@ -170,21 +101,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     }
   }
 
-  const handleDisconnectWallet = async () => {
-    await disconnectWallet()
-  }
 
-  const handleLogout = async () => {
-    try {
-      await authAPI.logout()
-      clearUser()
-      navigate('/')
-    } catch (error) {
-      // Clear user state and redirect even if logout fails
-      clearUser()
-      navigate('/')
-    }
-  }
 
   const handleCancelInvoice = async (invoiceId) => {
     const result = await cancelInvoiceFromProvider(invoiceId)
@@ -205,8 +122,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     }
   }
 
-  const handlePayInvoice = async (invoiceId) => {
-
+  const handlePayWithPhantom = async (invoiceId) => {
     try {
       // Force wallet reconnection before transaction to ensure user signs both login and transaction manually
       const reconnectResult = await reconnectWallet()
@@ -284,6 +200,27 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     }
   }
 
+  const handlePayWithHelio = async (invoiceId) => {
+    // Get the invoice data to extract the Helio payment link
+    try {
+      const invoiceResult = await paymentsAPI.getInvoiceById(invoiceId)
+      if (!invoiceResult.success) {
+        return
+      }
+
+      const invoiceData = invoiceResult.data.invoice || invoiceResult.data
+
+      // Open Helio payment link using helioChargeURL field
+      if (invoiceData.helioCharge.link) {
+        window.open(invoiceData.helioCharge.link, '_blank')
+      } else {
+        console.error('No helioChargeURL found in invoice data')
+      }
+    } catch (error) {
+      console.error('Failed to get invoice for Helio payment:', error)
+    }
+  }
+
   const handleRefreshBalance = async () => {
     setIsRefreshingBalance(true)
     try {
@@ -324,25 +261,16 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     return invoices.some(invoice => invoice.status === 'pending' || invoice.status === 'processing')
   }, [invoices])
 
-  // Check if wallet has insufficient balance for add funds
-  const hasInsufficientWalletBalance = useMemo(() => {
-    if (!isWalletConnected || !customAmount || parseFloat(customAmount) <= 0) {
-      return false
-    }
-    const requiredAmount = parseFloat(customAmount)
-    const feeBuffer = 0.001 // Transaction fee buffer
-    return walletSolBalance < (requiredAmount + feeBuffer)
-  }, [isWalletConnected, customAmount, walletSolBalance])
 
   // Check if wallet has insufficient balance for paying invoice
   const hasInsufficientBalanceForInvoice = useMemo(() => {
-    if (!firstPendingInvoice || !isWalletConnected) {
-      return false
+    if (!firstPendingInvoice || !isWalletConnected || isLoadingWalletBalance) {
+      return false // Don't show insufficient balance if wallet is not connected or balance is still loading
     }
     const requiredSol = firstPendingInvoice.lamports / 1e9 // Convert lamports to SOL
     const feeBuffer = 0.001 // Transaction fee buffer
     return walletSolBalance < (requiredSol + feeBuffer)
-  }, [firstPendingInvoice, isWalletConnected, walletSolBalance])
+  }, [firstPendingInvoice, isWalletConnected, walletSolBalance, isLoadingWalletBalance])
 
   // Refresh wallet balance when wallet connects/disconnects
   useEffect(() => {
@@ -365,19 +293,6 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     return (lamports / 1e9).toFixed(4) + ' SOL'
   }
 
-  // Get appropriate button text based on current state
-  const getTopUpButtonText = () => {
-    if (hasInsufficientWalletBalance) {
-      return t('balance.insufficientWalletBalance') || 'Insufficient SOL'
-    }
-    if (shouldDisableTopUp) {
-      const pendingInvoice = invoices.find(invoice => invoice.status === 'pending')
-      const processingInvoice = invoices.find(invoice => invoice.status === 'processing')
-      if (pendingInvoice) return t('balance.pendingInvoice')
-      if (processingInvoice) return t('balance.paymentProcessing')
-    }
-    return t('balance.add')
-  }
 
   const formatDate = (dateString) => {
     if (!dateString) return '-'
@@ -436,8 +351,8 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
               <button
                 key={amount}
                 onClick={() => setCustomAmount(amount.toString())}
-                disabled={!isWalletConnected || shouldDisableTopUp}
-                className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${isWalletConnected && !shouldDisableTopUp
+                disabled={shouldDisableTopUp}
+                className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${!shouldDisableTopUp
                   ? 'bg-white/5 hover:bg-white/10 text-white border-white/10 hover:border-white/20'
                   : 'bg-gray-600 text-gray-400 border-gray-600 cursor-not-allowed'
                   }`}
@@ -485,21 +400,26 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
               step="0.01"
               min="0"
               max="5"
-              disabled={!isWalletConnected || shouldDisableTopUp}
-              className={`flex-1 min-w-[80px] border rounded-xl px-3 py-2 text-sm transition-all ${isWalletConnected && !shouldDisableTopUp
+              disabled={shouldDisableTopUp}
+              className={`flex-1 min-w-[80px] border rounded-xl px-3 py-2 text-sm transition-all ${!shouldDisableTopUp
                 ? 'bg-white/5 border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/10'
                 : 'bg-gray-600 border-gray-600 text-gray-400 placeholder-gray-500 cursor-not-allowed'
                 }`}
             />
             <button
               onClick={handleAddCustomAmount}
-              disabled={!isWalletConnected || !customAmount || parseFloat(customAmount) <= 0 || shouldDisableTopUp || hasInsufficientWalletBalance}
-              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex-1 max-w-[140px] ${isWalletConnected && customAmount && parseFloat(customAmount) > 0 && !shouldDisableTopUp && !hasInsufficientWalletBalance
+              disabled={!customAmount || parseFloat(customAmount) <= 0 || shouldDisableTopUp || isAddingBalance}
+              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex-1 max-w-[140px] flex items-center justify-center gap-2 ${customAmount && parseFloat(customAmount) > 0 && !shouldDisableTopUp && !isAddingBalance
                 ? 'bg-white hover:bg-gray-100 text-gray-900'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 }`}
             >
-              {getTopUpButtonText()}
+              {isAddingBalance && (
+                <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              )}
+              {isAddingBalance ? t('balance.preparing') : t('balance.add')}
             </button>
           </div>
         </div>
@@ -507,30 +427,50 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
         {/* Invoice Action Buttons - Show if there's a pending invoice */}
         {firstPendingInvoice && (
           <div className="mb-4">
-            <div
-              className="text-xs text-white/60 text-center mb-2 cursor-pointer hover:text-white/80 transition-colors"
-              onClick={() => onNavigateToInvoices && onNavigateToInvoices()}
-              title="Click to view all invoices"
-            >
-              {t('balance.invoice')}: {formatInvoiceAmount(firstPendingInvoice.lamports)} • {t('balance.expires')} {formatDate(firstPendingInvoice.expiresAt)}
-            </div>
-            <div className="flex gap-2">
+            {/* Payment Method Buttons */}
+            <div className="space-y-2">
+              {/* Helio Payment Button */}
               <button
-                onClick={() => handleCancelInvoice(firstPendingInvoice.id)}
-                className="flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-600/30 hover:border-red-600/50"
+                onClick={() => handlePayWithHelio(firstPendingInvoice.id)}
+                className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 border border-orange-600/30 hover:border-orange-600/50 flex items-center justify-center gap-2"
               >
-                {t('balance.cancel')}
+                <span>Pay with </span>
+                <img src="/helio.png" alt="Helio" className="h-4" />
               </button>
+
+              {/* Phantom Payment Button */}
               <button
-                onClick={() => handlePayInvoice(firstPendingInvoice.id)}
-                disabled={!isWalletConnected || hasInsufficientBalanceForInvoice}
-                className={`flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all ${isWalletConnected && !hasInsufficientBalanceForInvoice
-                  ? 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-600/30 hover:border-green-600/50'
-                  : 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
+                onClick={() => {
+                  if (!isWalletConnected) {
+                    handleConnectWallet()
+                  } else {
+                    handlePayWithPhantom(firstPendingInvoice.id)
+                  }
+                }}
+                disabled={isWalletConnected && hasInsufficientBalanceForInvoice}
+                className={`w-full py-3 px-4 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${isWalletConnected && hasInsufficientBalanceForInvoice
+                  ? 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
+                  : 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-600/30 hover:border-purple-600/50'
                   }`}
                 title={hasInsufficientBalanceForInvoice ? 'Insufficient SOL in wallet' : ''}
               >
-                {hasInsufficientBalanceForInvoice ? 'Insufficient SOL' : t('balance.payInvoice')}
+                <span>
+                  {hasInsufficientBalanceForInvoice
+                    ? 'Insufficient SOL'
+                    : !isWalletConnected
+                      ? 'Connect'
+                      : 'Pay with'
+                  }
+                </span>
+                <img src="/phantom.png" alt="Phantom" className="w-4 h-4" />
+              </button>
+
+              {/* Cancel button */}
+              <button
+                onClick={() => handleCancelInvoice(firstPendingInvoice.id)}
+                className="w-full py-2 px-4 rounded-xl text-sm font-medium transition-all bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-600/30 hover:border-red-600/50"
+              >
+                {t('balance.cancel')}
               </button>
             </div>
           </div>
@@ -548,38 +488,19 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
           </div>
         )}
 
-        {/* Wallet Connection */}
-        <div className="mb-4">
-          <button
-            onClick={isWalletConnected ? handleDisconnectWallet : handleConnectWallet}
-            disabled={isConnecting}
-            className={`w-full py-3 rounded-xl text-sm font-medium transition-all h-12 ${isConnecting
-              ? 'bg-white/10 text-white/40 cursor-not-allowed'
-              : isWalletConnected
-                ? 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/20'
-                : 'bg-blue-600/30 hover:bg-blue-600/40 text-white shadow-lg hover:shadow-xl'
-              }`}
-          >
-            <div className="flex items-center justify-center gap-2 h-full">
-              {!isConnecting && !isWalletConnected && (
-                <img src="/phantom.png" alt="Phantom" className="w-5 h-5" />
-              )}
-              {isConnecting
-                ? t('balance.connecting')
-                : isWalletConnected
-                  ? t('balance.disconnectWallet')
-                  : t('balance.connectPhantomWallet')
-              }
+        {/* Invoice Info - Show at bottom if there's a pending invoice */}
+        {firstPendingInvoice && (
+          <div className="mt-auto pt-3 border-t border-white/10">
+            <div
+              className="text-xs text-white/60 text-center cursor-pointer hover:text-white/80 transition-colors"
+              onClick={() => onNavigateToInvoices && onNavigateToInvoices()}
+              title="Click to view all invoices"
+            >
+              {t('balance.invoice')}: {formatInvoiceAmount(firstPendingInvoice.lamports)} • {t('balance.expires')} {formatDate(firstPendingInvoice.expiresAt)}
             </div>
-          </button>
-          <div className="mt-2 h-4 flex items-center justify-center">
-            {isWalletConnected && walletAddress && (
-              <div className="text-xs text-white/60 break-all text-center">
-                {t('balance.connected')}: {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
-              </div>
-            )}
           </div>
-        </div>
+        )}
+
       </div>
 
       {/* Payment Processing Modal */}

@@ -17,7 +17,7 @@
   "navigation": {
     "dashboard": "대시보드",
     "call": "통화",
-    "balance": "잔액",
+    "balance": "활동 및 요금",
     "about": "소개",
     "esim": "이심",
     "support": "지원",
@@ -35,7 +35,7 @@
     "randomize": "무작위",
     "enterCallerID": "발신자 번호(전화번호)를 입력하세요",
     "phoneNumberPlaceholder": "예: 82 10 1234 5678",
-    "callerIDPlaceholder": "예: 1 555 0123, 49 30 12345678, 380 44 1234567",
+    "callerIDPlaceholder": "예: +1 555 0123, +49 30 12345678, +380 44 1234567, +39 06 12345678, +34 91 1234567, +351 21 1234567",
     "validatingCallerID": "발신자 번호 확인 중...",
     "callerIDError": "발신자 번호는 7-15자리 숫자여야 합니다",
     "callDuration": "통화 시간",
