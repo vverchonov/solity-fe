@@ -35,11 +35,11 @@ function Dashboard() {
 
   const menuItems = [
     { key: 'Call', label: t('navigation.call') },
-    { key: 'Balance', label: t('navigation.balance') },
-    { key: 'About', label: t('navigation.about') },
     { key: 'E-SIM', label: t('navigation.esim') },
+    { key: 'Balance', label: t('navigation.balance') },
     { key: 'HowToUse', label: t('navigation.howToUse') },
-    { key: 'Support', label: t('navigation.support') }
+    { key: 'Support', label: t('navigation.support') },
+    { key: 'About', label: t('navigation.about') }
   ]
 
   // Derived state for call
@@ -476,7 +476,7 @@ function Dashboard() {
                       <button
                         onClick={item.key === 'E-SIM' ? undefined : () => setActiveModule(item.key)}
                         disabled={item.key === 'E-SIM'}
-                        className={`w-full text-left px-4 py-3 rounded-xl ring-1 ring-white/10 font-medium transition-all duration-200 flex items-center justify-between ${item.key === 'E-SIM'
+                        className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-between ${item.key === 'E-SIM'
                           ? 'opacity-50 cursor-not-allowed text-white/50'
                           : activeModule === item.key
                             ? 'bg-white/10 border border-white/20 text-white'
