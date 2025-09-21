@@ -25,7 +25,8 @@
     "settings": "Settings",
     "logout": "Log Out",
     "language": "Language",
-    "module": "module"
+    "module": "module",
+    "messages": "Messages (Beta)"
   },
   "call": {
     "callerID": "Caller ID",
@@ -61,6 +62,36 @@
     "showCallModal": "Show call modal",
     "show": "Show",
     "insufficientBalance": "No Balance"
+  },
+  "messages": {
+    "callerIdFrom": "Caller ID (From)",
+    "toNumber": "To Number",
+    "messageLabel": "Message ({current}/{max})",
+    "enterCallerIdPlaceholder": "Enter caller ID number",
+    "enterRecipientPlaceholder": "Enter recipient phone number",
+    "enterMessagePlaceholder": "Enter your message...",
+    "callerIdHelp": "Enter a valid caller ID (7-15 digits)",
+    "toNumberHelp": "Enter recipient phone number (7-15 digits)",
+    "messageHelp": "Enter your message (max {maxLength} characters)",
+    "phoneNumberTooShort": "Phone number must be at least 7 digits long",
+    "phoneNumberTooLong": "Phone number cannot exceed 15 digits",
+    "phoneNumberOnlyDigits": "Phone number must contain only digits",
+    "messageEmpty": "Message cannot be empty",
+    "messageTooLong": "Message cannot exceed {maxLength} characters",
+    "validationFailed": "Validation failed",
+    "checkAllFields": "Please check all fields and try again",
+    "sendingMessage": "Sending message...",
+    "messageSentSuccess": "Message sent successfully!",
+    "sendFailed": "Failed to send message",
+    "messageSendFailed": "Message send failed",
+    "readyToSend": "Ready to Send",
+    "sending": "Sending...",
+    "messageSent": "Message Sent",
+    "sendMessage": "Send Message",
+    "insufficientBalance": "Insufficient balance for messages",
+    "accountInactiveMessage": "Your account is inactive. Please add balance to send messages.",
+    "logs": "Message Logs",
+    "noLogs": "No message logs yet"
   },
   "status": {
     "idle": "Idle",
