@@ -24,6 +24,8 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     refreshBalance
   } = useBalance()
 
+
+
   // Use invoices provider to get pending invoices and cancel functionality
   const { invoices, getPendingInvoices, cancelInvoice: cancelInvoiceFromProvider, refreshInvoices } = useInvoices()
 
