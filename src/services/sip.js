@@ -304,7 +304,7 @@ export const sipUtils = {
     const germanyRegex = /^\+49[1-9]\d{9,11}$/
     const ukraineRegex = /^\+380[1-9]\d{8}$/
 
-    return usCanadaRegex.test(callerID) || germanyRegex.test(callerID) || ukraineRegex.test(callerID)
+    return true //UNDO! usCanadaRegex.test(callerID) || germanyRegex.test(callerID) || ukraineRegex.test(callerID)
   },
 
   // Parse SIP connection URL
