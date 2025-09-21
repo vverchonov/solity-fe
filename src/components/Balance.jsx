@@ -433,7 +433,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
                 className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 border border-orange-600/30 hover:border-orange-600/50 flex items-center justify-center gap-2"
               >
                 <span>Pay with </span>
-                <img src="/helio.png" alt="Helio" className="w-4 h-4" />
+                <img src="/helio.png" alt="Helio" className="h-4" />
               </button>
 
               {/* Phantom Payment Button */}
