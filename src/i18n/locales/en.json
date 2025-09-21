@@ -60,7 +60,7 @@
     "rateCheckFailed": "Failed to check rate",
     "showCallModal": "Show call modal",
     "show": "Show",
-    "insufficientBalance": "Insufficient Balance"
+    "insufficientBalance": "No Balance"
   },
   "status": {
     "idle": "Idle",
