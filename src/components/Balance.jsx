@@ -14,6 +14,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const [isRefreshingBalance, setIsRefreshingBalance] = useState(false)
   const [walletSolBalance, setWalletSolBalance] = useState(0)
   const [isLoadingWalletBalance, setIsLoadingWalletBalance] = useState(false)
+  const [isAddingBalance, setIsAddingBalance] = useState(false)
   const { t } = useI18n()
   const { isWalletConnected, walletAddress, connectWallet, reconnectWallet } = useWallet()
   const {
@@ -67,14 +68,19 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
 
   const handleAddBalance = async (amount) => {
     // Always allow preparing invoice, even without wallet connection
-    const result = await topUpBalance(amount)
+    setIsAddingBalance(true)
+    try {
+      const result = await topUpBalance(amount)
 
-    if (result.success) {
-      logInvoicePrepare(amount, true, result.data.invoice)
-      // Don't proceed with payment automatically - let user choose payment method
-    } else {
-      logInvoicePrepare(amount, false)
-      // Show error message
+      if (result.success) {
+        logInvoicePrepare(amount, true, result.data.invoice)
+        // Don't proceed with payment automatically - let user choose payment method
+      } else {
+        logInvoicePrepare(amount, false)
+        // Show error message
+      }
+    } finally {
+      setIsAddingBalance(false)
     }
   }
 
@@ -192,8 +198,8 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     }
   }
 
-  const handlePayWithHelious = async (invoiceId) => {
-    // Get the invoice data to extract the Helious payment link
+  const handlePayWithHelio = async (invoiceId) => {
+    // Get the invoice data to extract the Helio payment link
     try {
       const invoiceResult = await paymentsAPI.getInvoiceById(invoiceId)
       if (!invoiceResult.success) {
@@ -202,15 +208,14 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
 
       const invoiceData = invoiceResult.data.invoice || invoiceResult.data
 
-      // Open Helious payment link (assuming it's provided in the invoice data)
-      if (invoiceData.heliousLink || invoiceData.paymentLink || invoiceData.link) {
-        const heliousUrl = invoiceData.heliousLink || invoiceData.paymentLink || invoiceData.link
-        window.open(heliousUrl, '_blank')
+      // Open Helio payment link using helioChargeURL field
+      if (invoiceData.helioChargeURL) {
+        window.open(invoiceData.helioChargeURL, '_blank')
       } else {
-        console.error('No Helious payment link found in invoice data')
+        console.error('No helioChargeURL found in invoice data')
       }
     } catch (error) {
-      console.error('Failed to get invoice for Helious payment:', error)
+      console.error('Failed to get invoice for Helio payment:', error)
     }
   }
 
@@ -401,13 +406,18 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
             />
             <button
               onClick={handleAddCustomAmount}
-              disabled={!customAmount || parseFloat(customAmount) <= 0 || shouldDisableTopUp}
-              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex-1 max-w-[140px] ${customAmount && parseFloat(customAmount) > 0 && !shouldDisableTopUp
+              disabled={!customAmount || parseFloat(customAmount) <= 0 || shouldDisableTopUp || isAddingBalance}
+              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex-1 max-w-[140px] flex items-center justify-center gap-2 ${customAmount && parseFloat(customAmount) > 0 && !shouldDisableTopUp && !isAddingBalance
                 ? 'bg-white hover:bg-gray-100 text-gray-900'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 }`}
             >
-              {t('balance.add')}
+              {isAddingBalance && (
+                <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              )}
+              {isAddingBalance ? t('balance.preparing') : t('balance.add')}
             </button>
           </div>
         </div>
@@ -417,13 +427,13 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
           <div className="mb-4">
             {/* Payment Method Buttons */}
             <div className="space-y-2">
-              {/* Helious Payment Button */}
+              {/* Helio Payment Button */}
               <button
-                onClick={() => handlePayWithHelious(firstPendingInvoice.id)}
+                onClick={() => handlePayWithHelio(firstPendingInvoice.id)}
                 className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 border border-orange-600/30 hover:border-orange-600/50 flex items-center justify-center gap-2"
               >
-                <span>Pay with Helius</span>
-                <img src="/helius.ico" alt="Helius" className="w-4 h-4" />
+                <span>Pay with Helio</span>
+                <img src="/helio.png" alt="Helio" className="w-4 h-4" />
               </button>
 
               {/* Phantom Payment Button */}
