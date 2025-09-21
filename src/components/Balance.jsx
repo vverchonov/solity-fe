@@ -430,44 +430,44 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
 
             {/* Payment Method Buttons */}
             <div className="space-y-2">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handlePayWithHelious(firstPendingInvoice.id)}
-                  className="flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-600/30 hover:border-blue-600/50 flex items-center justify-center gap-2"
-                >
-                  <span>Pay with Helious</span>
-                </button>
-                <button
-                  onClick={() => {
-                    if (!isWalletConnected) {
-                      handleConnectWallet()
-                    } else {
-                      handlePayWithPhantom(firstPendingInvoice.id)
-                    }
-                  }}
-                  disabled={isWalletConnected && hasInsufficientBalanceForInvoice}
-                  className={`flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                    isWalletConnected && hasInsufficientBalanceForInvoice
-                      ? 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
-                      : isWalletConnected
-                        ? 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-600/30 hover:border-purple-600/50'
-                        : 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-600/30 hover:border-purple-600/50'
-                  }`}
-                  title={hasInsufficientBalanceForInvoice ? 'Insufficient SOL in wallet' : ''}
-                >
-                  {!isWalletConnected && (
-                    <img src="/phantom.png" alt="Phantom" className="w-4 h-4" />
-                  )}
-                  <span>
-                    {hasInsufficientBalanceForInvoice
-                      ? 'Insufficient SOL'
-                      : !isWalletConnected
-                        ? 'Connect & Pay'
-                        : 'Pay with Phantom'
-                    }
-                  </span>
-                </button>
-              </div>
+              {/* Helious Payment Button */}
+              <button
+                onClick={() => handlePayWithHelious(firstPendingInvoice.id)}
+                className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 border border-orange-600/30 hover:border-orange-600/50 flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                </svg>
+                <span>Pay with Helius</span>
+              </button>
+
+              {/* Phantom Payment Button */}
+              <button
+                onClick={() => {
+                  if (!isWalletConnected) {
+                    handleConnectWallet()
+                  } else {
+                    handlePayWithPhantom(firstPendingInvoice.id)
+                  }
+                }}
+                disabled={isWalletConnected && hasInsufficientBalanceForInvoice}
+                className={`w-full py-3 px-4 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                  isWalletConnected && hasInsufficientBalanceForInvoice
+                    ? 'bg-gray-600/20 text-gray-500 border border-gray-600/30 cursor-not-allowed'
+                    : 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-600/30 hover:border-purple-600/50'
+                }`}
+                title={hasInsufficientBalanceForInvoice ? 'Insufficient SOL in wallet' : ''}
+              >
+                <img src="/phantom.png" alt="Phantom" className="w-4 h-4" />
+                <span>
+                  {hasInsufficientBalanceForInvoice
+                    ? 'Insufficient SOL'
+                    : !isWalletConnected
+                      ? 'Connect'
+                      : 'Pay with'
+                  }
+                </span>
+              </button>
 
               {/* Cancel button */}
               <button
@@ -492,38 +492,6 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
           </div>
         )}
 
-        {/* Wallet Connection */}
-        <div className="mb-4">
-          <button
-            onClick={isWalletConnected ? handleDisconnectWallet : handleConnectWallet}
-            disabled={isConnecting}
-            className={`w-full py-3 rounded-xl text-sm font-medium transition-all h-12 ${isConnecting
-              ? 'bg-white/10 text-white/40 cursor-not-allowed'
-              : isWalletConnected
-                ? 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/20'
-                : 'bg-blue-600/30 hover:bg-blue-600/40 text-white shadow-lg hover:shadow-xl'
-              }`}
-          >
-            <div className="flex items-center justify-center gap-2 h-full">
-              {!isConnecting && !isWalletConnected && (
-                <img src="/phantom.png" alt="Phantom" className="w-5 h-5" />
-              )}
-              {isConnecting
-                ? t('balance.connecting')
-                : isWalletConnected
-                  ? t('balance.disconnectWallet')
-                  : t('balance.connectPhantomWallet')
-              }
-            </div>
-          </button>
-          <div className="mt-2 h-4 flex items-center justify-center">
-            {isWalletConnected && walletAddress && (
-              <div className="text-xs text-white/60 break-all text-center">
-                {t('balance.connected')}: {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Payment Processing Modal */}
