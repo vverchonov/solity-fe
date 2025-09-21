@@ -435,10 +435,8 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
                 onClick={() => handlePayWithHelious(firstPendingInvoice.id)}
                 className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 border border-orange-600/30 hover:border-orange-600/50 flex items-center justify-center gap-2"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-                </svg>
                 <span>Pay with Helius</span>
+                <img src="/helius.ico" alt="Helius" className="w-4 h-4" />
               </button>
 
               {/* Phantom Payment Button */}
@@ -458,7 +456,6 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
                 }`}
                 title={hasInsufficientBalanceForInvoice ? 'Insufficient SOL in wallet' : ''}
               >
-                <img src="/phantom.png" alt="Phantom" className="w-4 h-4" />
                 <span>
                   {hasInsufficientBalanceForInvoice
                     ? 'Insufficient SOL'
@@ -467,6 +464,7 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
                       : 'Pay with'
                   }
                 </span>
+                <img src="/phantom.png" alt="Phantom" className="w-4 h-4" />
               </button>
 
               {/* Cancel button */}
