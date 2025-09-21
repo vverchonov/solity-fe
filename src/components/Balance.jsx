@@ -13,19 +13,13 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const [showProcessingModal, setShowProcessingModal] = useState(false)
   const [isRefreshingBalance, setIsRefreshingBalance] = useState(false)
   const [walletSolBalance, setWalletSolBalance] = useState(0)
+  const [isLoadingWalletBalance, setIsLoadingWalletBalance] = useState(false)
   const { t } = useI18n()
-  const { isWalletConnected, walletAddress, isConnecting, connectWallet, disconnectWallet, reconnectWallet, walletProvider } = useWallet()
+  const { isWalletConnected, walletAddress, connectWallet, reconnectWallet } = useWallet()
   const {
-    balance,
     getFormattedSolBalance,
-    getFormattedUsdBalance,
     isUserActive,
     topUpBalance,
-    isTopUpLoading,
-    activeInvoice,
-    cancelInvoice,
-    hasActiveInvoice,
-    getInvoiceTimeRemaining,
     refreshBalance
   } = useBalance()
 
@@ -52,9 +46,11 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
   const refreshWalletBalance = useCallback(async () => {
     if (!isWalletConnected || !walletAddress) {
       setWalletSolBalance(0)
+      setIsLoadingWalletBalance(false)
       return
     }
 
+    setIsLoadingWalletBalance(true)
     try {
       const balanceResult = await solanaService.getWalletBalance(walletAddress)
       if (balanceResult.success) {
@@ -64,6 +60,8 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
       }
     } catch (error) {
       setWalletSolBalance(0)
+    } finally {
+      setIsLoadingWalletBalance(false)
     }
   }, [isWalletConnected, walletAddress])
 
@@ -95,9 +93,6 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
     }
   }
 
-  const handleDisconnectWallet = async () => {
-    await disconnectWallet()
-  }
 
 
   const handleCancelInvoice = async (invoiceId) => {
@@ -262,13 +257,13 @@ function Balance({ onNavigateToInvoices, onNavigateToSupport }) {
 
   // Check if wallet has insufficient balance for paying invoice
   const hasInsufficientBalanceForInvoice = useMemo(() => {
-    if (!firstPendingInvoice || !isWalletConnected) {
-      return false
+    if (!firstPendingInvoice || !isWalletConnected || isLoadingWalletBalance) {
+      return false // Don't show insufficient balance if wallet is not connected or balance is still loading
     }
     const requiredSol = firstPendingInvoice.lamports / 1e9 // Convert lamports to SOL
     const feeBuffer = 0.001 // Transaction fee buffer
     return walletSolBalance < (requiredSol + feeBuffer)
-  }, [firstPendingInvoice, isWalletConnected, walletSolBalance])
+  }, [firstPendingInvoice, isWalletConnected, walletSolBalance, isLoadingWalletBalance])
 
   // Refresh wallet balance when wallet connects/disconnects
   useEffect(() => {
