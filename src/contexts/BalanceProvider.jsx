@@ -107,13 +107,7 @@ export const BalanceProvider = ({ children }) => {
       }
     }
 
-    // Don't allow top-up if wallet is not connected
-    if (!walletProvider) {
-      return {
-        success: false,
-        error: 'Wallet not connected'
-      }
-    }
+    // Allow preparing invoice without wallet connection
 
     setIsTopUpLoading(true)
     setError(null)
