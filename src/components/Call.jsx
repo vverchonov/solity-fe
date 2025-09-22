@@ -9,6 +9,7 @@ import { useI18n } from '../contexts/I18nProvider'
 import apiClient from '../lib/axios'
 import { apiDebouncer } from '../utils/debounce'
 import { PHONE_REGEX, getRandomCallerID } from '../constants/callerIds'
+import sipService from '../services/sip'
 
 function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, onShowModal, isModalVisible, soundDisabled, onSoundToggle, callDuration, phoneNumber, onPhoneNumberChange }) {
   // Get initial random caller ID
@@ -67,11 +68,25 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
       return false
     }
 
-    // Basic check - must contain only digits and be non-empty
-    if (!PHONE_REGEX.test(digitsOnly)) {
-      setError('Phone number must contain only digits')
-      return false
-    }
+    // const countryCheck = (callerID) => {
+    //   // Should be in E.164 format for supported countries
+    //   const usCanadaRegex = /^\+1[2-9]\d{9}$/
+    //   const germanyRegex = /^\+49[1-9]\d{9,11}$/
+    //   const ukraineRegex = /^\+380[1-9]\d{8}$/
+    //   const italyRegex = /^\+39[1-9]\d{9,11}$/
+    //   const spainRegex = /^\+34[1-9]\d{9,11}$/
+    //   const portugalRegex = /^\+351[1-9]\d{9,11}$/
+
+    //   return usCanadaRegex.test(callerID) || germanyRegex.test(callerID) || ukraineRegex.test(callerID) || italyRegex.test(callerID) || spainRegex.test(callerID) || portugalRegex.test(callerID)
+    // };
+
+    // Use country validation from sip service
+    // Format the phone number with + prefix for validation
+    // const formattedPhone = '+' + digitsOnly
+    // if (!countryCheck(formattedPhone)) {
+    //   setError('Phone number format not supported for this country')
+    //   return false
+    // }
 
     setError(null)
     return true
