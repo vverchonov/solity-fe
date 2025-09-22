@@ -4,25 +4,8 @@ import { useUser } from '../contexts/UserContext'
 import { useBalance } from '../contexts/BalanceProvider'
 import { useLogs } from '../contexts/LogsProvider'
 import { useI18n } from '../contexts/I18nProvider'
+import { PHONE_REGEX, getRandomCallerID } from '../constants/callerIds'
 import apiClient from '../lib/axios'
-
-// Phone validation constants for international numbers
-const PHONE_REGEX = /^\d{7,15}$/
-
-// Available caller ID numbers (same as Call component)
-const CALLER_ID_NUMBERS = [
-  '17349303030', '18009488488', '18775477272', '18007223727', '14198857000',
-  '18334800148', '18887706637', '14252149903', '18004235709', '19259693900',
-  '18665535554', '16265845880', '14169671010', '14164390000', '15194390000',
-  '18663100001', '18557693779', '17804983490', '19058482700', '13857078616',
-  '18007861000', '14793589274', '18012538600', '18667917626', '17024444800'
-]
-
-// Helper function to get a random caller ID
-const getRandomCallerID = () => {
-  const randomIndex = Math.floor(Math.random() * CALLER_ID_NUMBERS.length)
-  return CALLER_ID_NUMBERS[randomIndex]
-}
 
 function Messages({ onNavigateToInvoices, onNavigateToSupport }) {
   // Get initial random caller ID
