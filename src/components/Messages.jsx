@@ -279,7 +279,7 @@ function Messages({ onNavigateToInvoices, onNavigateToSupport }) {
             {/* Message Input */}
             <div className="mb-6">
               <label className="text-white/70 text-sm block mb-3">
-                {t('messages.messageLabel', { current: message.length, max: MAX_MESSAGE_LENGTH })}
+                {t('messages.messageLabel') + ` (${message.length}/${MAX_MESSAGE_LENGTH})`}
               </label>
               <div className={`relative bg-white/5 border ${messageError ? 'border-red-400' : 'border-white/10'} rounded-xl overflow-hidden ${isSending ? 'opacity-50' : ''}`}>
                 <textarea
