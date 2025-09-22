@@ -20,18 +20,12 @@ function HowToUse() {
         },
         {
           title: t('howToUse.pcSteps.step3.title'),
-          description: t('howToUse.pcSteps.step3.description'),
-          image: "/pc/3.png"
+          description: t('howToUse.pcSteps.step3.description')
         },
         {
           title: t('howToUse.pcSteps.step4.title'),
           description: t('howToUse.pcSteps.step4.description'),
           image: "/pc/4.png"
-        },
-        {
-          title: t('howToUse.pcSteps.step5.title'),
-          description: t('howToUse.pcSteps.step5.description'),
-          image: "/pc/5.png"
         }
       ]
     } else {

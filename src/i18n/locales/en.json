@@ -357,20 +357,20 @@
     "instead": "instead.",
     "pcSteps": {
       "step1": {
-        "title": "Go to BALANCE (or CALL)",
-        "description": "In **Balance and Call pages** you can top up your internal balance to start making calls."
+        "title": "Go to Call tab",
+        "description": "Go to the **Call tab**, find the **Balance card**, enter your desired SOL amount, and press the **Add button** to create a payment invoice."
       },
       "step2": {
-        "title": "Connect Phantom Wallet",
-        "description": "Click the **connect wallet button** and approve the connection in your Phantom wallet extension."
+        "title": "Choose Payment Provider",
+        "description": "Choose the provider you would like to use: **Phantom** on the website or with **Helio** through their official payment system.\n\nSee **1.png** for visual reference of the payment options."
       },
       "step3": {
-        "title": "Enter SOL amount and confirm transaction",
-        "description": "- Enter a custom **SOL amount (min 0.1)**\n- **Press Add button**\n- Review the transaction details in your Phantom wallet and **click confirm** to complete the deposit.\n\n**Transaction will be processing for ~30sec normally but can take up to 10min**"
+        "title": "Complete Payment",
+        "description": "- **If Phantom**: Connect your wallet, sign the transaction for the selected amount.\n- **If Helio**: Please follow the requirements in the Helio tab to complete the payment.\n\nPayment processing normally takes ~30 seconds but can take up to 5 minutes if there is high load."
       },
       "step4": {
-        "title": "You're all set 🎉",
-        "description": "**Credits appear after confirmation.** Refresh if needed.\n\nThe status will change from **processing** to **paid** and balance will be updated."
+        "title": "Congratulations! 🎉",
+        "description": "Your account is now active and ready for calls!"
       },
       "step5": {
         "title": "Making calls",
