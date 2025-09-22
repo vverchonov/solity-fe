@@ -25,7 +25,8 @@
     "settings": "설정",
     "logout": "로그아웃",
     "language": "언어",
-    "module": "모듈"
+    "module": "모듈",
+    "messages": "메시지 (베타)"
   },
   "call": {
     "callerID": "발신자 번호",
@@ -61,6 +62,36 @@
     "showCallModal": "통화 모달 표시",
     "show": "표시",
     "insufficientBalance": "잔액 부족"
+  },
+  "messages": {
+    "callerIdFrom": "발신자 번호",
+    "toNumber": "수신 번호",
+    "messageLabel": "메시지",
+    "enterCallerIdPlaceholder": "발신자 번호 입력",
+    "enterRecipientPlaceholder": "수신자 전화번호 입력",
+    "enterMessagePlaceholder": "메시지를 입력하세요...",
+    "callerIdHelp": "유효한 발신자 번호를 입력하세요",
+    "toNumberHelp": "수신자 전화번호를 입력하세요",
+    "messageHelp": "메시지를 입력하세요",
+    "phoneNumberTooShort": "전화번호는 최소 7자리 이상이어야 합니다",
+    "phoneNumberTooLong": "전화번호는 15자리를 초과할 수 없습니다",
+    "phoneNumberOnlyDigits": "전화번호는 숫자만 포함해야 합니다",
+    "messageEmpty": "메시지는 비어있을 수 없습니다",
+    "messageTooLong": "메시지는 160자를 초과할 수 없습니다",
+    "validationFailed": "유효성 검사 실패",
+    "checkAllFields": "모든 필드를 확인하고 다시 시도해주세요",
+    "sendingMessage": "메시지 전송 중...",
+    "messageSentSuccess": "메시지가 성공적으로 전송되었습니다!",
+    "sendFailed": "메시지 전송에 실패했습니다",
+    "messageSendFailed": "메시지 전송 실패",
+    "readyToSend": "전송 준비 완료",
+    "sending": "전송 중...",
+    "messageSent": "메시지 전송됨",
+    "sendMessage": "메시지 전송",
+    "insufficientBalance": "메시지 전송을 위한 잔액이 부족합니다",
+    "accountInactiveMessage": "계정이 비활성화되어 있습니다. 메시지를 보내려면 잔액을 충전해주세요.",
+    "logs": "메시지 로그",
+    "noLogs": "메시지 로그가 아직 없습니다"
   },
   "status": {
     "idle": "대기",

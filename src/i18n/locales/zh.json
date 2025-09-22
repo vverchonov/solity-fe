@@ -25,7 +25,8 @@
     "settings": "设置",
     "logout": "退出登录",
     "language": "语言",
-    "module": "模块"
+    "module": "模块",
+    "messages": "消息 (测试版)"
   },
   "call": {
     "callerID": "主叫号码",
@@ -61,6 +62,36 @@
     "showCallModal": "显示通话窗口",
     "show": "显示",
     "insufficientBalance": "余额不足"
+  },
+  "messages": {
+    "callerIdFrom": "主叫号码",
+    "toNumber": "接收号码",
+    "messageLabel": "消息",
+    "enterCallerIdPlaceholder": "输入主叫号码",
+    "enterRecipientPlaceholder": "输入接收方电话号码",
+    "enterMessagePlaceholder": "输入您的消息...",
+    "callerIdHelp": "输入您的主叫号码",
+    "toNumberHelp": "输入接收方电话号码",
+    "messageHelp": "输入您的消",
+    "phoneNumberTooShort": "电话号码必须至少7位数字",
+    "phoneNumberTooLong": "电话号码不能超过15位数字",
+    "phoneNumberOnlyDigits": "电话号码只能包含数字",
+    "messageEmpty": "消息不能为空",
+    "messageTooLong": "消息不能超过160个字符",
+    "validationFailed": "验证失败",
+    "checkAllFields": "请检查所有字段并重试",
+    "sendingMessage": "发送消息中...",
+    "messageSentSuccess": "消息发送成功！",
+    "sendFailed": "发送消息失败",
+    "messageSendFailed": "消息发送失败",
+    "readyToSend": "准备发送",
+    "sending": "发送中...",
+    "messageSent": "消息已发送",
+    "sendMessage": "发送消息",
+    "insufficientBalance": "消息余额不足",
+    "accountInactiveMessage": "您的账户未激活。请充值以发送消息。",
+    "logs": "消息日志",
+    "noLogs": "暂无消息日志"
   },
   "status": {
     "idle": "空闲",
