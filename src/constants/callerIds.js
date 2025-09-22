@@ -60,4 +60,4 @@ export const getRandomCallerID = () => {
 }
 
 // Phone validation constants for international numbers
-const PHONE_REGEX = /^\d{7,15}$/
+export const PHONE_REGEX = /^\d{7,15}$/
