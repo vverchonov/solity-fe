@@ -8,6 +8,7 @@ import { useTele } from '../contexts/TeleProvider'
 import { useI18n } from '../contexts/I18nProvider'
 import apiClient from '../lib/axios'
 import { apiDebouncer } from '../utils/debounce'
+import sipService from '../services/sip'
 
 // Phone validation constants for international numbers
 const PHONE_REGEX = /^\d{7,15}$/
@@ -130,9 +131,11 @@ function Call({ onNavigateToInvoices, onNavigateToSupport, onCallStateChange, on
       return false
     }
 
-    // Basic check - must contain only digits and be non-empty
-    if (!PHONE_REGEX.test(digitsOnly)) {
-      setError('Phone number must contain only digits')
+    // Use country validation from sip service
+    // Format the phone number with + prefix for validation
+    const formattedPhone = '+' + digitsOnly
+    if (!sipService.isValidCallerID(formattedPhone)) {
+      setError('Phone number format not supported for this country')
       return false
     }
 
