@@ -77,7 +77,7 @@
     "phoneNumberTooLong": "Phone number cannot exceed 15 digits",
     "phoneNumberOnlyDigits": "Phone number must contain only digits",
     "messageEmpty": "Message cannot be empty",
-    "messageTooLong": "Message cannot exceed 500 characters",
+    "messageTooLong": "Message cannot exceed 160 characters",
     "validationFailed": "Validation failed",
     "checkAllFields": "Please check all fields and try again",
     "sendingMessage": "Sending message...",
